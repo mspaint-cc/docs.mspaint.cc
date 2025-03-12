@@ -16,7 +16,7 @@ const docsTree: PageTree.Root = {
   name: 'Documentation',
   children: [
     { type: 'separator', name: 'Guides' },
-    { type: 'page', name: 'Home', url: '/' },
+    { type: 'page', name: 'Getting Started', url: '/' },
     { type: 'page', name: 'Key System', url: '/key-system' },
 
     { type: 'separator', name: 'Addons' },
