@@ -1,0 +1,129 @@
+---
+title: Getting Started
+description: 'How to setup and enable mspaint addons'
+--- 
+
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+## What are addons?
+mspaint addons are unofficial and unchecked scripts that attaches themselves into a custom tab made for addons.
+
+<Callout type="info">
+  **Prerequisite** You should have a executor that has the ability to use the filesystem.
+</Callout>
+
+## How to enable addons
+To enable addons, you must have created a folder in `mspaint/addons` found in your executor's workspace folder. Inside this folder, you can place your addons. The Addon tab does not appear if you do not have a single valid addon in the `mspaint/addons` folder.
+
+<Callout type="warn">
+  **BE CAREFUL!** any script you put in the `mspaint/addons` directory will be executed by the executor, we recommend you to only use addons from trusted sources or addons that are open source. We are not responsible for any damage caused by the addons, **YOU HAVE BEEN WARNED!**
+</Callout>
+
+## How to create an addon
+To create an addon, you simply create a lua file in the `mspaint/addons` folder. Then add addon info at the top of the file and you should be good to go. For more information on how to create an addon, check out the [api](api) section.
+
+## Examples
+<Tabs items={['button_addon_example.lua', 'toggle_addon_example.lua', 'fun_items.lua']}>
+  <Tab value="button_addon_example.lua">
+    ```lua button_addon_example.lua
+    mspaint.AddonInfo = {
+        Name = "FunItems", -- Addon Name (can't contain spaces)
+        Title = "Fun Items", -- Name for the groupbox
+        Description = "Button Example", -- Can be empty if you don't want a description
+        Game = "*", -- * means all games
+    }
+
+    mspaint.Groupbox:AddButton({
+        Text = 'Button',
+        Tooltip = 'Button example',
+
+        Func = function()
+            print("Hello from the button")
+        end
+    })
+    ```
+  </Tab>
+  <Tab value="toggle_addon_example.lua">
+    ```lua toggle_addon_example.lua
+    mspaint.AddonInfo = {
+        Name = "FunItems", -- Addon Name (can't contain spaces)
+        Title = "Fun Items", -- Name for the groupbox
+        Description = "Toggle example", -- Can be empty if you don't want a description
+        Game = "*", -- * means all games
+    }
+
+    mspaint.Groupbox:AddToggle("Toggle", {
+        Text = 'Toggle',
+        Tooltip = 'Toggle example',
+        Default = false, -- Default value for the toggle
+
+        Func = function(value)
+            print("Toggle is " .. (value and "On" or "Off"))
+        end
+    })
+    ```
+  </Tab>
+
+  <Tab value="fun_items.lua">
+    ```lua fun_items.lua
+    mspaint.AddonInfo = {
+        Name = "FunItems", -- Addon Name (can't contain spaces)
+        Title = "Fun Items", -- Name for the groupbox
+        Description = "Fun items, addon by mstudio45", -- Can be empty if you don't want a description
+        Game = {
+            "doors/doors",
+            "doors/lobby"
+        }
+    }
+
+    local crucifixModule = loadstring(game:HttpGet("https://raw.githubusercontent.com/RegularVynixu/Utilities/refs/heads/main/Doors/Crucifix%20Everything/Source.lua"))()
+
+    mspaint.Groupbox:AddButton({
+        Text = "Crucifix Everything",
+        Tooltip = "Crucifix Everything",
+        Func = function()
+            crucifixModule.GiveCrucifix({
+                Type = 1,
+                Uses = nil,
+                Resist = false,
+                EntitiesOnly = false,
+                IgnoreList = {}
+            })
+        end
+    }):AddButton({ -- This is optional, again look in the Linoria Example.lua file to see how this works for the elements.
+        Text = "Seek Gun",
+        Tooltip = "Made by upio",
+        Func = function()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/notpoiu/Scripts/main/seekgun.lua"))()
+        end
+    })
+
+    mspaint.Groupbox:AddDivider()
+
+    mspaint.Groupbox:AddButton({
+        Text = "Scanner Script",
+        Tooltip = "Made by lsplash & deivid, refactored by upio",
+        Func = function()
+            _G.scanner_fps = Options.ScannerFPS.Value or 30
+            _G.disable_static = Toggles.DisableStatic.Value or false
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/notpoiu/Scripts/main/Scanner.lua"))()
+        end
+    })
+
+    mspaint.Groupbox:AddInput("ScannerFPS", {
+        Text = "Scanner FPS",
+        Tooltip = "Changes the FPS of the scanner",
+        Default = "30",
+        Numeric = true,
+        Finished = true,
+        ClearTextOnFocus = true
+    })
+
+    mspaint.Groupbox:AddToggle("DisableStatic", {
+        Text = "Disable Static",
+        Tooltip = "Disables static in the scanner",
+        Enabled = false
+    })
+    ```
+  </Tab>
+</Tabs>

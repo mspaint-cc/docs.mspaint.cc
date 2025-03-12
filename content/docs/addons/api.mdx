@@ -1,0 +1,204 @@
+---
+title: Addons API
+description: 'API that mspaint exposes to addons'
+---
+
+import { TypeTable } from 'fumadocs-ui/components/type-table';
+
+## How to develop addons
+To create an addon, you simply create a `.lua`/`.luau`/`.txt` file in the `mspaint/addons` folder. Then add [addon info](#mspaint-addoninfo) at the top of the file and you should be good to go.
+
+<Callout type="info">
+    The `mspaint.AddonInfo` table is required to be set and should be the first thing that executes in the file. Or else `mspaint.Groupbox` will not be available (will return `nil`).
+
+    If mspaint detects that you are not in the correct game, it will stop loading the addon from where you set the `mspaint.AddonInfo` table.
+</Callout>
+
+### Example
+```lua
+mspaint.AddonInfo = {
+    Name = "SigmaAddon", -- Addon Name (can't contain spaces)
+    Title = "Sigma Addon", -- Name for the groupbox
+    Description = "Best addon made by upio 😎", -- Can be empty if you don't want a description
+    Game = "*", -- * means all games
+}
+
+mspaint.Groupbox:AddButton({
+    Text = "Get Detected",
+    Tooltip = "Get detected by hyperion",
+    Func = function()
+        Library:Notify({
+            Title = "Sigma Addon",
+            Description = "Detection by hyperion in 4 cpu cycles (real)",
+            Time = 4,
+        })
+
+        task.wait(4)
+        
+        while true do end      
+    end
+})
+```
+
+## mspaint
+This is a table that contains all essential information/functions for the addon to work.
+
+### AddonInfo
+This is the table that contains the information about the addon. It is required to be set and should be the first thing that executes in the file.
+
+<TypeTable
+  type={{
+    Name: {
+      description: 'This is the addon\'s name, it cannot contain any spaces.',
+      type: 'string',
+      required: true
+    },
+    Title: {
+      description: 'The title of the groupbox where the addon elements will be placed.',
+      type: 'string',
+      required: true
+    },
+    Description: {
+      description: 'A description of the addon, can be empty.',
+      type: 'string',
+      required: false
+    },
+    Game: {
+      description: 'A string or number (place id) or table of strings or numbers (place id) that represent the game(s) where the addon will be loaded. If you want the addon to be loaded in all games, use `*`.',
+      type: 'string | number | table',
+      required: true
+    }
+  }}
+/>
+
+**Example**
+```lua
+mspaint.AddonInfo = {
+    Name = "AddonName", -- Addon Name (can't contain spaces)
+    Title = "Addon Title", -- Name for the groupbox
+    Description = "Addon Description", -- Can be empty if you don't want a description
+    Game = "*", -- * means all games
+}
+```
+
+---
+
+### DiscordUserData
+This is a table that contains the user's discord data based on their luarmor key.
+
+<TypeTable
+  type={{
+    id: {
+      description: 'The user\'s discord id.',
+      type: 'string',
+      required: true
+    },
+    global_name: {
+      description: 'The user\'s global name.',
+      type: 'string',
+      required: true
+    },
+    username: {
+      description: 'The user\'s username.',
+      type: 'string',
+      required: true
+    }
+  }}
+/>
+
+**Example**
+```lua
+print(mspaint.DiscordUserData.id)
+print(mspaint.DiscordUserData.global_name)
+print(mspaint.DiscordUserData.username)
+```
+
+---
+
+### CurrentLanguage
+This is a string that contains the user's current language. It follows the [IEFT language tag](https://en.wikipedia.org/wiki/IETF_language_tag) format (e.g. `en`, `zh-cn`)
+
+**Example**
+```lua
+print(mspaint.CurrentLanguage)
+```
+
+---
+
+### ExecutorSupport
+Contains a table with the results of the UNC test done by mspaint at the start of loading the script.
+
+**Example**
+```lua
+print(mspaint.ExecutorSupport["fireproximityprompt"]) -- true/false
+print(mspaint.ExecutorSupport["replicatesignal"]) -- true/false
+```
+
+---
+
+### Groupbox
+
+This is the groupbox that contains all the elements that were created by the addon. You can use this to add UI elements to the groupbox.
+
+To learn more about the available elements and their arguments, check out the [Obsidian](https://github.com/deividcomsono/Obsidian/blob/main/Example.lua) documentation (Groupbox is essentially `:AddLeftGroupbox()`/`:AddRightGroupbox()` from Obsidian).
+
+**Example**
+```lua
+mspaint.Groupbox:AddButton({
+    Text = "Button",
+    Tooltip = "Button tooltip",
+    Func = function()
+        print("Button clicked!")
+    end
+})
+
+mspaint.Groupbox:AddDivider()
+
+mspaint.Groupbox:AddLabel("Real")
+```
+
+---
+
+## Options
+This is a table that contains all the Options that were created by the addons. (to learn more about the use case of "Options" check out the [Obsidian](https://github.com/deividcomsono/Obsidian/blob/main/Example.lua) documentation)
+
+## Toggles
+This is a table that contains all the Toggles that were created by the addons. (to learn more about the use case of "Toggles" check out the [Obsidian](https://github.com/deividcomsono/Obsidian/blob/main/Example.lua) documentation)
+
+<Callout type="info">
+    You no longer need to use `AddonName_Toggle/Option` to access the options/toggles in your addons.
+    You can just use the Options and Toggles tables directly.
+
+    Example:
+    ```lua
+    mspaint.Groupbox:AddSlider("Walkspeed", {
+        Text = 'Walkspeed Slider',
+        Default = 16,
+        Min = 0,
+        Max = 100,
+        Rounding = 0,
+        Compact = true
+    })
+
+    Options.Walkspeed:OnChanged(function(value)
+        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = value
+    end)
+    ```
+    
+    However keep in mind that you can only access the Options/Toggles that were created by the addon with the global `Options` and `Toggles` tables.
+    
+    If you want to access every single toggle or option, you can use `mspaint.Library.Options` and `mspaint.Library.Toggles` respectively.
+</Callout>
+
+
+## Library
+This is the table returned by Linoria/Obsidian. Can be used to create notifications. For more information, check out the [Obsidian](https://github.com/deividcomsono/Obsidian/blob/main/Example.lua) documentation.
+
+**Example**
+```lua
+Library:Notify({
+    Title = "Hello World!",
+    Description = "Hello from my skibidi addon!",
+    Time = 4,
+})
+```
