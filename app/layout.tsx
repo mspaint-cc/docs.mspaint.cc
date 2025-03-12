@@ -21,6 +21,7 @@ const docsTree: PageTree.Root = {
 
     { type: 'separator', name: 'Addons' },
     { type: 'page', name: 'Getting Started', url: '/addons/getting_started' },
+    { type: 'page', name: 'Migration Guide', url: '/addons/migrate' },
     { type: 'page', name: 'API', url: '/addons/api' },
 
     { type: 'separator', name: 'Purchase' },

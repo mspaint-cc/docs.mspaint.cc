@@ -1,0 +1,171 @@
+---
+title: Migration Guide
+description: 'Migrating from the old addon system to the new one'
+---   
+
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+## Introduction
+This guide will help you migrate your old addons to the new addon system.
+
+### Migration Guide
+1. Move addon metadata to the top of the file.
+<Tabs items={['before.lua', 'after.lua']}>
+  <Tab value="before.lua">
+    ```lua
+    return {
+        Name = "FunItems", -- Addon Name (can't contain spaces)
+        Title = "Fun Items", -- Name for the groupbox
+        Description = "Button Example", -- Can be empty if you don't want a description
+        Game = "*", -- * means all games
+        Elements = {
+            {
+                Type = "Button",
+                Name = "Placeholder", -- Accessible by using Options[<AddonName>_<Name>], for this element you can access it by Options["FunItems_CrucfixEverything"]
+                Arguments = {
+                    Text = 'Button',
+                    Tooltip = 'Button example',
+
+                    Func = function()
+                        print("Hello from the button")
+                    end
+                },
+            },
+            {
+                Type = "Toggle",
+                Name = "Toggle", -- Accessible by using Options[<AddonName>_<Name>], for this element you can access it by Options["ToggleExample_ToggleExample"]
+                Arguments = {
+                    Text = 'Toggle',
+                    Tooltip = 'Toggle example',
+                    Default = false, -- Default value for the toggle
+
+                    Func = function(value)
+                        print("Toggle is " .. (value and "On" or "Off"))
+                    end
+                },
+            }
+        }
+    }
+    ```
+  </Tab>
+
+  <Tab value="after.lua">
+    ```lua
+    mspaint.AddonInfo = {
+        Name = "FunItems", -- Addon Name (can't contain spaces)
+        Title = "Fun Items", -- Name for the groupbox
+        Description = "Button Example", -- Can be empty if you don't want a description
+        Game = "*", -- * means all games
+    }
+
+    local Elements = {
+        {
+            Type = "Button",
+            Name = "Placeholder", -- Accessible by using Options[<AddonName>_<Name>], for this element you can access it by Options["FunItems_CrucfixEverything"]
+            Arguments = {
+                Text = 'Button',
+                Tooltip = 'Button example',
+
+                Func = function()
+                    print("Hello from the button")
+                end
+            }
+        },
+        {
+            Type = "Toggle",
+            Name = "Toggle", -- Accessible by using Options[<AddonName>_<Name>], for this element you can access it by Options["ToggleExample_ToggleExample"]
+            Arguments = {
+                Text = 'Toggle',
+                Tooltip = 'Toggle example',
+                Default = false, -- Default value for the toggle
+
+                Func = function(value)
+                    print("Toggle is " .. (value and "On" or "Off"))
+                end
+            },
+        }
+    }
+    ```
+  </Tab>
+</Tabs>
+
+2. Migrate all Elements to use `mspaint.Groupbox`
+For more information on how to migrate each type of element, check out the [Obsidian](https://github.com/deividcomsono/Obsidian/blob/main/Example.lua) documentation.
+
+<Tabs items={['before.lua', 'after.lua']}>
+  <Tab value="before.lua">
+    ```lua
+    mspaint.AddonInfo = {
+        Name = "FunItems", -- Addon Name (can't contain spaces)
+        Title = "Fun Items", -- Name for the groupbox
+        Description = "Button Example", -- Can be empty if you don't want a description
+        Game = "*", -- * means all games
+    }
+
+    local Elements = {
+        {
+            Type = "Button",
+            Name = "Placeholder", -- Accessible by using Options[<AddonName>_<Name>], for this element you can access it by Options["FunItems_CrucfixEverything"]
+            Arguments = {
+                Text = 'Button',
+                Tooltip = 'Button example',
+
+                Func = function()
+                    print("Hello from the button")
+                end
+            },
+        },
+        {
+            Type = "Toggle",
+            Name = "Toggle", -- Accessible by using Options[<AddonName>_<Name>], for this element you can access it by Options["ToggleExample_ToggleExample"]
+            Arguments = {
+                Text = 'Toggle',
+                Tooltip = 'Toggle example',
+                Default = false, -- Default value for the toggle
+
+                Func = function(value)
+                    print("Toggle is " .. (value and "On" or "Off"))
+                end
+            },
+        }
+    }
+    ```
+  </Tab>
+
+  <Tab value="after.lua">
+    ```lua
+    mspaint.AddonInfo = {
+        Name = "FunItems", -- Addon Name (can't contain spaces)
+        Title = "Fun Items", -- Name for the groupbox
+        Description = "Button Example", -- Can be empty if you don't want a description
+        Game = "*", -- * means all games
+    }
+
+    mspaint.Groupbox:AddButton({
+        Text = 'Button',
+        Tooltip = 'Button example',
+
+        Func = function()
+            print("Hello from the button")
+        end
+    })
+
+    mspaint.Groupbox:AddToggle("ToggleExample", {
+        Text = 'Toggle',
+        Tooltip = 'Toggle example',
+        Default = false, -- Default value for the toggle
+    })
+
+    -- You no longer need to use `AddonName_Toggle/Option` to access the options/toggles in your addons.
+    -- (They will no longer conflict with any toggles/options, for more info check out the api documentation)
+    -- You can just use the Options and Toggles tables directly.
+    Toggles.ToggleExample:OnChanged(function(value)
+        print("Toggle is " .. (value and "On" or "Off"))
+    end)
+    ```
+  </Tab>
+</Tabs>
+
+3. Check out the [API](/addons/api) documentation to learn more about the new system.
+
+Congratulations, you have migrated your addon to the new system!
