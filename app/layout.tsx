@@ -31,7 +31,8 @@ const docsTree: PageTree.Root = {
       name: 'Payment Methods',
       children: [
         { type: 'page', name: 'Official Shop', url: '/purchase/sellapp' },
-        { type: 'page', name: 'Bloxproducts', url: '/purchase/bloxproducts' },
+        { type: 'page', name: 'BloxProducts', url: '/purchase/bloxproducts' },
+        { type: 'page', name: 'RobloxCheatz', url: '/purchase/robloxcheatz' },
         { type: 'page', name: 'Robux', url: '/purchase/robux' }
       ]
     }
