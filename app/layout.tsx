@@ -30,10 +30,10 @@ const docsTree: PageTree.Root = {
       type: 'folder',
       name: 'Payment Methods',
       children: [
-        { type: 'page', name: 'Official Shop', url: '/purchase/sellapp' },
+        { type: 'page', name: 'Official Shop', url: '/purchase/mspaintcc' },
         { type: 'page', name: 'BloxProducts', url: '/purchase/bloxproducts' },
         { type: 'page', name: 'YESU', url: '/purchase/YESU' },
-        { type: 'page', name: 'Aero', url: '/purchase/aero' },
+        { type: 'page', name: 'Aero', url: '/purchase/aero' }
       ]
     }
   ]
