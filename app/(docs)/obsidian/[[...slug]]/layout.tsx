@@ -1,6 +1,6 @@
 import type { PageTree } from "fumadocs-core/server";
 import { DocsLayout } from "fumadocs-ui/layouts/docs";
-import { baseOptions } from "@/app/obsidian/[[...slug]]/layout.config";
+import { baseOptions } from "@/app/(docs)/obsidian/[[...slug]]/layout.config";
 import { ReactNode } from "react";
 import type { Metadata } from "next";
 
@@ -42,6 +42,8 @@ const docsTree: PageTree.Root = {
 
 export default function Layout({ children }: { children: ReactNode }) {
   return (
-    <DocsLayout {...baseOptions} tree={docsTree}>{children}</DocsLayout>
+    <DocsLayout {...baseOptions} tree={docsTree}>
+      {children}
+    </DocsLayout>
   );
 }
