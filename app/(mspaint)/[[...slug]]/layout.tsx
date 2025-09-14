@@ -1,6 +1,6 @@
 import type { PageTree } from "fumadocs-core/server";
 import { DocsLayout } from "fumadocs-ui/layouts/docs";
-import { baseOptions } from "@/app/(docs)/[[...slug]]/layout.config";
+import { baseOptions } from "@/app/(mspaint)/[[...slug]]/layout.config";
 import { ReactNode } from "react";
 import type { Metadata } from "next/types";
 

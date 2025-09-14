@@ -1,6 +1,6 @@
 import type { PageTree } from "fumadocs-core/server";
 import { DocsLayout } from "fumadocs-ui/layouts/docs";
-import { baseOptions } from "@/app/(docs)/obsidian/[[...slug]]/layout.config";
+import { baseOptions } from "@/app/obsidian/[[...slug]]/layout.config";
 import { ReactNode } from "react";
 import type { Metadata } from "next";
 
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 };
 
 const docsTree: PageTree.Root = {
-  name: "Documentation",
+  name: "Obsidian",
   children: [
     { type: "separator", name: "Introduction" },
     { type: "page", name: "Getting Started", url: "/addons/getting_started" },
