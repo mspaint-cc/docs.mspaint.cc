@@ -1,0 +1,1916 @@
+---
+title: 'fdkjsahsd'
+description: 'Obsidian documentation dump'
+---  
+
+```lua
+-- example script by https://github.com/mstudio45/LinoriaLib/blob/main/Example.lua and modified by deivid
+-- You can suggest changes with a pull request or something
+
+local repo = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/"
+local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
+local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
+local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
+
+local Options = Library.Options
+local Toggles = Library.Toggles
+
+Library.ForceCheckbox = false -- Forces AddToggle to AddCheckbox
+Library.ShowToggleFrameInKeybinds = true -- Make toggle keybinds work inside the keybinds UI (aka adds a toggle to the UI). Good for mobile users (Default value = true)
+
+local Window = Library:CreateWindow({
+	-- Set Center to true if you want the menu to appear in the center
+	-- Set AutoShow to true if you want the menu to appear when it is created
+	-- Set Resizable to true if you want to have in-game resizable Window
+	-- Set MobileButtonsSide to "Left" or "Right" if you want the ui toggle & lock buttons to be on the left or right side of the window
+	-- Set ShowCustomCursor to false if you don't want to use the Linoria cursor
+	-- NotifySide = Changes the side of the notifications (Left, Right) (Default value = Left)
+	-- Position and Size are also valid options here
+	-- but you do not need to define them unless you are changing them :)
+
+	Title = "mspaint",
+	Footer = "version: example",
+	Icon = 95816097006870,
+	NotifySide = "Right",
+	ShowCustomCursor = true,
+})
+
+-- CALLBACK NOTE:
+-- Passing in callback functions via the initial element parameters (i.e. Callback = function(Value)...) works
+-- HOWEVER, using Toggles/Options.INDEX:OnChanged(function(Value) ... ) is the RECOMMENDED way to do this.
+-- I strongly recommend decoupling UI code from logic code. i.e. Create your UI elements FIRST, and THEN setup :OnChanged functions later.
+
+-- You do not have to set your tabs & groups up this way, just a prefrence.
+-- You can find more icons in https://lucide.dev/
+local Tabs = {
+	-- Creates a new tab titled Main
+	Main = Window:AddTab("Main", "user"),
+	Key = Window:AddKeyTab("Key System"),
+	["UI Settings"] = Window:AddTab("UI Settings", "settings"),
+}
+
+
+--[[
+Example of how to add a warning box to a tab; the title AND text support rich text formatting.
+
+local WarningTab = Tabs["UI Settings"]:AddTab("Warning Box", "user")
+
+WarningTab:UpdateWarningBox({
+	Visible = true,
+	Title = "Warning",
+	Text = "This is a warning box!",
+})
+
+]]
+
+-- Groupbox and Tabbox inherit the same functions
+-- except Tabboxes you have to call the functions on a tab (Tabbox:AddTab(Name))
+local LeftGroupBox = Tabs.Main:AddLeftGroupbox("Groupbox", "boxes")
+
+-- We can also get our Main tab via the following code:
+-- local LeftGroupBox = Window.Tabs.Main:AddLeftGroupbox("Groupbox", "boxes")
+
+-- Tabboxes are a tiny bit different, but here's a basic example:
+--[[
+
+local TabBox = Tabs.Main:AddLeftTabbox() -- Add Tabbox on left side
+
+local Tab1 = TabBox:AddTab("Tab 1")
+local Tab2 = TabBox:AddTab("Tab 2")
+
+-- You can now call AddToggle, etc on the tabs you added to the Tabbox
+]]
+
+-- Groupbox:AddToggle
+-- Arguments: Index, Options
+LeftGroupBox:AddToggle("MyToggle", {
+	Text = "This is a toggle",
+	Tooltip = "This is a tooltip", -- Information shown when you hover over the toggle
+	DisabledTooltip = "I am disabled!", -- Information shown when you hover over the toggle while it's disabled
+
+	Default = true, -- Default value (true / false)
+	Disabled = false, -- Will disable the toggle (true / false)
+	Visible = true, -- Will make the toggle invisible (true / false)
+	Risky = false, -- Makes the text red (the color can be changed using Library.Scheme.Red) (Default value = false)
+
+	Callback = function(Value)
+		print("[cb] MyToggle changed to:", Value)
+	end,
+})
+	:AddColorPicker("ColorPicker1", {
+		Default = Color3.new(1, 0, 0),
+		Title = "Some color1", -- Optional. Allows you to have a custom color picker title (when you open it)
+		Transparency = 0, -- Optional. Enables transparency changing for this color picker (leave as nil to disable)
+
+		Callback = function(Value)
+			print("[cb] Color changed!", Value)
+		end,
+	})
+	:AddColorPicker("ColorPicker2", {
+		Default = Color3.new(0, 1, 0),
+		Title = "Some color2",
+
+		Callback = function(Value)
+			print("[cb] Color changed!", Value)
+		end,
+	})
+
+-- Fetching a toggle object for later use:
+-- Toggles.MyToggle.Value
+
+-- Toggles is a table added to getgenv() by the library
+-- You index Toggles with the specified index, in this case it is 'MyToggle'
+-- To get the state of the toggle you do toggle.Value
+
+-- Calls the passed function when the toggle is updated
+Toggles.MyToggle:OnChanged(function()
+	-- here we get our toggle object & then get its value
+	print("MyToggle changed to:", Toggles.MyToggle.Value)
+end)
+
+-- This should print to the console: "My toggle state changed! New value: false"
+Toggles.MyToggle:SetValue(false)
+
+LeftGroupBox:AddCheckbox("MyCheckbox", {
+	Text = "This is a checkbox",
+	Tooltip = "This is a tooltip", -- Information shown when you hover over the toggle
+	DisabledTooltip = "I am disabled!", -- Information shown when you hover over the toggle while it's disabled
+
+	Default = true, -- Default value (true / false)
+	Disabled = false, -- Will disable the toggle (true / false)
+	Visible = true, -- Will make the toggle invisible (true / false)
+	Risky = false, -- Makes the text red (the color can be changed using Library.Scheme.Red) (Default value = false)
+
+	Callback = function(Value)
+		print("[cb] MyCheckbox changed to:", Value)
+	end,
+})
+
+Toggles.MyCheckbox:OnChanged(function()
+	print("MyCheckbox changed to:", Toggles.MyCheckbox.Value)
+end)
+
+-- 1/15/23
+-- Deprecated old way of creating buttons in favor of using a table
+-- Added DoubleClick button functionality
+
+--[[
+	Groupbox:AddButton
+	Arguments: {
+		Text = string,
+		Func = function,
+		DoubleClick = boolean
+		Tooltip = string,
+	}
+
+	You can call :AddButton on a button to add a SubButton!
+]]
+
+local MyButton = LeftGroupBox:AddButton({
+	Text = "Button",
+	Func = function()
+		print("You clicked a button!")
+	end,
+	DoubleClick = false,
+
+	Tooltip = "This is the main button",
+	DisabledTooltip = "I am disabled!",
+
+	Disabled = false, -- Will disable the button (true / false)
+	Visible = true, -- Will make the button invisible (true / false)
+	Risky = false, -- Makes the text red (the color can be changed using Library.Scheme.Red) (Default value = false)
+})
+
+local MyButton2 = MyButton:AddButton({
+	Text = "Sub button",
+	Func = function()
+		print("You clicked a sub button!")
+	end,
+	DoubleClick = true, -- You will have to click this button twice to trigger the callback
+	Tooltip = "This is the sub button",
+	DisabledTooltip = "I am disabled!",
+})
+
+local MyDisabledButton = LeftGroupBox:AddButton({
+	Text = "Disabled Button",
+	Func = function()
+		print("You somehow clicked a disabled button!")
+	end,
+	DoubleClick = false,
+	Tooltip = "This is a disabled button",
+	DisabledTooltip = "I am disabled!", -- Information shown when you hover over the button while it's disabled
+	Disabled = true,
+})
+
+--[[
+	NOTE: You can chain the button methods!
+	EXAMPLE:
+
+	LeftGroupBox:AddButton({ Text = 'Kill all', Func = Functions.KillAll, Tooltip = 'This will kill everyone in the game!' })
+		:AddButton({ Text = 'Kick all', Func = Functions.KickAll, Tooltip = 'This will kick everyone in the game!' })
+]]
+
+-- Groupbox:AddLabel
+-- Arguments: Text, DoesWrap, Idx
+-- Arguments: Idx, Options
+LeftGroupBox:AddLabel("This is a label")
+LeftGroupBox:AddLabel("This is a label\n\nwhich wraps its text!", true)
+LeftGroupBox:AddLabel("This is a label exposed to Labels", true, "TestLabel")
+LeftGroupBox:AddLabel("SecondTestLabel", {
+	Text = "This is a label made with table options and an index",
+	DoesWrap = true, -- Defaults to false
+})
+
+LeftGroupBox:AddLabel("SecondTestLabel", {
+	Text = "This is a label that doesn't wrap it's own text",
+	DoesWrap = false, -- Defaults to false
+})
+
+-- Options is a table added to getgenv() by the library
+-- You index Options with the specified index, in this case it is 'SecondTestLabel' & 'TestLabel'
+-- To set the text of the label you do label:SetText
+
+-- Options.TestLabel:SetText("first changed!")
+-- Options.SecondTestLabel:SetText("second changed!")
+
+-- Groupbox:AddDivider
+-- Arguments: None
+LeftGroupBox:AddDivider()
+
+--[[
+	Groupbox:AddSlider
+	Arguments: Idx, SliderOptions
+
+	SliderOptions: {
+		Text = string,
+		Default = number,
+		Min = number,
+		Max = number,
+		Suffix = string,
+		Rounding = number,
+		Compact = boolean,
+		HideMax = boolean,
+	}
+
+	Text, Default, Min, Max, Rounding must be specified.
+	Suffix is optional.
+	Rounding is the number of decimal places for precision.
+
+	Compact will hide the title label of the Slider
+
+	HideMax will only display the value instead of the value & max value of the slider
+	Compact will do the same thing
+]]
+LeftGroupBox:AddSlider("MySlider", {
+	Text = "This is my slider!",
+	Default = 0,
+	Min = 0,
+	Max = 5,
+	Rounding = 1,
+	Compact = false,
+
+	Callback = function(Value)
+		print("[cb] MySlider was changed! New value:", Value)
+	end,
+
+	Tooltip = "I am a slider!", -- Information shown when you hover over the slider
+	DisabledTooltip = "I am disabled!", -- Information shown when you hover over the slider while it's disabled
+
+	Disabled = false, -- Will disable the slider (true / false)
+	Visible = true, -- Will make the slider invisible (true / false)
+})
+
+-- Options is a table added to getgenv() by the library
+-- You index Options with the specified index, in this case it is 'MySlider'
+-- To get the value of the slider you do slider.Value
+
+local Number = Options.MySlider.Value
+Options.MySlider:OnChanged(function()
+	print("MySlider was changed! New value:", Options.MySlider.Value)
+end)
+
+-- This should print to the console: "MySlider was changed! New value: 3"
+Options.MySlider:SetValue(3)
+
+LeftGroupBox:AddSlider("MySlider2", {
+	Text = "This is my custom display slider!",
+	Default = 0,
+	Min = 0,
+	Max = 5,
+	Rounding = 0,
+	Compact = false,
+
+	FormatDisplayValue = function(slider, value)
+		if value == slider.Max then return 'Everything' end
+		if value == slider.Min then return 'Nothing' end
+		-- If you return nil, the default formatting will be applied
+	end,
+
+	Tooltip = "I am a slider!", -- Information shown when you hover over the slider
+	DisabledTooltip = "I am disabled!", -- Information shown when you hover over the slider while it's disabled
+
+	Disabled = false, -- Will disable the slider (true / false)
+	Visible = true, -- Will make the slider invisible (true / false)
+})
+
+-- Groupbox:AddInput
+-- Arguments: Idx, Info
+LeftGroupBox:AddInput("MyTextbox", {
+	Default = "My textbox!",
+	Numeric = false, -- true / false, only allows numbers
+	Finished = false, -- true / false, only calls callback when you press enter
+	ClearTextOnFocus = true, -- true / false, if false the text will not clear when textbox focused
+
+	Text = "This is a textbox",
+	Tooltip = "This is a tooltip", -- Information shown when you hover over the textbox
+
+	Placeholder = "Placeholder text", -- placeholder text when the box is empty
+	-- MaxLength is also an option which is the max length of the text
+
+	Callback = function(Value)
+		print("[cb] Text updated. New text:", Value)
+	end,
+})
+
+Options.MyTextbox:OnChanged(function()
+	print("Text updated. New text:", Options.MyTextbox.Value)
+end)
+
+-- Groupbox:AddDropdown
+-- Arguments: Idx, Info
+
+local DropdownGroupBox = Tabs.Main:AddRightGroupbox("Dropdowns")
+
+DropdownGroupBox:AddDropdown("MyDropdown", {
+	Values = { "This", "is", "a", "dropdown" },
+	Default = 1, -- number index of the value / string
+	Multi = false, -- true / false, allows multiple choices to be selected
+
+	Text = "A dropdown",
+	Tooltip = "This is a tooltip", -- Information shown when you hover over the dropdown
+	DisabledTooltip = "I am disabled!", -- Information shown when you hover over the dropdown while it's disabled
+
+	Searchable = false, -- true / false, makes the dropdown searchable (great for a long list of values)
+
+	Callback = function(Value)
+		print("[cb] Dropdown got changed. New value:", Value)
+	end,
+
+	Disabled = false, -- Will disable the dropdown (true / false)
+	Visible = true, -- Will make the dropdown invisible (true / false)
+})
+
+Options.MyDropdown:OnChanged(function()
+	print("Dropdown got changed. New value:", Options.MyDropdown.Value)
+end)
+
+Options.MyDropdown:SetValue("This")
+
+DropdownGroupBox:AddDropdown("MySearchableDropdown", {
+	Values = { "This", "is", "a", "searchable", "dropdown" },
+	Default = 1, -- number index of the value / string
+	Multi = false, -- true / false, allows multiple choices to be selected
+
+	Text = "A searchable dropdown",
+	Tooltip = "This is a tooltip", -- Information shown when you hover over the dropdown
+	DisabledTooltip = "I am disabled!", -- Information shown when you hover over the dropdown while it's disabled
+
+	Searchable = true, -- true / false, makes the dropdown searchable (great for a long list of values)
+
+	Callback = function(Value)
+		print("[cb] Dropdown got changed. New value:", Value)
+	end,
+
+	Disabled = false, -- Will disable the dropdown (true / false)
+	Visible = true, -- Will make the dropdown invisible (true / false)
+})
+
+DropdownGroupBox:AddDropdown("MyDisplayFormattedDropdown", {
+	Values = { "This", "is", "a", "formatted", "dropdown" },
+	Default = 1, -- number index of the value / string
+	Multi = false, -- true / false, allows multiple choices to be selected
+
+	Text = "A display formatted dropdown",
+	Tooltip = "This is a tooltip", -- Information shown when you hover over the dropdown
+	DisabledTooltip = "I am disabled!", -- Information shown when you hover over the dropdown while it's disabled
+
+	FormatDisplayValue = function(Value) -- You can change the display value for any values. The value will be still same, only the UI changes.
+		if Value == "formatted" then
+			return "display formatted" -- formatted -> display formatted but in Options.MyDisplayFormattedDropdown.Value it will still return formatted if its selected.
+		end
+
+		return Value
+	end,
+
+	Searchable = false, -- true / false, makes the dropdown searchable (great for a long list of values)
+
+	Callback = function(Value)
+		print("[cb] Display formatted dropdown got changed. New value:", Value)
+	end,
+
+	Disabled = false, -- Will disable the dropdown (true / false)
+	Visible = true, -- Will make the dropdown invisible (true / false)
+})
+
+-- Multi dropdowns
+DropdownGroupBox:AddDropdown("MyMultiDropdown", {
+	-- Default is the numeric index (e.g. "This" would be 1 since it if first in the values list)
+	-- Default also accepts a string as well
+
+	-- Currently you can not set multiple values with a dropdown
+
+	Values = { "This", "is", "a", "dropdown" },
+	Default = 1,
+	Multi = true, -- true / false, allows multiple choices to be selected
+
+	Text = "A multi dropdown",
+	Tooltip = "This is a tooltip", -- Information shown when you hover over the dropdown
+
+	Callback = function(Value)
+		print("[cb] Multi dropdown got changed:")
+		for key, value in next, Options.MyMultiDropdown.Value do
+			print(key, value) -- should print something like This, true
+		end
+	end,
+})
+
+Options.MyMultiDropdown:SetValue({
+	This = true,
+	is = true,
+})
+
+DropdownGroupBox:AddDropdown("MyDisabledDropdown", {
+	Values = { "This", "is", "a", "dropdown" },
+	Default = 1, -- number index of the value / string
+	Multi = false, -- true / false, allows multiple choices to be selected
+
+	Text = "A disabled dropdown",
+	Tooltip = "This is a tooltip", -- Information shown when you hover over the dropdown
+	DisabledTooltip = "I am disabled!", -- Information shown when you hover over the dropdown while it's disabled
+
+	Callback = function(Value)
+		print("[cb] Disabled dropdown got changed. New value:", Value)
+	end,
+
+	Disabled = true, -- Will disable the dropdown (true / false)
+	Visible = true, -- Will make the dropdown invisible (true / false)
+})
+
+DropdownGroupBox:AddDropdown("MyDisabledValueDropdown", {
+	Values = { "This", "is", "a", "dropdown", "with", "disabled", "value" },
+	DisabledValues = { "disabled" }, -- Disabled Values that are unclickable
+	Default = 1, -- number index of the value / string
+	Multi = false, -- true / false, allows multiple choices to be selected
+
+	Text = "A dropdown with disabled value",
+	Tooltip = "This is a tooltip", -- Information shown when you hover over the dropdown
+	DisabledTooltip = "I am disabled!", -- Information shown when you hover over the dropdown while it's disabled
+
+	Callback = function(Value)
+		print("[cb] Dropdown with disabled value got changed. New value:", Value)
+	end,
+
+	Disabled = false, -- Will disable the dropdown (true / false)
+	Visible = true, -- Will make the dropdown invisible (true / false)
+})
+
+DropdownGroupBox:AddDropdown("MyVeryLongDropdown", {
+	Values = {
+		"This",
+		"is",
+		"a",
+		"very",
+		"long",
+		"dropdown",
+		"with",
+		"a",
+		"lot",
+		"of",
+		"values",
+		"but",
+		"you",
+		"can",
+		"see",
+		"more",
+		"than",
+		"8",
+		"values",
+	},
+	Default = 1, -- number index of the value / string
+	Multi = false, -- true / false, allows multiple choices to be selected
+
+	MaxVisibleDropdownItems = 12, -- Default: 8, allows you to change the size of the dropdown list
+
+	Text = "A very long dropdown",
+	Tooltip = "This is a tooltip", -- Information shown when you hover over the dropdown
+	DisabledTooltip = "I am disabled!", -- Information shown when you hover over the dropdown while it's disabled
+
+	Searchable = false, -- true / false, makes the dropdown searchable (great for a long list of values)
+
+	Callback = function(Value)
+		print("[cb] Very long dropdown got changed. New value:", Value)
+	end,
+
+	Disabled = false, -- Will disable the dropdown (true / false)
+	Visible = true, -- Will make the dropdown invisible (true / false)
+})
+
+DropdownGroupBox:AddDropdown("MyPlayerDropdown", {
+	SpecialType = "Player",
+	ExcludeLocalPlayer = true, -- true / false, excludes the localplayer from the Player type
+	Text = "A player dropdown",
+	Tooltip = "This is a tooltip", -- Information shown when you hover over the dropdown
+
+	Callback = function(Value)
+		print("[cb] Player dropdown got changed:", Value)
+	end,
+})
+
+DropdownGroupBox:AddDropdown("MyTeamDropdown", {
+	SpecialType = "Team",
+	Text = "A team dropdown",
+	Tooltip = "This is a tooltip", -- Information shown when you hover over the dropdown
+
+	Callback = function(Value)
+		print("[cb] Team dropdown got changed:", Value)
+	end,
+})
+
+-- Label:AddColorPicker
+-- Arguments: Idx, Info
+
+-- You can also ColorPicker & KeyPicker to a Toggle as well
+
+LeftGroupBox:AddLabel("Color"):AddColorPicker("ColorPicker", {
+	Default = Color3.new(0, 1, 0), -- Bright green
+	Title = "Some color", -- Optional. Allows you to have a custom color picker title (when you open it)
+	Transparency = 0, -- Optional. Enables transparency changing for this color picker (leave as nil to disable)
+
+	Callback = function(Value)
+		print("[cb] Color changed!", Value)
+	end,
+})
+
+Options.ColorPicker:OnChanged(function()
+	print("Color changed!", Options.ColorPicker.Value)
+	print("Transparency changed!", Options.ColorPicker.Transparency)
+end)
+
+Options.ColorPicker:SetValueRGB(Color3.fromRGB(0, 255, 140))
+
+-- Label:AddKeyPicker
+-- Arguments: Idx, Info
+
+LeftGroupBox:AddLabel("Keybind"):AddKeyPicker("KeyPicker", {
+	-- SyncToggleState only works with toggles.
+	-- It allows you to make a keybind which has its state synced with its parent toggle
+
+	-- Example: Keybind which you use to toggle flyhack, etc.
+	-- Changing the toggle disables the keybind state and toggling the keybind switches the toggle state
+
+	Default = "MB2", -- String as the name of the keybind (MB1, MB2 for mouse buttons)
+	SyncToggleState = false,
+
+	-- You can define custom Modes but I have never had a use for it.
+	Mode = "Toggle", -- Modes: Always, Toggle, Hold, Press (example down below)
+
+	Text = "Auto lockpick safes", -- Text to display in the keybind menu
+	NoUI = false, -- Set to true if you want to hide from the Keybind menu,
+
+	-- Occurs when the keybind is clicked, Value is `true`/`false`
+	Callback = function(Value)
+		print("[cb] Keybind clicked!", Value)
+	end,
+
+	-- Occurs when the keybind itself is changed, `New` is a KeyCode Enum OR a UserInputType Enum
+	ChangedCallback = function(New)
+		print("[cb] Keybind changed!", New)
+	end,
+})
+
+-- OnClick is only fired when you press the keybind and the mode is Toggle
+-- Otherwise, you will have to use Keybind:GetState()
+Options.KeyPicker:OnClick(function()
+	print("Keybind clicked!", Options.KeyPicker:GetState())
+end)
+
+Options.KeyPicker:OnChanged(function()
+	print("Keybind changed!", Options.KeyPicker.Value)
+end)
+
+task.spawn(function()
+	while task.wait(1) do
+		-- example for checking if a keybind is being pressed
+		local state = Options.KeyPicker:GetState()
+		if state then
+			print("KeyPicker is being held down")
+		end
+
+		if Library.Unloaded then
+			break
+		end
+	end
+end)
+
+Options.KeyPicker:SetValue({ "MB2", "Hold" }) -- Sets keybind to MB2, mode to Hold
+
+-- Label:KeyPicker (Press Mode)
+
+local KeybindNumber = 0
+
+LeftGroupBox:AddLabel("Press Keybind"):AddKeyPicker("KeyPicker2", {
+	-- Example: Press Keybind which you use to run a callback when the key was pressed.
+
+	Default = "X", -- String as the name of the keybind (MB1, MB2 for mouse buttons)
+
+	Mode = "Press",
+	WaitForCallback = false, -- Locks the keybind during the execution of Callback and OnChanged.
+
+	Text = "Increase Number", -- Text to display in the keybind menu
+
+	-- Occurs when the keybind is clicked, Value is always `true` for Press keybind.
+	Callback = function()
+		KeybindNumber = KeybindNumber + 1
+		print("[cb] Keybind clicked! Number increased to:", KeybindNumber)
+	end
+})
+
+-- Long text label to demonstrate UI scrolling behaviour.
+local LeftGroupBox2 = Tabs.Main:AddLeftGroupbox("Groupbox #2")
+LeftGroupBox2:AddLabel(
+	"This label spans multiple lines! We're gonna run out of UI space...\nJust kidding! Scroll down!\n\n\nHello from below!",
+	true
+)
+
+local TabBox = Tabs.Main:AddRightTabbox() -- Add Tabbox on right side
+
+-- Anything we can do in a Groupbox, we can do in a Tabbox tab (AddToggle, AddSlider, AddLabel, etc etc...)
+local Tab1 = TabBox:AddTab("Tab 1")
+Tab1:AddToggle("Tab1Toggle", { Text = "Tab1 Toggle" })
+
+local Tab2 = TabBox:AddTab("Tab 2")
+Tab2:AddToggle("Tab2Toggle", { Text = "Tab2 Toggle" })
+
+Library:OnUnload(function()
+	print("Unloaded!")
+end)
+
+-- Anything we can do in a Groupbox, we can do in a Key tab (AddToggle, AddSlider, AddLabel, etc etc...)
+Tabs.Key:AddLabel({
+	Text = "Key: Banana",
+	DoesWrap = true,
+	Size = 16,
+})
+
+Tabs.Key:AddKeyBox("Banana", function(Success, ReceivedKey)
+	print("Expected Key: Banana - Received Key:", ReceivedKey, "| Success:", Success)
+	Library:Notify({
+		Title = "Expected Key: Banana",
+		Description = "Received Key: " .. ReceivedKey .. "\nSuccess: " .. tostring(Success),
+		Time = 4,
+	})
+end)
+
+Tabs.Key:AddLabel({
+	Text = "No Key",
+	DoesWrap = true,
+	Size = 16,
+})
+
+Tabs.Key:AddKeyBox(function(Success, ReceivedKey)
+	print("Expected Key: None | Success:", Success) -- true
+	Library:Notify("Success: " .. tostring(Success), 4)
+end)
+
+-- UI Settings
+local MenuGroup = Tabs["UI Settings"]:AddLeftGroupbox("Menu", "wrench")
+
+MenuGroup:AddToggle("KeybindMenuOpen", {
+	Default = Library.KeybindFrame.Visible,
+	Text = "Open Keybind Menu",
+	Callback = function(value)
+		Library.KeybindFrame.Visible = value
+	end,
+})
+MenuGroup:AddToggle("ShowCustomCursor", {
+	Text = "Custom Cursor",
+	Default = true,
+	Callback = function(Value)
+		Library.ShowCustomCursor = Value
+	end,
+})
+MenuGroup:AddDropdown("NotificationSide", {
+	Values = { "Left", "Right" },
+	Default = "Right",
+
+	Text = "Notification Side",
+
+	Callback = function(Value)
+		Library:SetNotifySide(Value)
+	end,
+})
+MenuGroup:AddDropdown("DPIDropdown", {
+	Values = { "50%", "75%", "100%", "125%", "150%", "175%", "200%" },
+	Default = "100%",
+
+	Text = "DPI Scale",
+
+	Callback = function(Value)
+		Value = Value:gsub("%%", "")
+		local DPI = tonumber(Value)
+
+		Library:SetDPIScale(DPI)
+	end,
+})
+MenuGroup:AddDivider()
+MenuGroup:AddLabel("Menu bind")
+	:AddKeyPicker("MenuKeybind", { Default = "RightShift", NoUI = true, Text = "Menu keybind" })
+
+MenuGroup:AddButton("Unload", function()
+	Library:Unload()
+end)
+
+Library.ToggleKeybind = Options.MenuKeybind -- Allows you to have a custom keybind for the menu
+
+-- Addons:
+-- SaveManager (Allows you to have a configuration system)
+-- ThemeManager (Allows you to have a menu theme system)
+
+-- Hand the library over to our managers
+ThemeManager:SetLibrary(Library)
+SaveManager:SetLibrary(Library)
+
+-- Ignore keys that are used by ThemeManager.
+-- (we dont want configs to save themes, do we?)
+SaveManager:IgnoreThemeSettings()
+
+-- Adds our MenuKeybind to the ignore list
+-- (do you want each config to have a different menu key? probably not.)
+SaveManager:SetIgnoreIndexes({ "MenuKeybind" })
+
+-- use case for doing it this way:
+-- a script hub could have themes in a global folder
+-- and game configs in a separate folder per game
+ThemeManager:SetFolder("MyScriptHub")
+SaveManager:SetFolder("MyScriptHub/specific-game")
+SaveManager:SetSubFolder("specific-place") -- if the game has multiple places inside of it (for example: DOORS)
+-- you can use this to save configs for those places separately
+-- The path in this script would be: MyScriptHub/specific-game/settings/specific-place
+-- [ This is optional ]
+
+-- Builds our config menu on the right side of our tab
+SaveManager:BuildConfigSection(Tabs["UI Settings"])
+
+-- Builds our theme menu (with plenty of built in themes) on the left side
+-- NOTE: you can also call ThemeManager:ApplyToGroupbox to add it to a specific groupbox
+ThemeManager:ApplyToTab(Tabs["UI Settings"])
+
+-- You can use the SaveManager:LoadAutoloadConfig() to load a config
+-- which has been marked to be one that auto loads!
+SaveManager:LoadAutoloadConfig()
+```
+
+# Obsidian UI Library
+
+![Example Image](https://github.com/deividcomsono/Obsidian/blob/main/assets/Example.png?raw=true)
+
+## Table of Contents
+
+- [Getting Started](#getting-started)
+- [Icon Information](#icon-information)
+- [Core Components](#core-components)
+  - [Window](#window)
+  - [Tabs](#tabs)
+  - [Groupboxes](#groupboxes)
+  - [Tabboxes](#tabboxes)
+  - [Dependency Boxes](#dependency-boxes)
+  - [Dependency Groupboxes](#dependency-groupboxes)
+- [UI Elements](#ui-elements)
+  - [Labels](#labels)
+  - [Buttons](#buttons)
+  - [Toggles & Checkboxes](#toggles--checkboxes)
+  - [Inputs](#inputs)
+  - [Sliders](#sliders)
+  - [Dropdowns](#dropdowns)
+  - [Keybinds](#keybinds)
+  - [Color Pickers](#color-pickers)
+  - [Dividers](#dividers)
+  - [Viewports](#viewports)
+  - [Images](#images)
+- [Additional Features](#additional-features)
+  - [Notifications](#notifications)
+  - [Tooltips](#tooltips)
+  - [Watermark](#watermark)
+  - [Keybind Menu](#keybind-menu)
+  - [Custom Cursor](#custom-cursor)
+  - [Mobile Support](#mobile-support)
+- [Theming](#theming)
+- [API Reference](#api-reference)
+- [Examples](#examples)
+
+## Getting Started
+
+To use the Obsidian UI Library, you need to assign it to a variable:
+
+```lua
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/deividcomsono/Obsidian/refs/heads/main/Library.lua"))()
+```
+
+Then, create a window:
+
+```lua
+local Window = Library:CreateWindow({
+    Title = "My Script",
+    Footer = "v1.0.0",
+    ToggleKeybind = Enum.KeyCode.RightControl,
+    Center = true,
+    AutoShow = true
+})
+```
+
+## Icon Information
+
+The Obsidian UI Library uses [Lucide](https://lucide.dev/) for Tab Icons and more.
+
+## Core Components
+
+### Window
+
+The Window is the main container for your UI. You can create one using `Library:CreateWindow()`.
+
+#### Options
+
+| Property          | Type         | Default                    | Description                                        |
+| ----------------- | ------------ | -------------------------- | -------------------------------------------------- |
+| Title             | string       | "No Title"                 | The title displayed at the top of the window       |
+| Footer            | string       | "No Footer"                | The text displayed at the bottom of the window     |
+| Position          | UDim2        | UDim2.fromOffset(6, 6)     | The initial position of the window                 |
+| Size              | UDim2        | UDim2.fromOffset(720, 600) | The size of the window                             |
+| Center            | boolean      | true                       | Whether to center the window on the screen         |
+| AutoShow          | boolean      | true                       | Whether to show the window immediately             |
+| ToggleKeybind     | Enum.KeyCode | Enum.KeyCode.RightControl  | The keybind to toggle the UI                       |
+| NotifySide        | string       | "Right"                    | The side to show notifications ("Left" or "Right") |
+| ShowCustomCursor  | boolean      | true                       | Whether to show a custom cursor                    |
+| Font              | Enum.Font    | Enum.Font.Code             | The font to use for text                           |
+| CornerRadius      | number       | 4                          | The corner radius for UI elements                  |
+| Icon              | string/ID    | nil                        | Optional icon for the window                       |
+| IconSize          | UDim2        | UDim2.fromOffset(30, 30)   | Size of the icon if provided                       |
+| BackgroundImage.  | string/ID.   | nil                        | Background image for the window                    |
+| Resizable         | boolean      | true                       | Whether the window can be resized                  |
+| MobileButtonsSide | string       | "Left"                     | Side to place mobile buttons ("Left" or "Right")   |
+| DisableSearch     | boolean      | false                      | Whether to disable the search box                  |
+
+### Tabs
+
+Tabs are the primary way to organize content in your UI. You can add them with `Window:AddTab()`.
+
+```lua
+local MainTab = Window:AddTab("Main", "home", "Main features")
+-- Second parameter is the optional icon name from lucide.dev, third is an optional description
+
+local UISettingsTab = Window:AddTab({
+    Name = "UI Settings",
+    Description = "Customize the UI",
+    Icon = "settings"
+})
+```
+
+#### Methods
+
+| Method                                                                                            | Description                                                                     |
+| ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| `Window:AddTab(name, iconName, description)`                                                      | Adds a new tab with the given name and optional icon and a optional description |
+| `Window:AddTab({ Name = "Tab Name", Icon = "icon_name", Description = "Tab description" })`       | Adds a new tab with a table containing name, icon, and description              |
+| `Window:AddKeyTab(name)`                                                                          | Adds a special tab for key input                                                |
+| `Tab:UpdateWarningBox({ Title = "Warning", Text = "Example", Visible = true, LockSize = true })`  | Updates the warning box in a tab                                                |
+
+### Groupboxes
+
+Groupboxes are containers for UI elements within tabs. They help organize elements into sections.
+
+```lua
+local LeftGroupbox = MainTab:AddLeftGroupbox("Settings", "wrench")
+local RightGroupbox = MainTab:AddRightGroupbox("Information", "info")
+```
+
+#### Methods
+
+| Method                                 | Description                                   |
+| -------------------------------------- | --------------------------------------------- |
+| `Tab:AddLeftGroupbox(name, iconName)`  | Adds a groupbox on the left side              |
+| `Tab:AddRightGroupbox(name, iconName)` | Adds a groupbox on the right side             |
+| `Groupbox:Resize()`                    | Manually resizes the groupbox (rarely needed) |
+
+### Tabboxes
+
+Tabboxes are containers that can have their own tabs, useful for organizing related options.
+
+```lua
+local Tabbox = MainTab:AddLeftTabbox("Settings")
+local Tab1 = Tabbox:AddTab("General")
+local Tab2 = Tabbox:AddTab("Advanced")
+```
+
+#### Methods
+
+| Method                     | Description                     |
+| -------------------------- | ------------------------------- |
+| `Tab:AddLeftTabbox(name)`  | Adds a tabbox on the left side  |
+| `Tab:AddRightTabbox(name)` | Adds a tabbox on the right side |
+| `Tabbox:AddTab(name)`      | Adds a new tab to the tabbox    |
+
+### Dependency Boxes
+
+Dependency boxes allow you to conditionally show or hide elements contained in a groupbox based on the state of other elements.
+
+```lua
+local LeftGroupbox = MainTab:AddLeftGroupbox("Settings", "wrench")
+
+LeftGroupbox:AddToggle("EnableAudio", {
+    Text = "Enable Audio",
+    Default = false
+})
+
+local AudioSettings = LeftGroupbox:AddDependencyBox()
+
+AudioSettings:AddSlider("Volume", {
+    Text = "Volume",
+    Default = 50,
+    Min = 0,
+    Max = 100,
+    Rounding = 0
+})
+
+AudioSettings:SetupDependencies({
+    { Toggles.EnableAudio, true } -- Only show if EnableAudio is true
+})
+```
+
+### Dependency Groupboxes
+
+Dependency groupboxes allow you to conditionally show or hide entire groupboxes based on the state of other elements.
+
+```lua
+local LeftGroupbox = MainTab:AddLeftGroupbox("Settings", "wrench")
+
+LeftGroupbox:AddToggle("EnableAudio", {
+    Text = "Enable Audio",
+    Default = false
+})
+
+-- Creates a dependency groupbox on the left side since LeftGroupbox is on the left
+local DependencyGroupbox = LeftGroupbox:AddDependencyGroupbox("Audio Settings")
+
+DependencyGroupbox:AddSlider("Volume", {
+    Text = "Volume",
+    Default = 50,
+    Min = 0,
+    Max = 100,
+    Rounding = 0
+})
+
+DependencyGroupbox:SetupDependencies({
+    { Toggles.EnableAudio, true } -- Only show if EnableAudio is true
+})
+
+```
+
+## UI Elements
+
+### Labels
+
+Labels display text information.
+
+```lua
+local Label = Groupbox:AddLabel("This is a label")
+local WrappedLabel = Groupbox:AddLabel({
+    Text = "This is a wrapped label that will break into multiple lines",
+    DoesWrap = true
+})
+```
+
+#### Methods
+
+| Method                      | Description              |
+| --------------------------- | ------------------------ |
+| `Label:SetText(text)`       | Updates the label's text |
+| `Label:SetVisible(boolean)` | Shows or hides the label |
+
+### Buttons
+
+Buttons allow user interaction through clicking.
+
+```lua
+local Button = Groupbox:AddButton({
+    Text = "Click Me",
+    Func = function()
+        print("Button clicked!")
+    end,
+    DoubleClick = true -- Requires double-click for risky actions
+})
+
+-- You can also add sub-buttons
+Button:AddButton({
+    Text = "Sub Button",
+    Func = function()
+        print("Sub-button clicked!")
+    end
+})
+```
+
+#### Options
+
+| Property        | Type     | Default        | Description                                   |
+| --------------- | -------- | -------------- | --------------------------------------------- |
+| Text            | string   | "Button"       | The button's text                             |
+| Func            | function | function() end | The function to call when clicked             |
+| DoubleClick     | boolean  | false          | Whether the button needs double-click         |
+| Tooltip         | string   | nil            | Tooltip text shown on hover                   |
+| DisabledTooltip | string   | nil            | Tooltip shown when disabled                   |
+| Risky           | boolean  | false          | Displays text in red to indicate risky action |
+| Disabled        | boolean  | false          | Whether the button is disabled                |
+| Visible         | boolean  | true           | Whether the button is visible                 |
+
+#### Methods
+
+| Method                        | Description                    |
+| ----------------------------- | ------------------------------ |
+| `Button:SetText(text)`        | Updates the button's text      |
+| `Button:SetDisabled(boolean)` | Enables or disables the button |
+| `Button:SetVisible(boolean)`  | Shows or hides the button      |
+
+### Toggles & Checkboxes
+
+Toggles and checkboxes allow users to toggle boolean values.
+
+```lua
+-- Always capture the reference returned by AddToggle
+local MyToggle = Groupbox:AddToggle("MyToggle", {
+    Text = "Example Toggle",
+    Default = false,
+    Tooltip = "This is a toggle",
+    Callback = function(Value)
+        print("Toggle changed to:", Value)
+    end
+})
+
+-- You can use :OnChanged to add another callback
+MyToggle:OnChanged(function(Value)
+    print("Toggle changed via OnChanged:", Value)
+})
+
+-- You can also create checkboxes instead of switch-style toggles
+local MyCheckbox = Groupbox:AddCheckbox("MyCheckbox", {
+    Text = "Example Checkbox",
+    Default = false,
+    Callback = function(Value)
+        print("Checkbox changed to:", Value)
+    end
+})
+```
+
+#### Options
+
+| Property        | Type     | Default        | Description                                   |
+| --------------- | -------- | -------------- | --------------------------------------------- |
+| Text            | string   | "Toggle"       | The toggle's text                             |
+| Default         | boolean  | false          | The initial state                             |
+| Tooltip         | string   | nil            | Tooltip text shown on hover                   |
+| DisabledTooltip | string   | nil            | Tooltip shown when disabled                   |
+| Callback        | function | function() end | Called when the toggle changes                |
+| Risky           | boolean  | false          | Displays text in red to indicate risky action |
+| Disabled        | boolean  | false          | Whether the toggle is disabled                |
+| Visible         | boolean  | true           | Whether the toggle is visible                 |
+
+#### Methods
+
+| Method                        | Description                    |
+| ----------------------------- | ------------------------------ |
+| `Toggle:SetValue(boolean)`    | Sets the toggle value          |
+| `Toggle:SetText(text)`        | Updates the toggle's text      |
+| `Toggle:SetDisabled(boolean)` | Enables or disables the toggle |
+| `Toggle:SetVisible(boolean)`  | Shows or hides the toggle      |
+| `Toggle:OnChanged(function)`  | Adds another callback function |
+
+### Inputs
+
+Input fields allow users to enter text values.
+
+```lua
+local Input = Groupbox:AddInput("MyInput", {
+    Text = "Input Example",
+    Default = "Default value",
+    Numeric = false,
+    Finished = true, -- Only calls callback when you press enter
+    Placeholder = "Enter text here...",
+    Callback = function(Value)
+        print("Input updated:", Value)
+    end
+})
+```
+
+#### Options
+
+| Property         | Type     | Default        | Description                                             |
+| ---------------- | -------- | -------------- | ------------------------------------------------------- |
+| Text             | string   | "Input"        | The input's label text                                  |
+| Default          | string   | ""             | The initial value                                       |
+| Numeric          | boolean  | false          | Whether to allow only numeric input                     |
+| Finished         | boolean  | false          | Whether to call the callback only when Enter is pressed |
+| ClearTextOnFocus | boolean  | true           | Whether to clear the text when focused                  |
+| Placeholder      | string   | ""             | Placeholder text when empty                             |
+| AllowEmpty       | boolean  | true           | Whether to allow empty input                            |
+| EmptyReset       | string   | "---"          | Value to use when empty if AllowEmpty is false          |
+| MaxLength        | number   | nil            | Maximum character length                                |
+| Tooltip          | string   | nil            | Tooltip text shown on hover                             |
+| DisabledTooltip  | string   | nil            | Tooltip shown when disabled                             |
+| Callback         | function | function() end | Called when the input changes                           |
+| Disabled         | boolean  | false          | Whether the input is disabled                           |
+| Visible          | boolean  | true           | Whether the input is visible                            |
+
+#### Methods
+
+| Method                       | Description                    |
+| ---------------------------- | ------------------------------ |
+| `Input:SetValue(text)`       | Sets the input value           |
+| `Input:SetText(text)`        | Updates the input's label text |
+| `Input:SetDisabled(boolean)` | Enables or disables the input  |
+| `Input:SetVisible(boolean)`  | Shows or hides the input       |
+| `Input:OnChanged(function)`  | Adds another callback function |
+
+### Sliders
+
+Sliders allow users to select a numeric value from a range.
+
+```lua
+local Slider = Groupbox:AddSlider("MySlider", {
+    Text = "Example Slider",
+    Default = 50,
+    Min = 0,
+    Max = 100,
+    Rounding = 1,
+    Compact = false,
+    Callback = function(Value)
+        print("Slider changed to:", Value)
+    end
+})
+```
+
+#### Options
+
+| Property            | Type     | Default        | Description                              |
+| ------------------- | -------- | -------------- | ---------------------------------------- |
+| Text                | string   | "Slider"       | The slider's text                        |
+| Default             | number   | 0              | The initial value                        |
+| Min                 | number   | 0              | The minimum value                        |
+| Max                 | number   | 100            | The maximum value                        |
+| Rounding            | number   | 0              | Decimal places to round to               |
+| Compact             | boolean  | false          | Whether to use compact mode              |
+| HideMax             | boolean  | false          | Whether to hide the max value in display |
+| Prefix              | string   | ""             | Text before the value                    |
+| Suffix              | string   | ""             | Text after the value                     |
+| FormatDisplayValue  | function | nil            | Function to format displayed values      |
+| Tooltip             | string   | nil            | Tooltip text shown on hover              |
+| DisabledTooltip     | string   | nil            | Tooltip shown when disabled              |
+| Callback            | function | function() end | Called when the slider changes           |
+| Disabled            | boolean  | false          | Whether the slider is disabled           |
+| Visible             | boolean  | true           | Whether the slider is visible            |
+
+#### Methods
+
+| Method                        | Description                    |
+| ----------------------------- | ------------------------------ |
+| `Slider:SetValue(number)`     | Sets the slider value          |
+| `Slider:SetText(text)`        | Updates the slider's text      |
+| `Slider:SetMin(number)`       | Sets the minimum value         |
+| `Slider:SetMax(number)`       | Sets the maximum value         |
+| `Slider:SetDisabled(boolean)` | Enables or disables the slider |
+| `Slider:SetVisible(boolean)`  | Shows or hides the slider      |
+| `Slider:SetPrefix(text)`      | Sets the prefix text           |
+| `Slider:SetSuffix(text)`      | Sets the suffix text           |
+| `Slider:OnChanged(function)`  | Adds another callback function |
+
+### Dropdowns
+
+Dropdowns allow users to select from a list of options.
+
+```lua
+local Dropdown = Groupbox:AddDropdown("MyDropdown", {
+    Values = {"Option 1", "Option 2", "Option 3"},
+    Default = 1, -- Index of the default option
+    Multi = false, -- Whether to allow multiple selections
+    Text = "Example Dropdown",
+    Tooltip = "This is a dropdown",
+    Callback = function(Value)
+        print("Dropdown new value:", Value)
+    end
+})
+
+-- Multi-select dropdown
+local MultiDropdown = Groupbox:AddDropdown("MyMultiDropdown", {
+    Values = {"Option A", "Option B", "Option C"},
+    Default = {"Option A"}, -- Default selected values for multi-select
+    Multi = true,
+    Text = "Multi-Select Example",
+    Callback = function(Values)
+        for Value, Selected in pairs(Values) do
+            if Selected then
+                print("Selected:", Value)
+            end
+        end
+    end
+})
+```
+
+#### Special Dropdowns
+
+```lua
+-- Player dropdown (automatically updates with players)
+local PlayerDropdown = Groupbox:AddDropdown("PlayerDropdown", {
+    SpecialType = "Player",
+    Text = "Select Players",
+    Multi = true,
+    ExcludeLocalPlayer = true
+})
+
+-- Team dropdown (automatically updates with teams)
+local TeamDropdown = Groupbox:AddDropdown("TeamDropdown", {
+    SpecialType = "Team",
+    Text = "Select Team"
+})
+```
+
+#### Options
+
+| Property                | Type      | Default        | Description                                       |
+| ----------------------- | --------- | -------------- | ------------------------------------------------- |
+| Text                    | string    | nil            | The dropdown's label text                         |
+| Values                  | table     | {}             | List of selectable values                         |
+| Default                 | any/table | nil            | Default selected value or values for multi-select |
+| Multi                   | boolean   | false          | Whether multiple values can be selected           |
+| AllowNull               | boolean   | false          | Whether no selection is allowed                   |
+| Searchable              | boolean   | false          | Whether to allow searching in dropdown            |
+| MaxVisibleDropdownItems | number    | 8              | Maximum number of visible items                   |
+| SpecialType             | string    | nil            | Special types: "Player" or "Team"                 |
+| ExcludeLocalPlayer      | boolean   | false          | For Player type, excludes local player            |
+| FormatDisplayValue      | function  | nil            | Function to format displayed values               |
+| DisabledValues          | table     | {}             | Values that cannot be selected                    |
+| Tooltip                 | string    | nil            | Tooltip text shown on hover                       |
+| DisabledTooltip         | string    | nil            | Tooltip shown when disabled                       |
+| Callback                | function  | function() end | Called when selection changes                     |
+| Disabled                | boolean   | false          | Whether the dropdown is disabled                  |
+| Visible                 | boolean   | true           | Whether the dropdown is visible                   |
+
+#### Methods
+
+| Method                                    | Description                       |
+| ----------------------------------------- | --------------------------------- |
+| `Dropdown:SetValue(value)`                | Sets the selected value(s)        |
+| `Dropdown:SetValues(table)`               | Replaces all dropdown values      |
+| `Dropdown:AddValues(value/table)`         | Adds new values to the dropdown   |
+| `Dropdown:SetDisabledValues(table)`       | Sets which values are disabled    |
+| `Dropdown:AddDisabledValues(value/table)` | Adds values to disabled list      |
+| `Dropdown:SetText(text)`                  | Updates the dropdown's label text |
+| `Dropdown:SetDisabled(boolean)`           | Enables or disables the dropdown  |
+| `Dropdown:SetVisible(boolean)`            | Shows or hides the dropdown       |
+| `Dropdown:OnChanged(function)`            | Adds another callback function    |
+
+### Keybinds
+
+Keybinds allow users to set and use keyboard shortcuts. You must add them to a toggle by using the reference returned when creating the toggle.
+
+```lua
+-- First create a toggle and capture the reference
+local MyToggle = Groupbox:AddToggle("MyToggle", {
+    Text = "Example Toggle",
+    Default = false
+})
+
+-- Then add a keybind to it using the reference
+local Keybind = MyToggle:AddKeyPicker("MyKeybind", {
+    Default = "F",
+    Text = "Example Keybind",
+    Mode = "Toggle", -- Options: "Toggle", "Hold", "Always"
+
+    -- Sets the toggle's value according to the keybind state if Mode is Toggle
+    SyncToggleState = false,
+
+    Callback = function(Value)
+        print("Keybind pressed, value:", Value)
+    end
+})
+```
+
+#### Options
+
+| Property        | Type     | Default                      | Description                                                                               |
+| --------------- | -------- | ---------------------------- | ----------------------------------------------------------------------------------------- |
+| Text            | string   | "KeyPicker"                  | The keybind's text                                                                        |
+| Default         | string   | "None"                       | The initial key                                                                           |
+| Mode            | string   | "Toggle"                     | Operation mode ("Toggle", "Hold", "Always", "Press")                                      |
+| SyncToggleState | boolean  | false                        | Whether to sync with parent toggle                                                        |
+| WaitForCallback | boolean  | false                        | *Only for Press mode.* Locks the keybind during the execution of Callback and OnChanged.  |
+| Modes           | table    | {"Always", "Toggle", "Hold"} | Available modes                                                                           |
+| NoUI            | boolean  | false                        | Whether to hide from keybind menu                                                         |
+| Callback        | function | function() end               | Called when keybind state changes                                                         |
+| ChangedCallback | function | function() end               | Called when key is changed                                                                |
+| Clicked         | function | function() end               | Called when clicked                                                                       |
+
+#### Methods
+
+| Method                          | Description                        |
+| ------------------------------- | ---------------------------------- |
+| `Keybind:SetValue({key, mode})` | Sets the key and mode              |
+| `Keybind:GetState()`            | Returns current state (true/false) |
+| `Keybind:SetText(text)`         | Updates the keybind's text         |
+| `Keybind:Update()`              | Updates the keybind display        |
+| `Keybind:OnClick(function)`     | Sets the click callback            |
+| `Keybind:OnChanged(function)`   | Sets the change callback           |
+
+### Color Pickers
+
+Color pickers allow users to select colors. They must be added to a toggle by using the reference returned when creating the toggle.
+
+```lua
+-- First create a toggle and capture the reference
+local MyToggle = Groupbox:AddToggle("MyToggle", {
+    Text = "Example Toggle",
+    Default = false
+})
+
+-- Then add a color picker to it using the reference
+local ColorPicker = MyToggle:AddColorPicker("MyColorPicker", {
+    Default = Color3.fromRGB(255, 0, 0),
+    Title = "Select Color",
+    Transparency = 0, -- 0 to 1
+
+    Callback = function(Value)
+        print("Color changed to:", Value)
+    end
+})
+```
+
+#### Options
+
+| Property     | Type     | Default             | Description                |
+| ------------ | -------- | ------------------- | -------------------------- |
+| Default      | Color3   | Color3.new(1, 1, 1) | The initial color          |
+| Title        | string   | nil                 | Title shown in picker      |
+| Transparency | number   | 0                   | Default transparency (0-1) |
+| Callback     | function | function() end      | Called when color changes  |
+| Changed      | function | function() end      | Alternative callback       |
+
+#### Methods
+
+| Method                                         | Description                     |
+| ---------------------------------------------- | ------------------------------- |
+| `ColorPicker:SetValue(hsv, transparency)`      | Sets HSV color and transparency |
+| `ColorPicker:SetValueRGB(color, transparency)` | Sets RGB color and transparency |
+| `ColorPicker:OnChanged(function)`              | Sets the change callback        |
+
+### Dividers
+
+Dividers are simple horizontal lines that separate content.
+
+```lua
+Groupbox:AddDivider()
+```
+
+### Viewports
+
+Viewports allow you to display 3D Objects in your UI.
+
+```lua
+local Viewport = Groupbox:AddViewport("MyViewport", {
+    Object = Instance.new("Part"),
+    Camera = Instance.new("Camera"),
+    Interactive = true,
+    AutoFocus = true
+})
+```
+
+#### Options
+
+| Property    | Type              | Default           | Description                                                                                                |
+| ----------- | ----------------- | ----------------- | ---------------------------------------------------------------------------------------------------------- |
+| Object      | Instance          | nil               | The 3D object to display in the viewport                                                                   |
+| Camera      | Instance (Camera) | Instance (Camera) | The camera used to view the object                                                                         |
+| Interactive | boolean           | false             | Whether the viewport is interactive (scrolling/pinching to zoom, right click and move mouse/swipe to move) |
+| AutoFocus   | boolean           | true              | Whether to automatically focus the camera on the object on viewport creation                               |
+| Height      | number            | 200               | Height of the viewport frame in pixels.                                                                    |
+
+#### Methods
+
+| Method                                 | Description                                      |
+| -------------------------------------- | ------------------------------------------------ |
+| `Viewport:SetObject(object)`           | Sets the 3D object to display in the viewport    |
+| `Viewport:SetCamera(camera)`           | Sets the camera used to view the object          |
+| `Viewport:SetInteractive(Interactive)` | Sets whether the viewport is interactive         |
+| `Viewport:SetHeight(height)`           | Sets the height of the viewport frame in pixels  |
+| `Viewport:Focus()`                     | Focuses the camera on the object in the viewport |
+
+### Images
+
+Images allow you to display static images in your UI.
+
+```lua
+LeftGroupBox:AddImage("MyAgaImage", {
+    Image = "http://www.roblox.com/asset/?id=135666356081915",
+    Transparency = 0,
+    Color = Color3.new(1, 1, 1),
+    RectOffset = Vector2.zero,
+    RectSize = Vector2.zero,
+    ScaleType = Enum.ScaleType.Fit,
+    Height = 200,
+})
+```
+
+#### Options
+
+| Property     | Type           | Default             | Description                                                   |
+| ------------ | -------------- | ------------------- | ------------------------------------------------------------- |
+| Image        | string         | ""                  | The image URL or asset ID to display                          |
+| Transparency | number         | 0                   | The transparency of the image (0 to 1)                        |
+| Color        | Color3         | Color3.new(1, 1, 1) | The color tint applied to the image                           |
+| RectOffset   | Vector2        | Vector2.zero        | The offset for the image rectangle                            |
+| RectSize     | Vector2        | Vector2.zero        | The size of the image rectangle                               |
+| ScaleType    | Enum.ScaleType | Enum.ScaleType.Fit  | How the image should scale within its frame (Fit, Fill, etc.) |
+| Height       | number         | 200                 | The height of the image frame in pixels                       |
+
+#### Methods
+
+| Method                          | Description                                      |
+| ------------------------------- | ------------------------------------------------ |
+| `Image:SetImage(image)`         | Sets the image URL or asset ID to display        |
+| `Image:SetTransparency(value)`  | Sets the transparency of the image (0 to 1)      |
+| `Image:SetColor(color)`         | Sets the color tint applied to the image         |
+| `Image:SetRectOffset(offset)`   | Sets the offset for the image rectangle          |
+| `Image:SetRectSize(size)`       | Sets the size of the image rectangle             |
+| `Image:SetScaleType(scaleType)` | Sets how the image should scale within its frame |
+| `Image:SetHeight(height)`       | Sets the height of the image frame in pixels     |
+
+## Additional Features
+
+### Notifications
+
+Notifications display temporary messages to the user.
+
+```lua
+-- Simple notification
+Library:Notify("This is a notification", 5) -- Second param is duration in seconds
+
+-- Advanced notification
+Library:Notify({
+    Title = "Success",
+    Description = "Operation completed successfully",
+    Time = 5, -- Duration in seconds
+    SoundId = 123456789 -- Optional sound ID
+})
+
+-- Getting notification object for manipulation
+local Notification = Library:Notify({
+    Title = "Progress",
+    Description = "Processing...",
+    Time = 10
+})
+
+-- Update notification text
+Notification:ChangeTitle("Almost done")
+Notification:ChangeDescription("Finalizing...")
+
+-- For step notifications
+local StepNotification = Library:Notify({
+    Title = "Progress",
+    Description = "Downloading files...",
+    Steps = 5, -- Total number of steps
+    Time = someInstanceThatFires -- or use a number for time-based
+})
+
+-- Update steps
+StepNotification:ChangeStep(2) -- Set to step 2 of 5
+```
+
+### Tooltips
+
+Tooltips provide additional information on hover.
+
+```lua
+-- Tooltips are added automatically to UI elements via the Tooltip and DisabledTooltip properties
+local Button = Groupbox:AddButton({
+    Text = "Help",
+    Tooltip = "Click for assistance",
+    DisabledTooltip = "Currently unavailable"
+})
+
+-- Manual tooltip creation
+local TooltipObject = Library:AddTooltip("Normal info", "Disabled info", someGuiElement)
+```
+
+### Watermark
+
+The library can create a customizable draggable watermark that can be shown in the top left corner.
+
+```lua
+-- Sets the watermark visibility
+Library:SetWatermarkVisibility(true)
+
+-- Example of dynamically-updating watermark with common traits (fps and ping)
+local FrameTimer = tick()
+local FrameCounter = 0;
+local FPS = 60;
+
+local WatermarkConnection = game:GetService('RunService').RenderStepped:Connect(function()
+    FrameCounter += 1;
+
+    if (tick() - FrameTimer) >= 1 then
+        FPS = FrameCounter;
+        FrameTimer = tick();
+        FrameCounter = 0;
+    end;
+
+    Library:SetWatermark(('Obsidian demo | %s fps | %s ms'):format(
+        math.floor(FPS),
+        math.floor(game:GetService('Stats').Network.ServerStatsItem['Data Ping']:GetValue())
+    ));
+end);
+```
+
+### Keybind Menu
+
+The library provides a built-in keybind menu that shows all keybinds.
+
+```lua
+-- The keybind menu is shown automatically when any keybinds are added
+-- You can customize its appearance:
+Library.ShowToggleFrameInKeybinds = true -- Show toggle state in keybind menu
+```
+
+### Custom Cursor
+
+The library includes a custom cursor option.
+
+```lua
+-- Enable/disable the custom cursor
+Library.ShowCustomCursor = true
+```
+
+### Mobile Support
+
+The library includes built-in mobile support.
+
+```lua
+-- Check if the user is on mobile
+if Library.IsMobile then
+    -- Adjust your UI accordingly
+end
+
+-- Mobile button positioning
+Window = Library:CreateWindow({
+    MobileButtonsSide = "Right" -- "Left" or "Right"
+})
+```
+
+## Theming
+
+You can customize the appearance of the UI programmatically.
+
+Setting default colors:
+
+```lua
+ThemeManager:SetLibrary(Library)
+
+ThemeManager:SetDefaultTheme({
+    BackgroundColor = Color3.fromRGB(15, 15, 15),
+    MainColor = Color3.fromRGB(25, 25, 25),
+    AccentColor = Color3.fromRGB(125, 85, 255),
+    OutlineColor = Color3.fromRGB(40, 40, 40),
+    FontColor = Color3.new(1, 1, 1),
+    FontFace = Enum.Font.Gotham,
+})
+
+-- ApplyToTab must be called after setting the default theme
+ThemeManager:ApplyToTab(Tabs["UI Settings"])
+
+-- Change font
+Library:SetFont(Enum.Font.Gotham)
+
+-- Change DPI scale
+Library:SetDPIScale(150) -- 150% scaling
+```
+
+## API Reference
+
+### Library Functions
+
+| Function                                                | Description                             |
+| ------------------------------------------------------- | --------------------------------------- |
+| `Library:CreateWindow(options)`                         | Creates a new window                    |
+| `Library:Notify(message, duration, soundId)`            | Shows a notification                    |
+| `Library:SetFont(font)`                                 | Sets the global font                    |
+| `Library:SetNotifySide(side)`                           | Sets which side notifications appear on |
+| `Library:SetDPIScale(scale)`                            | Sets the UI scaling (100 = 100%)        |
+| `Library:Toggle(visible)`                               | Shows or hides the entire UI            |
+| `Library:AddTooltip(tooltip, disabledTooltip, element)` | Adds a tooltip to an element            |
+| `Library:AddDraggableButton(text, callback)`            | Creates a draggable button              |
+| `Library:AddDraggableMenu(name)`                        | Creates a draggable menu                |
+| `Library:OnUnload(callback)`                            | Sets a function to call when unloaded   |
+| `Library:Unload()`                                      | Destroys the UI completely              |
+
+### Global References
+
+| Variable                            | Description                                          |
+| ----------------------------------- | ---------------------------------------------------- |
+| `Library.Toggled`                   | Whether the UI is currently visible                  |
+| `Library.IsMobile`                  | Whether the user is on a mobile device               |
+| `Library.IsRobloxFocused`           | Whether the roblox window is focused                 |
+| `Library.CornerRadius`              | The corner radius used throughout the UI             |
+| `Library.NotifySide`                | Which side notifications appear on                   |
+| `Library.ShowCustomCursor`          | Whether to show the custom cursor                    |
+| `Library.ForceCheckbox`             | Whether to always use checkboxes instead of switches |
+| `Library.ShowToggleFrameInKeybinds` | Whether to show toggle state in keybind menu         |
+| `Library.NotifyOnError`             | Whether to show notifications for errors             |
+| `Library.ToggleKeybind`             | The keybind to toggle the UI                         |
+
+## Examples
+
+### Basic Window with Elements
+
+```lua
+-- Create a basic window with common elements
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/deividcomsono/Obsidian/refs/heads/main/Library.lua"))()
+
+local Window = Library:CreateWindow({
+    Title = "My Script",
+    Footer = "v1.0.0",
+    Center = true,
+    AutoShow = true
+})
+
+local MainTab = Window:AddTab("Main", "home")
+local SettingsTab = Window:AddTab("Settings", "settings", "Customize the UI")
+
+-- Add a groupbox to the left side
+local LeftGroupbox = MainTab:AddLeftGroupbox("Features")
+
+-- Add toggles, buttons, sliders
+local MyToggle = LeftGroupbox:AddToggle("MyToggle", {
+    Text = "Enable Feature",
+    Default = false,
+    Tooltip = "Enables the main feature",
+    Callback = function(Value)
+        print("Feature enabled:", Value)
+    end
+})
+
+local MyButton = LeftGroupbox:AddButton({
+    Text = "Run Action",
+    Func = function()
+        print("Action running!")
+    end
+})
+
+local MySlider = LeftGroupbox:AddSlider("MySlider", {
+    Text = "Speed",
+    Default = 50,
+    Min = 0,
+    Max = 100,
+    Rounding = 0,
+    Suffix = "%",
+    Callback = function(Value)
+        print("Speed set to:", Value)
+    end
+})
+
+-- Add a dropdown
+local MyDropdown = LeftGroupbox:AddDropdown("MyDropdown", {
+    Values = {"Option 1", "Option 2", "Option 3"},
+    Default = 1,
+    Text = "Select Option",
+    Callback = function(Value)
+        print("Selected:", Value)
+    end
+})
+
+-- Add a groupbox to the right side
+local RightGroupbox = MainTab:AddRightGroupbox("Information")
+
+-- Add a label
+RightGroupbox:AddLabel("Welcome to my script!")
+
+-- Add a tabbox
+local MyTabbox = SettingsTab:AddLeftTabbox("Settings")
+local ConfigTab = MyTabbox:AddTab("Config")
+local ThemeTab = MyTabbox:AddTab("Theme")
+
+-- Add config elements
+ConfigTab:AddButton({
+    Text = "Save Config",
+    Func = function()
+        Library:Notify("Config saved!")
+    end
+})
+
+-- Add toggle with keybind - IMPORTANT: Capture the toggle reference
+local ToggleWithKeybind = LeftGroupbox:AddToggle("ToggleWithKey", {
+    Text = "Toggle with Keybind",
+    Default = false,
+    Callback = function(Value)
+        print("Toggled with keybind:", Value)
+    end
+})
+
+-- Add keybind to the toggle using the reference
+local MyKeybind = ToggleWithKeybind:AddKeyPicker("MyKeybind", {
+    Default = "G",
+    Mode = "Toggle",
+    Text = "Toggle Feature",
+    SyncToggleState = true,
+})
+
+-- Add a color picker to the toggle using the reference
+local MyColorPicker = ToggleWithKeybind:AddColorPicker("MyColorPicker", {
+    Default = Color3.fromRGB(255, 0, 0),
+    Title = "UI Color",
+    Callback = function(Value)
+        Library.Scheme.AccentColor = Value
+        Library:UpdateColorsUsingRegistry()
+    end
+})
+```
+
+### Advanced Example with Tabboxes
+
+```lua
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/deividcomsono/Obsidian/refs/heads/main/Library.lua"))()
+
+local Window = Library:CreateWindow({
+    Title = "Advanced Example",
+    Size = UDim2.fromOffset(550, 480),
+    Center = true
+})
+
+local MainTab = Window:AddTab("Main")
+local ConfigTab = Window:AddTab("Config")
+
+-- Main features
+local FeaturesBox = MainTab:AddLeftTabbox("Features")
+local GeneralTab = FeaturesBox:AddTab("General")
+local CombatTab = FeaturesBox:AddTab("Combat")
+local VisualsTab = FeaturesBox:AddTab("Visuals")
+
+-- General features
+local WalkSpeedToggle = GeneralTab:AddToggle("WalkSpeed", {
+    Text = "Custom Walk Speed",
+    Default = false,
+    Callback = function(Value)
+        print("Walk Speed enabled:", Value)
+    end
+})
+
+local SpeedSlider = GeneralTab:AddSlider("SpeedValue", {
+    Text = "Speed Value",
+    Default = 16,
+    Min = 16,
+    Max = 100,
+    Rounding = 0,
+    Callback = function(Value)
+        print("Speed set to:", Value)
+    end
+})
+
+-- Combat features - IMPORTANT: Capture references directly
+local AimbotToggle = CombatTab:AddToggle("Aimbot", {
+    Text = "Aimbot",
+    Default = false,
+    Tooltip = "Automatically aims at enemies",
+    Callback = function(Value)
+        print("Aimbot enabled:", Value)
+    end
+})
+
+-- Use the direct reference to add the keybind
+AimbotToggle:AddKeyPicker("AimbotKey", {
+    Default = "E",
+    Mode = "Hold",
+    Text = "Aimbot",
+    Callback = function(Value)
+        print("Aimbot key held:", Value)
+    end
+})
+
+local TargetDropdown = CombatTab:AddDropdown("AimbotTarget", {
+    Text = "Target",
+    Values = {"Head", "Torso", "Random"},
+    Default = 1,
+    Callback = function(Value)
+        print("Aimbot targeting:", Value)
+    end
+})
+
+-- Visuals features - IMPORTANT: Capture references directly
+local ESPToggle = VisualsTab:AddToggle("ESP", {
+    Text = "ESP",
+    Default = false,
+    Callback = function(Value)
+        print("ESP enabled:", Value)
+    end
+})
+
+-- Use the direct reference to add the color picker
+ESPToggle:AddColorPicker("ESPColor", {
+    Default = Color3.fromRGB(255, 0, 0),
+    Title = "ESP Color",
+    Callback = function(Value)
+        print("ESP color set to:", Value)
+    end
+})
+
+local ESPOptions = VisualsTab:AddDropdown("ESPOptions", {
+    Text = "ESP Options",
+    Values = {"Boxes", "Names", "Health", "Distance"},
+    Multi = true,
+    Default = {"Boxes", "Names"},
+    Callback = function(Values)
+        for Option, Enabled in pairs(Values) do
+            if Enabled then
+                print("ESP option enabled:", Option)
+            end
+        end
+    end
+})
+
+-- Config section
+local SaveBox = ConfigTab:AddLeftGroupbox("Save Configuration")
+
+local ConfigNameInput = SaveBox:AddInput("ConfigName", {
+    Text = "Config Name",
+    Default = "MyConfig",
+    Placeholder = "Enter name...",
+    Finished = true
+})
+
+SaveBox:AddButton({
+    Text = "Save Config",
+    Func = function()
+        local name = Options.ConfigName.Value
+        Library:Notify({
+            Title = "Config Saved",
+            Description = "Saved configuration as " .. name,
+            Time = 3
+        })
+    end
+})
+
+SaveBox:AddButton({
+    Text = "Load Config",
+    Func = function()
+        local name = Options.ConfigName.Value
+        Library:Notify({
+            Title = "Config Loaded",
+            Description = "Loaded configuration " .. name,
+            Time = 3
+        })
+    end
+})
+
+-- Player list
+local PlayerBox = MainTab:AddRightGroupbox("Players")
+
+local PlayerSelector = PlayerBox:AddDropdown("PlayerList", {
+    SpecialType = "Player",
+    Text = "Select Player",
+    Tooltip = "Select a player to target",
+    Callback = function(Value)
+        print("Selected player:", Value)
+    end
+})
+
+-- Theme settings
+local ThemeBox = ConfigTab:AddRightGroupbox("UI Settings")
+
+local ThemeToggle = ThemeBox:AddToggle("CustomTheme", {
+    Text = "Custom Theme",
+    Default = false,
+    Callback = function(Value)
+        print("Custom theme enabled:", Value)
+    end
+})
+
+local UIScaleSlider = ThemeBox:AddSlider("UIScale", {
+    Text = "UI Scale",
+    Default = 100,
+    Min = 75,
+    Max = 150,
+    Rounding = 0,
+    Suffix = "%",
+    Callback = function(Value)
+        Library:SetDPIScale(Value)
+    end
+})
+
+-- Set a keybind toggler
+ThemeBox:AddLabel("Press Right-Ctrl to toggle the UI")
+
+-- Show the UI
+Library:Toggle(true)
+```
