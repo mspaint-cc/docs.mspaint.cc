@@ -20,7 +20,7 @@ const docsTree: PageTree.Root = {
     { type: "page", name: "Installation", url: "/obsidian/installation" },
     { type: "page", name: "Contributing", url: "/obsidian/contributing" },
 
-    { type: "separator", name: "Obsidian Core" },
+    { type: "separator", name: "Core" },
     {
       type: "page",
       name: "Library",
