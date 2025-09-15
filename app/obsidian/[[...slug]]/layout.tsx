@@ -20,33 +20,23 @@ const docsTree: PageTree.Root = {
     { type: "page", name: "Installation", url: "/obsidian/installation" },
     { type: "page", name: "Contributing", url: "/obsidian/contributing" },
 
-    { type: "separator", name: "Core Components" },
+    { type: "separator", name: "Obsidian Core" },
     {
       type: "page",
-      name: "Window",
-      url: "/obsidian/elements/luau/window",
-    },
-    { type: "page", name: "Tabs", url: "/obsidian/elements/luau/tabs" },
-    {
-      type: "page",
-      name: "Groupboxes",
-      url: "/obsidian/elements/luau/groupboxes",
+      name: "Library",
+      url: "/obsidian/core/library/",
     },
     {
       type: "page",
-      name: "Tabboxes",
-      url: "/obsidian/elements/luau/tabboxes",
+      name: "SaveManager",
+      url: "/obsidian/core/addons/savemanager",
     },
     {
       type: "page",
-      name: "Dependency Boxes",
-      url: "/obsidian/elements/luau/dependency-boxes",
+      name: "SaveManager",
+      url: "/obsidian/core/addons/thememanager",
     },
-    {
-      type: "page",
-      name: "Dependency Groupboxes",
-      url: "/obsidian/elements/luau/dependency-groupboxes",
-    },
+
     { type: "separator", name: "UI Elements" },
     {
       type: "page",

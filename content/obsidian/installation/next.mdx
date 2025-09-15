@@ -139,3 +139,14 @@ If you want to automatically dump your obsidian UI to a JSON file, you can use t
 ```lua
 loadstring(game:HttpGet("https://raw.githubusercontent.com/mspaint-cc/assets/refs/heads/main/uidata/extractor.lua"))()
 ```
+This file can then be imported and put into the `uiData` prop of the Obsidian component:
+```tsx
+import UIData from "@/data/ObsidianExtracted.json";
+
+<Obsidian
+  title="mspaint"
+  icon="/mspaint.png"
+  footer="version: example"
+  uiData={UIData}
+/>
+```
