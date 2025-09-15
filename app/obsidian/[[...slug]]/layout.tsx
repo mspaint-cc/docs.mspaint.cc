@@ -16,19 +16,88 @@ const docsTree: PageTree.Root = {
   name: "Obsidian",
   children: [
     { type: "separator", name: "Introduction" },
-    { type: "page", name: "Getting Started", url: "/addons/getting_started" },
-    { type: "page", name: "Migration Guide", url: "/addons/migrate" },
-    { type: "page", name: "API", url: "/addons/api" },
+    { type: "page", name: "Getting Started", url: "/obsidian/" },
+    { type: "page", name: "Installation", url: "/obsidian/installation" },
+    { type: "page", name: "Contributing", url: "/obsidian/contributing" },
 
-    { type: "separator", name: "Documentation" },
-    { type: "page", name: "Getting Started", url: "/" },
-    { type: "page", name: "Key System", url: "/key-system" },
-
-    { type: "separator", name: "Purchase" },
-    { type: "page", name: "Getting Started", url: "/purchase/getting_started" },
+    { type: "separator", name: "Core Components" },
     {
+      type: "page",
+      name: "Window",
+      url: "/obsidian/elements/luau/window",
+    },
+    { type: "page", name: "Tabs", url: "/obsidian/elements/luau/tabs" },
+    {
+      type: "page",
+      name: "Groupboxes",
+      url: "/obsidian/elements/luau/groupboxes",
+    },
+    {
+      type: "page",
+      name: "Tabboxes",
+      url: "/obsidian/elements/luau/tabboxes",
+    },
+    {
+      type: "page",
+      name: "Dependency Boxes",
+      url: "/obsidian/elements/luau/dependency-boxes",
+    },
+    {
+      type: "page",
+      name: "Dependency Groupboxes",
+      url: "/obsidian/elements/luau/dependency-groupboxes",
+    },
+    { type: "separator", name: "UI Elements" },
+    {
+      type: "page",
+      name: "Labels",
+      url: "/obsidian/elements/luau/labels",
+    },
+    {
+      type: "page",
+      name: "Buttons",
+      url: "/obsidian/elements/luau/buttons",
+    },
+    {
+      type: "page",
+      name: "Toggles",
+      url: "/obsidian/elements/luau/toggles",
+    },
+    { type: "page", name: "Inputs", url: "/obsidian/elements/luau/inputs" },
+    {
+      type: "page",
+      name: "Sliders",
+      url: "/obsidian/elements/luau/sliders",
+    },
+    {
+      type: "page",
+      name: "Dropdowns",
+      url: "/obsidian/elements/luau/dropdowns",
+    },
+    {
+      type: "page",
+      name: "Keybinds",
+      url: "/obsidian/elements/luau/keybinds",
+    },
+    {
+      type: "page",
+      name: "Color Pickers",
+      url: "/obsidian/elements/luau/color-pickers",
+    },
+    {
+      type: "page",
+      name: "Dividers",
+      url: "/obsidian/elements/luau/dividers",
+    },
+    {
+      type: "page",
+      name: "Viewports",
+      url: "/obsidian/elements/luau/viewports",
+    },
+    { type: "page", name: "Images", url: "/obsidian/elements/luau/images" },
+    /*{
       type: "folder",
-      name: "Payment Methods",
+      name: "React",
       children: [
         { type: "page", name: "Official Shop", url: "/purchase/mspaintcc" },
         { type: "page", name: "BloxProducts", url: "/purchase/bloxproducts" },
@@ -36,7 +105,7 @@ const docsTree: PageTree.Root = {
         { type: "page", name: "Aero", url: "/purchase/aero" },
         { type: "page", name: "Munchen Keys", url: "/purchase/munchen_keys" },
       ],
-    },
+    },*/
   ],
 };
 

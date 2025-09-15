@@ -1,0 +1,38 @@
+---
+title: 'Executor'
+description: 'Install Obsidian in an executor environment'
+---
+
+## Installing Obsidian in an Executor
+To install Obsidian in an executor environment, you can use the following code snippet to get the library:
+
+```lua
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/deividcomsono/Obsidian/refs/heads/main/Library.lua"))()
+```
+
+Then, create a window:
+
+```lua
+local Window = Library:CreateWindow({
+    Title = "My Script",
+    Footer = "v1.0.0",
+    ToggleKeybind = Enum.KeyCode.RightControl,
+    Center = true,
+    AutoShow = true
+})
+```
+
+## Icon Information
+
+The Obsidian UI Library uses [Lucide](https://lucide.dev/) for Tab Icons and more.
+
+## Addons
+The library comes with several built-in addons such as **ThemeManager** and **SaveManager**.
+
+```lua
+local repo = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/"
+
+local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
+local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
+local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
+```

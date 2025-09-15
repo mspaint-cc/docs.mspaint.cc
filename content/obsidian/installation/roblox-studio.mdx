@@ -1,0 +1,23 @@
+---
+title: 'Roblox Studio'
+description: 'Install Obsidian in Roblox Studio'
+---
+
+## Installing Obsidian in Roblox Studio
+To install Obsidian in Roblox Studio, you can copy the [Library.lua](https://raw.githubusercontent.com/deividcomsono/Obsidian/refs/heads/main/Library.lua) file into a modulescript and require it.
+
+```lua
+local Library = require(game:GetService("ReplicatedStorage"):WaitForChild("Obsidian"))
+```
+
+## Addons
+The library comes with several built-in addons such as **ThemeManager** and ~~**SaveManager**~~ (SaveManager is not available in Roblox Studio).
+
+### Installing ThemeManager
+To install the ThemeManager addon, you can copy the [addons/ThemeManager.lua](https://raw.githubusercontent.com/deividcomsono/Obsidian/main/addons/ThemeManager.lua) file into a modulescript and require it.
+
+```lua
+local Obsidian = game:GetService("ReplicatedStorage"):WaitForChild("Obsidian")
+local Library = require(Obsidian)
+local ThemeManager = require(Obsidian:WaitForChild("ThemeManager"))
+```
