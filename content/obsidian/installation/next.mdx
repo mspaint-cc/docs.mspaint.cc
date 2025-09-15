@@ -7,6 +7,8 @@ import { OpenInV0Button } from "@/components/open-in-v0-button";
 import DemoObsidian from "@/components/demo/Obsidian";
 import { Tab, Tabs } from "fumadocs-ui/components/tabs";
 
+We use the shadcn/ui CLI to automate the installation process.
+
 <Tabs items={['Preview', 'Code']}>
   <Tab value="Preview">
     <div className="flex flex-col gap-4 border rounded-lg p-4 min-h-[450px] relative">
@@ -78,6 +80,24 @@ import { Tab, Tabs } from "fumadocs-ui/components/tabs";
     ```
   </Tab>
 </Tabs>
+
+---
+
+Then add the following lines of code in your `global.css` file.
+```css
+.no-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none;    /* Firefox */
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
+  display: none;            /* Chrome, Safari, Opera */
+}
+```
+
+---
 
 ## Usage
 
