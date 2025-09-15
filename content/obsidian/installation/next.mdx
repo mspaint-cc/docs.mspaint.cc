@@ -133,3 +133,9 @@ import {
   </ObsidianTab>
 </Obsidian>
 ```
+
+## Extra Resources
+If you want to automatically dump your obsidian UI to a JSON file, you can use the following script which will save a file named `ObsidianExtracted.json` in your executor's `workspace` folder:
+```lua
+loadstring(game:HttpGet("https://raw.githubusercontent.com/mspaint-cc/assets/refs/heads/main/uidata/extractor.lua"))()
+```
