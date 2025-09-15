@@ -1,18 +1,135 @@
 ---
-title: 'Next.js + Tailwind'
-description: 'Install Obsidian in a Next.js + Tailwind environment'
+title: "Next.js + Tailwind"
+description: "Install Obsidian in a Next.js + Tailwind environment"
 ---
 
-import { OpenInV0Button } from '@/components/open-in-v0-button';
+import { OpenInV0Button } from "@/components/open-in-v0-button";
+import DemoObsidian from "@/components/demo/Obsidian";
+import { Tab, Tabs } from "fumadocs-ui/components/tabs";
 
-<div className="flex flex-col gap-4 border rounded-lg p-4 min-h-[450px] relative">
-    <div className="flex items-center justify-between">
-        <h2 className="text-sm text-muted-foreground sm:pl-3">
-            A contact form with Zod validation.
-        </h2>
-        <OpenInV0Button name="example-form" className="w-fit" />
+<Tabs items={['Preview', 'Code']}>
+  <Tab value="Preview">
+    <div className="flex flex-col gap-4 border rounded-lg p-4 min-h-[450px] relative">
+        <div className="flex items-center justify-between px-2">
+            <div />
+            <OpenInV0Button name="Obsidian" className="w-fit" />
+        </div>
+        <div className="flex items-center justify-center min-h-[500px] relative">
+            <div className="max-w-[720px] max-h-[600px] scale-[0.8] max-sm:scale-[0.5] md:scale-90 lg:scale-100">
+            <DemoObsidian />
+            </div>
+        </div>
     </div>
-    <div className="flex items-center justify-center min-h-[500px] relative">
-        <p>give me the mustard</p>
-    </div>
-</div>
+  </Tab>
+
+  <Tab value="Code">
+    ```tsx
+    import { useMemo } from "react";
+    import { Obsidian } from "@/components/obsidian/obsidian";
+    import UIData from "@/components/demo/ObsidianExample.json";
+
+    export default function DemoObsidian() {
+        const memoizedObsidian = useMemo(
+            () => (
+                <Obsidian
+                    title="mspaint"
+                    icon="/mspaint.png"
+                    footer="version: example"
+                    uiData={UIData}
+                />
+            ),
+            []
+        );
+
+        return (
+            <div className="max-w-[720px] max-h-[600px] scale-[0.8] max-sm:scale-[0.5] md:scale-90 lg:scale-100">
+                {memoizedObsidian}
+            </div>
+        );
+    }
+    ```
+
+  </Tab>
+</Tabs>
+
+## Installation
+
+<Tabs items={["pnpm", "npm", "yarn", "bun"]}>
+  <Tab value="pnpm">
+    ```bash
+    pnpm dlx shadcn@latest add "https://www.mspaint.cc/r/Obsidian"
+    ```
+  </Tab>
+  <Tab value="npm">
+    ```bash
+    npx shadcn@latest add "https://www.mspaint.cc/r/Obsidian"
+    ```
+  </Tab>
+  <Tab value="yarn">
+    ```bash
+    yarn shadcn@latest add "https://www.mspaint.cc/r/Obsidian"
+    ```
+  </Tab>
+  <Tab value="bun">
+    ```bash
+    bunx --bun shadcn@latest add "https://www.mspaint.cc/r/Obsidian"
+    ```
+  </Tab>
+</Tabs>
+
+## Usage
+
+```tsx
+import {
+  Obsidian,
+  ObsidianTab,
+  ObsidianLeft,
+  ObsidianRight,
+  ObsidianGroupbox,
+  ObsidianTabWarning,
+  ObsidianToggle,
+  ObsidianSlider,
+  ObsidianInput,
+  ObsidianDropdown,
+  ObsidianButton,
+  ObsidianLabel,
+  ObsidianDivider,
+  ObsidianImage,
+} from "@/components/obsidian/obsidian";
+```
+
+```tsx
+<Obsidian
+  title="mspaint"
+  icon="/mspaint.png"
+  footer="version: example"
+  //width={720}
+  //height={600}
+>
+  <ObsidianTab name="General" order={0} icon="Settings">
+    <ObsidianLeft>
+      <ObsidianGroupbox name="Basics" order={0}>
+        <ObsidianToggle text="Enable feature" defaultChecked />
+        <ObsidianSlider
+          text="Opacity"
+          min={0}
+          max={100}
+          value={80}
+          suffix="%"
+        />
+        <ObsidianInput text="Display name" placeholder="Type your name" />
+        <ObsidianDivider />
+        <ObsidianDropdown text="Mode" options={["Simple", "Advanced"]} />
+        <ObsidianButton text="Apply" />
+      </ObsidianGroupbox>
+    </ObsidianLeft>
+
+    <ObsidianRight>
+      <ObsidianGroupbox name="Info" order={0}>
+        <ObsidianLabel text="This is a label." />
+        <ObsidianImage text="Logo" image="/next.svg" height={200} />
+      </ObsidianGroupbox>
+    </ObsidianRight>
+  </ObsidianTab>
+</Obsidian>
+```
