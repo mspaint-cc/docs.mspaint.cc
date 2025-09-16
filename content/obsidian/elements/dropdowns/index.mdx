@@ -1,0 +1,255 @@
+---
+title: 'Dropdown'
+description: 'Dropdowns present selectable lists with optional search, multi-select, and formatter support.'
+---
+
+import DropdownPlayground from '@/components/demo/playground/Dropdown';
+import { TypeTable } from '@/components/type-table';
+
+## Playground
+
+<DropdownPlayground />
+
+## Usage
+
+You can create a Dropdown by calling the `AddDropdown` method on a Groupbox.
+
+### Arguments
+
+```lua
+local Dropdown = Groupbox:AddDropdown("MyDropdown", {
+    Text = "A dropdown",
+    Values = { "This", "is", "a", "dropdown" },
+    Default = 1,
+    Multi = false,
+})
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Index/ID of the dropdown | string | nil |
+| 2 | Dropdown configuration table | table | nil |
+
+### Configuration Table
+
+<TypeTable
+  type={{
+    Text: {
+      description: "The dropdown's label text",
+      type: 'string',
+      default: 'nil',
+      required: true
+    },
+    Values: {
+      description: 'List of selectable values',
+      type: 'table',
+      default: '{}',
+      required: true
+    },
+    Default: {
+      description: 'Default selected value or values (index, string, or table)',
+      type: 'any',
+      default: 'nil',
+      required: false
+    },
+    Multi: {
+      description: 'Whether multiple values can be selected',
+      type: 'boolean',
+      default: 'false',
+      required: false
+    },
+    AllowNull: {
+      description: 'Whether no selection is allowed',
+      type: 'boolean',
+      default: 'false',
+      required: false
+    },
+    Searchable: {
+      description: 'Enables searching through the dropdown values',
+      type: 'boolean',
+      default: 'false',
+      required: false
+    },
+    MaxVisibleDropdownItems: {
+      description: 'Maximum number of visible items in the dropdown menu',
+      type: 'number',
+      default: '8',
+      required: false
+    },
+    SpecialType: {
+      description: 'Special data source ("Player" or "Team")',
+      type: 'string',
+      default: 'nil',
+      required: false
+    },
+    ExcludeLocalPlayer: {
+      description: 'For Player type, excludes the local player',
+      type: 'boolean',
+      default: 'false',
+      required: false
+    },
+    FormatDisplayValue: {
+      description: 'Function to format displayed values',
+      type: 'function',
+      default: 'nil',
+      required: false
+    },
+    DisabledValues: {
+      description: 'Values that cannot be selected',
+      type: 'table',
+      default: '{}',
+      required: false
+    },
+    Tooltip: {
+      description: 'Tooltip text shown on hover',
+      type: 'string',
+      default: 'nil',
+      required: false
+    },
+    DisabledTooltip: {
+      description: 'Tooltip shown when disabled',
+      type: 'string',
+      default: 'nil',
+      required: false
+    },
+    Callback: {
+      description: 'Called when the selection changes',
+      type: 'function',
+      default: 'function() end',
+      required: false
+    },
+    Disabled: {
+      description: 'Whether the dropdown is disabled',
+      type: 'boolean',
+      default: 'false',
+      required: false
+    },
+    Visible: {
+      description: 'Whether the dropdown is visible',
+      type: 'boolean',
+      default: 'true',
+      required: false
+    }
+  }}
+/>
+
+## Methods
+
+You can use the following methods to interact with the dropdown:
+
+#### SetValue
+Sets the selected value or values.
+
+```lua
+Dropdown:SetValue(value)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Value to select (string, number, or table) | any | nil |
+
+#### SetValues
+Replaces all dropdown values.
+
+```lua
+Dropdown:SetValues(table)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | New values list | table | nil |
+
+#### AddValues
+Adds new values to the dropdown.
+
+```lua
+Dropdown:AddValues(value)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Value or table of values to add | any | nil |
+
+#### SetDisabledValues
+Sets which values are disabled.
+
+```lua
+Dropdown:SetDisabledValues(table)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Table of values to disable | table | nil |
+
+#### AddDisabledValues
+Adds values to the disabled list.
+
+```lua
+Dropdown:AddDisabledValues(value)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Value or table of values to disable | any | nil |
+
+#### SetText
+Updates the dropdown's label text.
+
+```lua
+Dropdown:SetText(text)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | New label text | string | nil |
+
+#### SetDisabled
+Enables or disables the dropdown.
+
+```lua
+Dropdown:SetDisabled(boolean)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Whether to disable the dropdown | boolean | nil |
+
+#### SetVisible
+Shows or hides the dropdown.
+
+```lua
+Dropdown:SetVisible(boolean)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Whether to show the dropdown | boolean | nil |
+
+#### OnChanged
+Adds another callback function.
+
+```lua
+Dropdown:OnChanged(function)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Callback executed when the dropdown changes | function | nil |
+
+## Example
+
+```lua
+local Options = Library.Options
+
+local Dropdown = Groupbox:AddDropdown("MyDropdown", {
+    Text = "A dropdown",
+    Values = { "This", "is", "a", "dropdown" },
+    Default = 1,
+})
+
+Options.MyDropdown:OnChanged(function()
+    print("Selected value:", Options.MyDropdown.Value)
+end)
+
+Options.MyDropdown:SetValue("This")
+```

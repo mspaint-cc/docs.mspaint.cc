@@ -1,0 +1,198 @@
+---
+title: 'Keybind'
+description: 'Keybinds attach keyboard shortcuts to toggles or labels for quick actions.'
+---
+
+import KeybindPlayground from '@/components/demo/playground/Keybind';
+import { TypeTable } from '@/components/type-table';
+
+## Playground
+
+<KeybindPlayground />
+
+## Usage
+
+You can create a Keybind by calling the `AddKeyPicker` method on a toggle or label reference.
+Keybinds can hang off any element that returns a reference (for example `AddToggle` or `AddLabel`).
+
+### Arguments
+
+```lua
+local Toggle = Groupbox:AddToggle("MyToggle", {
+    Text = "Example Toggle",
+    Default = false,
+})
+
+local Keybind = Toggle:AddKeyPicker("MyKeybind", {
+    Text = "Example Keybind",
+    Default = "F",
+    Mode = "Toggle",
+})
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Index/ID of the keybind | string | nil |
+| 2 | Keybind configuration table | table | nil |
+
+### Configuration Table
+
+<TypeTable
+  type={{
+    Text: {
+      description: "The keybind's text shown in the UI",
+      type: 'string',
+      default: '"KeyPicker"',
+      required: false
+    },
+    Default: {
+      description: 'Initial key assigned to the keybind',
+      type: 'string',
+      default: '"None"',
+      required: false
+    },
+    Mode: {
+      description: 'Operation mode ("Toggle", "Hold", "Always", "Press")',
+      type: 'string',
+      default: '"Toggle"',
+      required: false
+    },
+    SyncToggleState: {
+      description: 'Whether to synchronise with the parent toggle state',
+      type: 'boolean',
+      default: 'false',
+      required: false
+    },
+    WaitForCallback: {
+      description: '*Press mode only.* Locks the keybind while callbacks run',
+      type: 'boolean',
+      default: 'false',
+      required: false
+    },
+    Modes: {
+      description: 'Custom list of available modes',
+      type: 'table',
+      default: '{"Always", "Toggle", "Hold"}',
+      required: false
+    },
+    NoUI: {
+      description: 'Hide the keybind from the keybind menu',
+      type: 'boolean',
+      default: 'false',
+      required: false
+    },
+    Callback: {
+      description: 'Function fired when the keybind state changes',
+      type: 'function',
+      default: 'function() end',
+      required: false
+    },
+    ChangedCallback: {
+      description: 'Function fired when the keybind binding changes',
+      type: 'function',
+      default: 'function() end',
+      required: false
+    },
+    Clicked: {
+      description: 'Function fired when the keybind button is clicked',
+      type: 'function',
+      default: 'function() end',
+      required: false
+    }
+  }}
+/>
+
+## Methods
+
+You can use the following methods to interact with the keybind:
+
+#### SetValue
+Sets the key and mode.
+
+```lua
+Keybind:SetValue({ "F", "Toggle" })
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Table containing `{ key, mode }` | table | nil |
+
+#### GetState
+Returns whether the keybind is active.
+
+```lua
+local state = Keybind:GetState()
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | *No arguments* | – | – |
+
+#### SetText
+Updates the keybind's text.
+
+```lua
+Keybind:SetText(text)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | New keybind text | string | nil |
+
+#### Update
+Refreshes the keybind display.
+
+```lua
+Keybind:Update()
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | *No arguments* | – | – |
+
+#### OnClick
+Sets the click callback.
+
+```lua
+Keybind:OnClick(function)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Callback executed on click | function | nil |
+
+#### OnChanged
+Sets the change callback.
+
+```lua
+Keybind:OnChanged(function)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Callback executed when the keybind changes | function | nil |
+
+## Example
+
+```lua
+local Options = Library.Options
+
+local Toggle = Groupbox:AddToggle("AutoFarm", {
+    Text = "Enable Auto Farm",
+    Default = false,
+})
+
+local Keybind = Toggle:AddKeyPicker("AutoFarmKey", {
+    Default = "F",
+    Text = "Auto Farm Key",
+    Mode = "Toggle",
+})
+
+Options.AutoFarmKey:OnClick(function()
+    print("Keybind clicked:", Options.AutoFarmKey:GetState())
+end)
+
+Options.AutoFarmKey:OnChanged(function()
+    print("Key changed to:", Options.AutoFarmKey.Value)
+end)
+```

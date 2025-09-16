@@ -1,0 +1,55 @@
+---
+title: 'Label'
+description: 'Labels are used to display text.'
+---
+
+import LabelPlayground from '@/components/demo/playground/Label';
+import { TypeTable } from '@/components/type-table';
+
+## Playground
+
+<LabelPlayground />
+
+## Usage
+
+You can create a Label by calling the `AddLabel` method on a Groupbox.
+
+Choose between positional arguments for quick calls or a configuration table for more readability.
+
+### Positional Arguments
+
+```lua
+local Label = Groupbox:AddLabel("This is a label", false)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Text of the label | string | nil |
+| 2 | Whether to wrap the text | boolean | true |
+
+### Configuration Table
+
+```lua
+local Label = Groupbox:AddLabel({
+    Text = "This is a label",
+    DoesWrap = false
+})
+```
+
+<TypeTable
+  type={{
+    Text: {
+      description: 'The text of the label',
+      type: 'string',
+      default: 'nil',
+      required: true
+    },
+    DoesWrap: {
+      description: 'Whether to wrap the text',
+      type: 'boolean',
+      default: 'true',
+      required: false
+    }
+  }}
+/>
+

@@ -33,7 +33,7 @@ const docsTree: PageTree.Root = {
     },
     {
       type: "page",
-      name: "SaveManager",
+      name: "ThemeManager",
       url: "/obsidian/core/addons/thememanager",
     },
 
@@ -41,50 +41,50 @@ const docsTree: PageTree.Root = {
     {
       type: "page",
       name: "Labels",
-      url: "/obsidian/elements/luau/labels",
+      url: "/obsidian/elements/labels",
     },
     {
       type: "page",
       name: "Buttons",
-      url: "/obsidian/elements/luau/buttons",
+      url: "/obsidian/elements/buttons",
     },
     {
       type: "page",
       name: "Toggles",
-      url: "/obsidian/elements/luau/toggles",
+      url: "/obsidian/elements/toggles",
     },
-    { type: "page", name: "Inputs", url: "/obsidian/elements/luau/inputs" },
+    { type: "page", name: "Inputs", url: "/obsidian/elements/inputs" },
     {
       type: "page",
       name: "Sliders",
-      url: "/obsidian/elements/luau/sliders",
+      url: "/obsidian/elements/sliders",
     },
     {
       type: "page",
       name: "Dropdowns",
-      url: "/obsidian/elements/luau/dropdowns",
+      url: "/obsidian/elements/dropdowns",
     },
     {
       type: "page",
       name: "Keybinds",
-      url: "/obsidian/elements/luau/keybinds",
+      url: "/obsidian/elements/keybinds",
     },
     {
       type: "page",
       name: "Color Pickers",
-      url: "/obsidian/elements/luau/color-pickers",
+      url: "/obsidian/elements/color-pickers",
     },
     {
       type: "page",
       name: "Dividers",
-      url: "/obsidian/elements/luau/dividers",
+      url: "/obsidian/elements/dividers",
     },
     {
       type: "page",
       name: "Viewports",
-      url: "/obsidian/elements/luau/viewports",
+      url: "/obsidian/elements/viewports",
     },
-    { type: "page", name: "Images", url: "/obsidian/elements/luau/images" },
+    { type: "page", name: "Images", url: "/obsidian/elements/images" },
     /*{
       type: "folder",
       name: "React",

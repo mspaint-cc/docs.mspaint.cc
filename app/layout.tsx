@@ -3,6 +3,7 @@ import { RootProvider } from "fumadocs-ui/provider";
 import { Inter } from "next/font/google";
 
 import "./global.css";
+import { Toaster } from "@/components/ui/sonner";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -25,6 +26,7 @@ export default function Layout({ children }: { children: ReactNode }) {
             },
           }}
         >
+          <Toaster />
           {children}
         </RootProvider>
       </body>

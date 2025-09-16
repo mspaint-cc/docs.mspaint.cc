@@ -2,3 +2,212 @@
 title: 'ThemeManager'
 description: 'Using the ThemeManager addon to manage themes in Obsidian'
 ---
+
+import { InlineTOC } from 'fumadocs-ui/components/inline-toc';
+
+<InlineTOC items={toc} />
+
+## What is the ThemeManager?
+
+The ThemeManager addon ships with a library of built-in color schemes and helper utilities to create, persist and reuse custom themes for your Obsidian UI.
+
+## Quick Start
+
+Add the ThemeManager alongside your library and attach it to a tab or groupbox so users can tweak colors on the fly:
+
+```lua
+local repo = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/"
+local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
+local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
+
+-- register the library so ThemeManager can manipulate controls
+ThemeManager:SetLibrary(Library)
+
+-- optional: keep themes inside a custom folder
+ThemeManager:SetFolder("MyScriptHub")
+
+local Tab = Window:AddTab("UI Settings", "settings")
+
+-- automatically creates the color pickers, theme lists and buttons
+ThemeManager:ApplyToTab(Tab)
+
+-- apply whatever theme is flagged as default (built-in or custom)
+ThemeManager:LoadDefault()
+```
+
+### Built-In Themes
+
+`ThemeManager.BuiltInThemes` exposes packaged schemes such as Default, BBot, Fatality, Nord, Dracula, Catppuccin and more. These are available instantly from the “Theme list” dropdown created by `ApplyToTab`.
+
+## API Reference
+
+### Methods
+
+#### SetLibrary
+Registers the UI library instance so ThemeManager can read and update color pickers.
+
+```lua
+ThemeManager:SetLibrary(Library)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Library returned by `Library.lua` | Library | nil |
+
+#### SetFolder
+Overrides the base folder used to store theme JSON files and default markers.
+
+```lua
+ThemeManager:SetFolder(folder)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Folder path relative to workspace | string | `"ObsidianLibSettings"` |
+
+#### ApplyTheme
+Applies either a built-in theme or a custom theme saved on disk.
+
+```lua
+ThemeManager:ApplyTheme(name)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Theme name (built-in or custom) | string | nil |
+
+#### ThemeUpdate
+Pushes the current picker values back into the library scheme. Automatically called when color pickers change, but exposed if you need to trigger it manually.
+
+```lua
+ThemeManager:ThemeUpdate()
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| - | This method does not accept any arguments | - | - |
+
+#### GetCustomTheme
+Loads a custom theme JSON file and returns the decoded table.
+
+```lua
+local theme = ThemeManager:GetCustomTheme(name)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Theme file name without extension | string | nil |
+
+Returns `table?`; `nil` when the file does not exist or cannot be decoded.
+
+#### LoadDefault
+Reads the saved default marker and applies the relevant theme (built-in or custom).
+
+```lua
+ThemeManager:LoadDefault()
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| - | This method does not accept any arguments | - | - |
+
+#### SaveDefault
+Stores the provided theme name as the default choice for future sessions.
+
+```lua
+ThemeManager:SaveDefault(name)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Theme name to persist | string | nil |
+
+#### SetDefaultTheme
+Replaces the built-in `Default` theme with custom color definitions before rendering the UI. Call this **before** `ApplyToTab`.
+
+```lua
+ThemeManager:SetDefaultTheme(theme)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Table containing `FontColor`, `MainColor`, `AccentColor`, `BackgroundColor`, `OutlineColor`, `FontFace` | table | nil |
+
+#### SaveCustomTheme
+Serializes the current picker values to `<folder>/themes/<name>.json`.
+
+```lua
+ThemeManager:SaveCustomTheme(name)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Theme name without extension | string | nil |
+
+#### Delete
+Removes a saved custom theme file from disk.
+
+```lua
+local success, err = ThemeManager:Delete(name)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Theme name without extension | string | nil |
+
+Returns `boolean, string?` describing the result.
+
+#### ReloadCustomThemes
+Re-scans the theme directory and returns a list of custom theme names.
+
+```lua
+local names = ThemeManager:ReloadCustomThemes()
+```
+
+Returns `{ string }`.
+
+#### CreateThemeManager
+Builds the ThemeManager controls inside a provided groupbox (color pickers, dropdowns and action buttons).
+
+```lua
+ThemeManager:CreateThemeManager(groupbox)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Groupbox returned by `AddLeftGroupbox`/`AddRightGroupbox` | table | nil |
+
+#### CreateGroupBox
+Helper that creates the standard “Themes” groupbox on the left side of a tab.
+
+```lua
+local groupbox = ThemeManager:CreateGroupBox(tab)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Tab returned by `Window:AddTab` | table | nil |
+
+Returns the created groupbox so you can customize it further before calling `CreateThemeManager`.
+
+#### ApplyToTab
+Creates a groupbox within the tab and installs the ThemeManager UI into it.
+
+```lua
+ThemeManager:ApplyToTab(tab)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Tab returned by `Window:AddTab` | table | nil |
+
+#### ApplyToGroupbox
+Installs the ThemeManager UI into an existing groupbox.
+
+```lua
+ThemeManager:ApplyToGroupbox(groupbox)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Groupbox to populate | table | nil |

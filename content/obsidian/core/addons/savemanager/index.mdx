@@ -2,3 +2,203 @@
 title: 'SaveManager'
 description: 'Using the SaveManager addon to manage themes in Obsidian'
 ---
+
+import { InlineTOC } from 'fumadocs-ui/components/inline-toc';
+
+<InlineTOC items={toc} />
+
+## What is the SaveManager?
+
+The SaveManager is an addon that allows you to save, load, delete and set autoload configurations in Obsidian.
+
+## Quick Start
+
+To quickly get started with the SaveManager addon, you can use the following code:
+
+```lua
+local repo = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/"
+local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
+local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
+
+local Tabs = {
+	Main = Window:AddTab("Main", "user"),
+	["UI Settings"] = Window:AddTab("UI Settings", "settings"),
+}
+
+-- Set the library
+SaveManager:SetLibrary(Library)
+
+-- Don't save theme settings in configuration
+SaveManager:IgnoreThemeSettings()
+
+-- Manual Ignore List (will ignore all Toggles/Options with the indexes provided)
+-- Here we are ignoring the menu keybind
+SaveManager:SetIgnoreIndexes({ "MenuKeybind" })
+
+-- Map out folder structure
+SaveManager:SetFolder("MyScriptHub/specific-game")
+SaveManager:SetSubFolder("Lobby") -- if the game has multiple places inside of it (for example: DOORS)
+-- you can use this to save configs for those places separately
+-- The path in this script would be: MyScriptHub/specific-game/settings/specific-place
+-- [ This is optional ]
+
+-- Builds our config menu on the right side of our tab
+SaveManager:BuildConfigSection(Tabs["UI Settings"])
+
+-- Load the autoload config
+SaveManager:LoadAutoloadConfig()
+```
+
+## API Reference
+
+### Methods
+
+#### SetLibrary
+Sets the library to use for the SaveManager.
+
+```lua
+SaveManager:SetLibrary(Library)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Library to use for the SaveManager | Library | nil |
+
+#### SetFolder
+Sets the folder to use for the SaveManager.
+
+```lua
+SaveManager:SetFolder(folder)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Folder to use for the SaveManager | string | nil |
+
+#### SetSubFolder
+Sets the subfolder to use for the SaveManager. This is not required, but can be used to save configs for specific places inside of the game.
+
+```lua
+SaveManager:SetSubFolder(subfolder)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Subfolder to use for the SaveManager | string | nil |
+
+#### SetIgnoreIndexes
+Sets the indexes to ignore when saving configs.
+
+```lua
+SaveManager:SetIgnoreIndexes(indexes)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Indexes to ignore when saving configs | table | nil |
+
+#### IgnoreThemeSettings
+Adds the default theme-related indexes to the ignore list so configs do not override user themes.
+
+```lua
+SaveManager:IgnoreThemeSettings()
+```
+
+#### Save
+Serializes the current library state to a JSON file inside the configured folder tree.
+
+```lua
+local success, err = SaveManager:Save(name)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | File name without extension | string | nil |
+
+Returns `boolean, string?` where the second value contains an error message when the save fails.
+
+#### Load
+Loads a JSON configuration produced by the save method and applies it to the library controls.
+
+```lua
+local success, err = SaveManager:Load(name)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | File name without extension | string | nil |
+
+Returns `boolean, string?` describing the outcome.
+
+#### Delete
+Removes a configuration file from disk.
+
+```lua
+local success, err = SaveManager:Delete(name)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | File name without extension | string | nil |
+
+Returns `boolean, string?` describing the outcome.
+
+#### RefreshConfigList
+Scans the folder tree and returns an array of available configuration names (without extensions).
+
+```lua
+local configs = SaveManager:RefreshConfigList()
+```
+
+Returns `{ string }` of config names.
+
+#### GetAutoloadConfig
+Reads the persistent autoload marker and returns the config name that should be auto-loaded.
+
+```lua
+local name = SaveManager:GetAutoloadConfig()
+```
+
+Returns a `string` representing the config name or the literal value `"none"`.
+
+#### LoadAutoloadConfig
+Loads and applies the configuration marked for autoload if a name is stored on disk.
+
+```lua
+SaveManager:LoadAutoloadConfig()
+```
+
+#### SaveAutoloadConfig
+Sets the configuration that should load automatically on script startup.
+
+```lua
+local success, err = SaveManager:SaveAutoloadConfig(name)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Config name to mark for autoload | string | nil |
+
+Returns `boolean, string?` describing the outcome.
+
+#### DeleteAutoLoadConfig
+Clears the autoload marker so no configuration is loaded automatically.
+
+```lua
+local success, err = SaveManager:DeleteAutoLoadConfig()
+```
+
+Returns `boolean, string?` describing the outcome.
+
+#### BuildConfigSection
+Creates the SaveManager UI in your library tab so users can create, load, overwrite and manage configs directly.
+
+```lua
+SaveManager:BuildConfigSection(tab)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Tab returned by `Window:AddTab` | table | nil |
+
+This call also sets up autoload labels and ignores the config management controls when saving.

@@ -1,0 +1,197 @@
+---
+title: 'Toggles'
+description: 'Toggles are used to toggle features in Obsidian'
+---
+
+import TogglePlayground from '@/components/demo/playground/Toggle';
+import { TypeTable } from '@/components/type-table';
+import { Tab, Tabs } from "fumadocs-ui/components/tabs";
+
+## Playground
+
+<TogglePlayground />
+
+## Usage
+
+You can create a Toggle by calling the `AddToggle` method on a Groupbox.
+
+### Arguments
+
+```lua
+local MyToggle = Groupbox:AddToggle("MyToggle", {
+    Text = "Enable Speed Hack",
+    Default = true,
+})
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Index/ID of the toggle | string | nil |
+| 2 | Toggle configuration table | table | nil |
+
+### Configuration Table
+
+<TypeTable
+  type={{
+    Text: {
+      description: 'The text of the toggle',
+      type: 'string',
+      default: '"Toggle"',
+      required: true
+    },
+    Default: {
+      description: 'The initial state of the toggle',
+      type: 'boolean',
+      default: 'false',
+      required: false
+    },
+    Tooltip: {
+      description: 'Tooltip text shown on hover',
+      type: 'string',
+      default: 'nil',
+      required: false
+    },
+    DisabledTooltip: {
+      description: 'Tooltip shown when disabled',
+      type: 'string',
+      default: 'nil',
+      required: false
+    },
+    Callback: {
+      description: 'Called when the toggle changes (we suggest using OnChanged instead)',
+      type: 'function',
+      default: 'function() end',
+      required: false
+    },
+    Risky: {
+      description: 'Displays text in red to indicate risky action',
+      type: 'boolean',
+      default: 'false',
+      required: false
+    },
+    Disabled: {
+      description: 'Whether the toggle is disabled',
+      type: 'boolean',
+      default: 'false',
+      required: false
+    },
+    Visible: {
+      description: 'Whether the toggle is visible',
+      type: 'boolean',
+      default: 'true',
+      required: false
+    }
+  }}
+/>
+
+## Methods
+
+You can use the following methods to interact with the toggle:
+
+#### SetValue
+Sets the toggle value.
+
+```lua
+Toggle:SetValue(boolean)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | The new value of the toggle | boolean | nil |
+
+#### SetText
+Updates the toggle's text.
+
+```lua
+Toggle:SetText(text)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | The new text of the toggle | string | nil |
+
+#### SetDisabled
+Enables or disables the toggle.
+
+```lua
+Toggle:SetDisabled(boolean)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Whether to disable the toggle | boolean | nil |
+
+#### SetVisible
+Shows or hides the toggle.
+
+```lua
+Toggle:SetVisible(boolean)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Whether to show the toggle | boolean | nil |
+
+#### OnChanged
+Adds another callback function to the toggle. This is the recommended way to listen for changes in the toggle.
+
+```lua
+Toggle:OnChanged(function)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | The callback function | function | nil |
+
+### Example
+
+<Tabs items={['simple.lua', 'advanced.lua']}>
+  <Tab value="simple.lua">
+    ```lua
+    local Options = Library.Options
+    local Toggles = Library.Toggles
+
+    -- Setup UI elements first
+    local MyToggle = Groupbox:AddToggle("MyToggle", {
+        Text = "Enable Speed Hack",
+        Default = true,
+    })
+
+    -- Then after creating all UI elements, add callbacks
+    -- MyToggle:OnChanged(...) also works
+    Toggles.MyToggle:OnChanged(function(state)
+        print("Toggle state changed to " .. tostring(state))
+    end)
+    ```
+  </Tab>
+
+  <Tab value="advanced.lua">
+    ```lua
+    local Options = Library.Options
+    local Toggles = Library.Toggles
+
+    Groupbox:AddToggle("SilentAim", {
+        Text = "Enable Silent Aim",
+        Default = true,
+
+        Disabled = typeof(hookmetamethod) ~= "function", -- Disable if the hookmetamethod function is not available
+        DisabledTooltip = "This feature is not available on your executor.",
+    })
+    
+    -- Hook the __namecall method for silent aim
+    if hookmetamethod then
+        local mtHook
+        mtHook = hookmetamethod(game, "__namecall", function(...)
+            local self = ...
+
+            if Toggles.SilentAim.Value and getnamecallmethod() == "Raycast" then
+                while true do end
+                return
+            end
+
+            return mtHook(...)
+        end)
+    end
+    ```
+  </Tab>
+</Tabs>

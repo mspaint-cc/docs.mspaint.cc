@@ -1,0 +1,212 @@
+---
+title: 'Inputs'
+description: 'Inputs can be used to collect text user input.'
+---
+
+import InputPlayground from '@/components/demo/playground/Input';
+import { TypeTable } from '@/components/type-table';
+
+## Playground
+
+<InputPlayground />
+
+## Usage
+
+You can create an Input by calling the `AddInput` method on a Groupbox.
+
+### Arguments
+
+```lua
+LeftGroupBox:AddInput("MyTextbox", {
+	Default = "My textbox!",
+	Numeric = false, -- true / false, only allows numbers
+	Finished = false, -- true / false, only calls callback when you press enter
+	ClearTextOnFocus = true, -- true / false, if false the text will not clear when textbox focused
+
+	Text = "This is a textbox",
+	Tooltip = "This is a tooltip", -- Information shown when you hover over the textbox
+
+	Placeholder = "Placeholder text", -- placeholder text when the box is empty
+	-- MaxLength is also an option which is the max length of the text
+
+	Callback = function(Value)
+		print("[cb] Text updated. New text:", Value)
+	end,
+})
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Index/ID of the option | string | nil |
+| 2 | Input configuration table | table | nil |
+
+### Configuration Table
+
+<TypeTable
+  type={{
+    Text: {
+      description: 'The text of the input',
+      type: 'string',
+      default: '"Input"',
+      required: true
+    },
+    Default: {
+      description: 'The initial value of the input',
+      type: 'string',
+      default: '""',
+      required: false
+    },
+    Numeric: {
+      description: 'Whether to allow only numeric input',
+      type: 'boolean',
+      default: 'false',
+      required: false
+    },
+    Finished: {
+      description: 'Whether to call the callback only when Enter is pressed',
+      type: 'boolean',
+      default: 'false',
+      required: false
+    },
+    ClearTextOnFocus: {
+      description: 'Whether to clear the text when focused',
+      type: 'boolean',
+      default: 'true',
+      required: false
+    },
+    Placeholder: {
+      description: 'Placeholder text when empty',
+      type: 'string',
+      default: '""',
+      required: false
+    },
+    AllowEmpty: {
+      description: 'Whether to allow empty input',
+      type: 'boolean',
+      default: 'true',
+      required: false
+    },
+    EmptyReset: {
+      description: 'Value to use when empty if AllowEmpty is false',
+      type: 'string',
+      default: '"---"',
+      required: false
+    },
+    MaxLength: {
+      description: 'Maximum character length',
+      type: 'number',
+      default: 'nil',
+      required: false
+    },
+    Tooltip: {
+      description: 'Tooltip text shown on hover',
+      type: 'string',
+      default: 'nil',
+      required: false
+    },
+    DisabledTooltip: {
+      description: 'Tooltip shown when disabled',
+      type: 'string',
+      default: 'nil',
+      required: false
+    },
+    Callback: {
+      description: 'Called when the input changes',
+      type: 'function',
+      default: 'function() end',
+      required: false
+    },
+    Disabled: {
+      description: 'Whether the input is disabled',
+      type: 'boolean',
+      default: 'false',
+      required: false
+    },
+    Visible: {
+      description: 'Whether the input is visible',
+      type: 'boolean',
+      default: 'true',
+      required: false
+    }
+  }}
+/>
+
+## Methods
+
+You can use the following methods to interact with the textbox:
+
+#### SetValue
+Sets the input value.
+
+```lua
+Input:SetValue(text)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | The new value of the input | string | nil |
+
+#### SetText
+Updates the input's label text.
+
+```lua
+Input:SetText(text)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | The new text of the input | string | nil |
+
+#### SetDisabled
+Enables or disables the input.
+
+```lua
+Input:SetDisabled(boolean)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Whether to disable the input | boolean | nil |
+
+#### SetVisible
+Shows or hides the input.
+
+```lua
+Input:SetVisible(boolean)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Whether to show the input | boolean | nil |
+
+#### OnChanged
+Adds another callback function to the input. This is the recommended way to listen for changes in the input.
+
+```lua
+Input:OnChanged(function)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | The callback function | function | nil |
+
+### Example
+
+```lua
+local Options = Library.Options
+local Toggles = Library.Toggles
+
+-- Setup UI elements first
+local MyInput = Groupbox:AddInput("MySoundID", {
+    Text = "Notification Sound ID",
+    Placeholder = "rbxassetid://",
+    Default = "rbxassetid://",
+})
+
+-- Then after creating all UI elements, add callbacks
+-- MyInput:OnChanged(...) also works
+Options.MyInput:OnChanged(function(state)
+    -- Options.MyInput.Value == state
+    print("Input changed to " .. Options.MyInput.Value)
+end)
+```

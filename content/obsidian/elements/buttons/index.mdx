@@ -1,0 +1,116 @@
+---
+title: 'Button'
+description: 'Buttons are used to trigger actions.'
+---
+
+import ButtonPlayground from '@/components/demo/playground/Button';
+import { TypeTable } from '@/components/type-table';
+
+## Playground
+
+<ButtonPlayground />
+
+## Usage
+
+You can create a Button by calling the `AddButton` method on a Groupbox.
+
+Choose between positional arguments for quick calls or a configuration table for more customization.
+
+### Positional Arguments
+
+```lua
+Groupbox:AddButton("This is a button", function()
+    print("Button clicked!")
+end)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Text of the button | string | nil |
+| 2 | Callback function | function | nil |
+
+### Configuration Table
+
+```lua
+Groupbox:AddButton({
+    Text = "This is a button",
+    Func = function()
+        print("Button clicked!")
+    end
+})
+```
+
+<TypeTable
+  type={{
+    Text: {
+      description: 'The text of the button',
+      type: 'string',
+      default: 'nil',
+      required: true
+    },
+    Callback: {
+      description: 'The callback function to execute when the button is clicked',
+      type: 'function',
+      default: 'nil',
+      required: true
+    },
+    DoubleClick: {
+      description: 'Whether the button needs double-click',
+      type: 'boolean',
+      default: 'false',
+      required: false
+    },
+    Tooltip: {
+      description: 'Tooltip text shown on hover',
+      type: 'string',
+      default: 'nil',
+      required: false
+    },
+    DisabledTooltip: {
+      description: 'Tooltip shown when disabled',
+      type: 'string',
+      default: 'nil',
+      required: false
+    },
+    Risky: {
+      description: 'Displays text in red to indicate risky action',
+      type: 'boolean',
+      default: 'false',
+      required: false
+    },
+    Disabled: {
+      description: 'Whether the button is disabled',
+      type: 'boolean',
+      default: 'false',
+      required: false
+    },
+    Visible: {
+      description: 'Whether the button is visible',
+      type: 'boolean',
+      default: 'true',
+      required: false
+    }
+  }}
+/>
+
+## Sub Button
+
+You can also add a sub button to a button.
+
+
+```lua
+local MainButton = Groupbox:AddButton({
+    Text = "Button",
+    Func = function()
+        print("Button clicked!")
+    end
+})
+
+MainButton:AddButton({
+    Text = "Sub Button",
+    Func = function()
+        print("Sub button clicked!")
+    end
+})
+``` 
+

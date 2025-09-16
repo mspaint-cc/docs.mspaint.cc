@@ -50,7 +50,7 @@ export default function Button({
 }) {
 	if (subButton != undefined) {
 		return (
-			<div className="flex flex-row gap-2">
+			<div className="flex flex-row gap-2 w-full">
 				<ButtonBase text={text} containerClassName="min-w-0 flex-1 flex-shrink" />
 				<ButtonBase text={subButton.text} containerClassName="min-w-0 flex-1 flex-shrink" />
 			</div>

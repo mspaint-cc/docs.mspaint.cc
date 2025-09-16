@@ -1,0 +1,251 @@
+---
+title: 'Slider'
+description: 'Sliders expose numeric settings with optional prefixes, suffixes, and callbacks.'
+---
+
+import SliderPlayground from '@/components/demo/playground/Slider';
+import { TypeTable } from '@/components/type-table';
+
+## Playground
+
+<SliderPlayground />
+
+## Usage
+
+You can create a Slider by calling the `AddSlider` method on a Groupbox.
+
+### Arguments
+
+```lua
+local Slider = Groupbox:AddSlider("Sensitivity", {
+    Text = "Sensitivity",
+    Default = 50,
+    Min = 0,
+    Max = 100,
+    Rounding = 0,
+})
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Index/ID of the slider | string | nil |
+| 2 | Slider configuration table | table | nil |
+
+### Configuration Table
+
+<TypeTable
+  type={{
+    Text: {
+      description: 'Text displayed for the slider (hidden when Compact is true)',
+      type: 'string',
+      default: '"Slider"',
+      required: true
+    },
+    Default: {
+      description: 'Initial value the slider starts at',
+      type: 'number',
+      default: '0',
+      required: true
+    },
+    Min: {
+      description: 'Minimum selectable value',
+      type: 'number',
+      default: '0',
+      required: true
+    },
+    Max: {
+      description: 'Maximum selectable value',
+      type: 'number',
+      default: '100',
+      required: true
+    },
+    Rounding: {
+      description: 'Decimal precision applied to values',
+      type: 'number',
+      default: '0',
+      required: true
+    },
+    Prefix: {
+      description: 'Text rendered before the numeric value',
+      type: 'string',
+      default: '""',
+      required: false
+    },
+    Suffix: {
+      description: 'Text rendered after the numeric value',
+      type: 'string',
+      default: '""',
+      required: false
+    },
+    Compact: {
+      description: 'Hide the label and only display the slider value',
+      type: 'boolean',
+      default: 'false',
+      required: false
+    },
+    HideMax: {
+      description: 'Display only the current value instead of value/max',
+      type: 'boolean',
+      default: 'false',
+      required: false
+    },
+    FormatDisplayValue: {
+      description: 'Custom formatter for the displayed value',
+      type: 'function',
+      default: 'nil',
+      required: false
+    },
+    Callback: {
+      description: 'Function called when the slider value changes',
+      type: 'function',
+      default: 'function() end',
+      required: false
+    },
+    Tooltip: {
+      description: 'Tooltip shown when hovered',
+      type: 'string',
+      default: 'nil',
+      required: false
+    },
+    DisabledTooltip: {
+      description: 'Tooltip shown when disabled',
+      type: 'string',
+      default: 'nil',
+      required: false
+    },
+    Disabled: {
+      description: 'Whether the slider is interactive',
+      type: 'boolean',
+      default: 'false',
+      required: false
+    },
+    Visible: {
+      description: 'Whether the slider is rendered',
+      type: 'boolean',
+      default: 'true',
+      required: false
+    }
+  }}
+/>
+
+## Methods
+
+You can use the following methods to interact with the slider:
+
+#### SetValue
+Sets the slider value.
+
+```lua
+Slider:SetValue(number)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | The new value of the slider | number | nil |
+
+#### SetText
+Updates the slider's text.
+
+```lua
+Slider:SetText(text)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | The new text of the slider | string | nil |
+
+#### SetMin
+Sets the minimum value.
+
+```lua
+Slider:SetMin(number)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Minimum allowed value | number | nil |
+
+#### SetMax
+Sets the maximum value.
+
+```lua
+Slider:SetMax(number)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Maximum allowed value | number | nil |
+
+#### SetDisabled
+Enables or disables the slider.
+
+```lua
+Slider:SetDisabled(boolean)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Whether to disable the slider | boolean | nil |
+
+#### SetVisible
+Shows or hides the slider.
+
+```lua
+Slider:SetVisible(boolean)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Whether to show the slider | boolean | nil |
+
+#### SetPrefix
+Sets the prefix text.
+
+```lua
+Slider:SetPrefix(text)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Text displayed before the value | string | nil |
+
+#### SetSuffix
+Sets the suffix text.
+
+```lua
+Slider:SetSuffix(text)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Text displayed after the value | string | nil |
+
+#### OnChanged
+Adds another callback function.
+
+```lua
+Slider:OnChanged(function)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Callback executed on value change | function | nil |
+
+## Example
+
+```lua
+local Options = Library.Options
+
+Groupbox:AddSlider("Sensitivity", {
+    Text = "Sensitivity",
+    Default = 50,
+    Min = 0,
+    Max = 100,
+    Rounding = 0,
+    Suffix = "%",
+})
+
+Options.Sensitivity:OnChanged(function(value)
+    print("Slider changed to", value)
+end)
+```
