@@ -62,7 +62,7 @@ SaveManager:SetLibrary(Library)
 
 | Arg Idx | Argument Description | Type | Default |
 | --- | --- | --- | --- |
-| 1 | Library to use for the SaveManager | Library | nil |
+| 1 | Library to use for the SaveManager | Library (table) | nil |
 
 #### SetFolder
 Sets the folder to use for the SaveManager.
@@ -73,7 +73,7 @@ SaveManager:SetFolder(folder)
 
 | Arg Idx | Argument Description | Type | Default |
 | --- | --- | --- | --- |
-| 1 | Folder to use for the SaveManager | string | nil |
+| 1 | Folder path relative to workspace | string | nil |
 
 #### SetSubFolder
 Sets the subfolder to use for the SaveManager. This is not required, but can be used to save configs for specific places inside of the game.
@@ -95,7 +95,7 @@ SaveManager:SetIgnoreIndexes(indexes)
 
 | Arg Idx | Argument Description | Type | Default |
 | --- | --- | --- | --- |
-| 1 | Indexes to ignore when saving configs | table | nil |
+| 1 | Indexes to ignore when saving configs (e.g. `{ "MenuKeybind" }`) | table | nil |
 
 #### IgnoreThemeSettings
 Adds the default theme-related indexes to the ignore list so configs do not override user themes.
@@ -199,6 +199,6 @@ SaveManager:BuildConfigSection(tab)
 
 | Arg Idx | Argument Description | Type | Default |
 | --- | --- | --- | --- |
-| 1 | Tab returned by `Window:AddTab` | table | nil |
+| 1 | Tab to populate | Tab (table) | nil |
 
-This call also sets up autoload labels and ignores the config management controls when saving.
+This call also ignores the config management controls when saving.

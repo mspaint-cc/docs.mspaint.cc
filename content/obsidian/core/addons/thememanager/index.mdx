@@ -52,7 +52,7 @@ ThemeManager:SetLibrary(Library)
 
 | Arg Idx | Argument Description | Type | Default |
 | --- | --- | --- | --- |
-| 1 | Library returned by `Library.lua` | Library | nil |
+| 1 | Library to use for the ThemeManager | Library (table) | nil |
 
 #### SetFolder
 Overrides the base folder used to store theme JSON files and default markers.
@@ -83,9 +83,6 @@ Pushes the current picker values back into the library scheme. Automatically cal
 ThemeManager:ThemeUpdate()
 ```
 
-| Arg Idx | Argument Description | Type | Default |
-| --- | --- | --- | --- |
-| - | This method does not accept any arguments | - | - |
 
 #### GetCustomTheme
 Loads a custom theme JSON file and returns the decoded table.
@@ -106,10 +103,6 @@ Reads the saved default marker and applies the relevant theme (built-in or custo
 ```lua
 ThemeManager:LoadDefault()
 ```
-
-| Arg Idx | Argument Description | Type | Default |
-| --- | --- | --- | --- |
-| - | This method does not accept any arguments | - | - |
 
 #### SaveDefault
 Stores the provided theme name as the default choice for future sessions.
@@ -142,7 +135,7 @@ ThemeManager:SaveCustomTheme(name)
 
 | Arg Idx | Argument Description | Type | Default |
 | --- | --- | --- | --- |
-| 1 | Theme name without extension | string | nil |
+| 1 | Theme name without file extension | string | nil |
 
 #### Delete
 Removes a saved custom theme file from disk.
@@ -153,7 +146,7 @@ local success, err = ThemeManager:Delete(name)
 
 | Arg Idx | Argument Description | Type | Default |
 | --- | --- | --- | --- |
-| 1 | Theme name without extension | string | nil |
+| 1 | Theme name without file extension | string | nil |
 
 Returns `boolean, string?` describing the result.
 
@@ -164,7 +157,7 @@ Re-scans the theme directory and returns a list of custom theme names.
 local names = ThemeManager:ReloadCustomThemes()
 ```
 
-Returns `{ string }`.
+Returns `{ string }` of theme names.
 
 #### CreateThemeManager
 Builds the ThemeManager controls inside a provided groupbox (color pickers, dropdowns and action buttons).
@@ -175,7 +168,7 @@ ThemeManager:CreateThemeManager(groupbox)
 
 | Arg Idx | Argument Description | Type | Default |
 | --- | --- | --- | --- |
-| 1 | Groupbox returned by `AddLeftGroupbox`/`AddRightGroupbox` | table | nil |
+| 1 | Groupbox returned by `AddLeftGroupbox`/`AddRightGroupbox` | Groupbox (table) | nil |
 
 #### CreateGroupBox
 Helper that creates the standard “Themes” groupbox on the left side of a tab.
@@ -186,7 +179,7 @@ local groupbox = ThemeManager:CreateGroupBox(tab)
 
 | Arg Idx | Argument Description | Type | Default |
 | --- | --- | --- | --- |
-| 1 | Tab returned by `Window:AddTab` | table | nil |
+| 1 | Tab returned by `Window:AddTab` | Tab (table) | nil |
 
 Returns the created groupbox so you can customize it further before calling `CreateThemeManager`.
 
@@ -199,7 +192,7 @@ ThemeManager:ApplyToTab(tab)
 
 | Arg Idx | Argument Description | Type | Default |
 | --- | --- | --- | --- |
-| 1 | Tab returned by `Window:AddTab` | table | nil |
+| 1 | Tab returned by `Window:AddTab` | Tab (table) | nil |
 
 #### ApplyToGroupbox
 Installs the ThemeManager UI into an existing groupbox.
@@ -210,4 +203,4 @@ ThemeManager:ApplyToGroupbox(groupbox)
 
 | Arg Idx | Argument Description | Type | Default |
 | --- | --- | --- | --- |
-| 1 | Groupbox to populate | table | nil |
+| 1 | Groupbox to populate | Groupbox (table) | nil |
