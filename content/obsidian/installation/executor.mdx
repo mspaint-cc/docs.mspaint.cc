@@ -3,32 +3,14 @@ title: 'Executor'
 description: 'Install Obsidian in an executor environment'
 ---
 
-## Installing Obsidian in an Executor
-To install Obsidian in an executor environment, you can use the following code snippet to get the library:
+## Using Obsidian in an Executor Environment
+To use Obsidian in an executor environment, you can use the following code snippet to get the library:
 
 ```lua
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/deividcomsono/Obsidian/refs/heads/main/Library.lua"))()
 ```
 
-Then, create a window:
-
-```lua
-local Window = Library:CreateWindow({
-    Title = "My Script",
-    Footer = "v1.0.0",
-    ToggleKeybind = Enum.KeyCode.RightControl,
-    Center = true,
-    AutoShow = true
-})
-```
+Then, you should be good to go! You can start by checking out the [Window](/obsidian/core/library#Window) section to create your first window, tab, groupbox and UI elements.
 
 ## Addons
-The library comes with several built-in addons such as **ThemeManager** and **SaveManager**.
-
-```lua
-local repo = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/"
-
-local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
-local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
-local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
-```
+The library comes with several built-in addons such as [ThemeManager](/obsidian/core/addons/thememanager) and [SaveManager](/obsidian/core/addons/savemanager).
