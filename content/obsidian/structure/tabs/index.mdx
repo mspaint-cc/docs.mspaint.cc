@@ -1,0 +1,193 @@
+---
+title: 'Tabs'
+description: 'Tabs are used to structure your Obsidian UI.'
+---
+
+import { InlineTOC } from 'fumadocs-ui/components/inline-toc';
+import { Tab, Tabs } from "fumadocs-ui/components/tabs";
+import { TypeTable } from '@/components/type-table';
+
+<InlineTOC items={toc} />
+
+Tabs are the main way to sepearate each section for your UI. Each tab can have a name, icon and a description. The order is determined by the order of when `Window:AddTab()` is called.
+
+![Obsidian](./tabspreview.webp)
+
+## Quick Start
+
+We recommend storing your tabs in a table to make it easier to manage.
+
+```lua
+local Tabs = {
+    Main = Window:AddTab("Main", "user"),
+    ["UI Settings"] = Window:AddTab("UI Settings", "settings"),
+}
+```
+
+Once you have created your tabs, you can add UI elements to them via [groupboxes](./groupboxes) and/or [tabboxes](./tabboxes).
+
+## Usage
+
+You can create a Tab by calling the `AddTab` method on a Window.
+
+### Arguments
+```lua
+local Tab = Window:AddTab("Main", "user")
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Index/ID of the tab | string | nil |
+| 2 | Icon name from lucide.dev | string | nil |
+| 3 | Tab description | string | nil |
+
+### Configuration Table
+```lua
+local Tab = Window:AddTab({
+    Name = "Main",
+    Description = "Main features",
+    Icon = "home"
+})
+```
+
+<TypeTable
+  type={{
+    Name: {
+      description: 'The name of the tab',
+      type: 'string',
+      default: 'nil',
+      required: true
+    },
+    Description: {
+      description: 'The description of the tab',
+      type: 'string',
+      default: 'nil',
+      required: false
+    },
+    Icon: {
+      description: 'The icon name from lucide.dev',
+      type: 'string',
+      default: 'nil',
+      required: false
+    }
+  }}
+/>
+
+## Methods
+
+You can use the following methods to interact with the tab:
+
+#### UpdateWarningBox
+
+Updates the warning box in a tab. This can be used to display warnings/errors, or any useful information.
+
+![warningbox](./warningbox.png)
+
+```lua
+Tab:UpdateWarningBox({
+    Title = "Warning",
+    Text = "Example",
+    IsNormal = false, -- Error Box = true, Normal Box = false
+    Visible = true,
+    LockSize = true,
+})
+```
+
+<TypeTable
+    type={{
+        Title: {
+            description: 'The title of the warning box',
+            type: 'string',
+            default: 'nil',
+            required: true
+        },
+        Text: {
+            description: 'The text inside the warning box',
+            type: 'string',
+            default: 'nil',
+            required: true
+        },
+        IsNormal: {
+            description: 'Whether the warning box follows the normal Obsidian style or uses a red background',
+            type: 'boolean',
+            default: 'false',
+            required: false
+        },
+        Visible: {
+            description: 'Whether the warning box is visible',
+            type: 'boolean',
+            default: 'true',
+            required: false
+        },
+        LockSize: {
+            description: 'Whether the warning box should be locked to a fixed size',
+            type: 'boolean',
+            default: 'false',
+            required: false
+        }
+    }}
+/>
+
+#### SetVisible
+Shows or hides the tab.
+
+```lua
+Tab:SetVisible(boolean)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Whether to show the tab | boolean | nil |
+
+#### SetOrder
+Changes the order of the tab.
+
+```lua
+Tab:SetOrder(number)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | New order of the tab | number | nil |
+
+#### SetName
+Updates the name of the tab.
+
+```lua
+Tab:SetName(name)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | New name of the tab | string | nil |
+
+#### SetDescription
+Updates the description of the tab.
+
+```lua
+Tab:SetDescription(description)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | New description of the tab | string | nil |
+
+#### SetIcon
+Updates the icon of the tab.
+
+```lua
+Tab:SetIcon(icon)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | New icon of the tab | string | nil |
+
+## Example
+
+```lua
+local Tabs = {
+    Main = Window:AddTab("Main", "user"),
+    ["UI Settings"] = Window:AddTab("UI Settings", "settings"),
+}
+```

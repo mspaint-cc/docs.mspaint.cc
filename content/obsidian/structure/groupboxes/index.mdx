@@ -1,0 +1,27 @@
+---
+title: 'Groupboxes'
+description: 'Groupboxes are used to group ui elements together in a tab.'
+---
+
+import DemoGroupbox from "@/components/demo/Groupbox";
+
+[Groupboxes](/obsidian/structure/groupboxes) and [Tabboxes](/obsidian/structure/tabboxes) are the basic building block of each tab, you need it to group together UI elements. Any groupbox you create can be either a left or right groupbox.
+
+<DemoGroupbox />
+
+## Usage
+
+You can create a Groupbox by calling the `AddLeftGroupbox` or `AddRightGroupbox` method on a Tab.
+
+### Arguments
+
+```lua
+local LeftGroupBox = Tab:AddLeftGroupbox("Left Groupbox", "wrench")
+local RightGroupBox = Tab:AddRightGroupbox("Right Groupbox")
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Index/ID of the groupbox | string | nil |
+| 2 | Icon name from lucide.dev | string | nil |
+

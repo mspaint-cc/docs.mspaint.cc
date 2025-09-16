@@ -37,6 +37,23 @@ const docsTree: PageTree.Root = {
       url: "/obsidian/core/addons/thememanager",
     },
 
+    { type: "separator", name: "Structure" },
+    {
+      type: "page",
+      name: "Tabs",
+      url: "/obsidian/structure/tabs",
+    },
+    {
+      type: "page",
+      name: "Groupboxes",
+      url: "/obsidian/structure/groupboxes",
+    },
+    {
+      type: "page",
+      name: "Tabboxes",
+      url: "/obsidian/structure/tabboxes",
+    },
+
     { type: "separator", name: "UI Elements" },
     {
       type: "page",
