@@ -1,0 +1,185 @@
+---
+title: 'Image'
+description: 'Images display static assets with optional tinting and sizing controls.'
+---
+
+import ImagePlayground from '@/components/demo/playground/Image';
+import { TypeTable } from '@/components/type-table';
+
+## Playground
+
+<ImagePlayground />
+
+## Usage
+
+You can create an Image by calling the `AddImage` method on a Groupbox.
+
+### Arguments
+
+```lua
+Groupbox:AddImage("MyImage", {
+    Image = "http://www.roblox.com/asset/?id=135666356081915",
+    Height = 200,
+})
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Index/ID of the image element | string | nil |
+| 2 | Image configuration table | table | nil |
+
+### Configuration Table
+
+<TypeTable
+  type={{
+    Image: {
+      description: 'Image URL or asset ID to display',
+      type: 'string',
+      default: '""',
+      required: true
+    },
+    Transparency: {
+      description: 'Transparency of the image (0 to 1)',
+      type: 'number',
+      default: '0',
+      required: false
+    },
+    Color: {
+      description: 'Color tint applied to the image',
+      type: 'Color3',
+      default: 'Color3.new(1, 1, 1)',
+      required: false
+    },
+    RectOffset: {
+      description: 'Offset for the image rectangle (Vector2)',
+      type: 'Vector2',
+      default: 'Vector2.zero',
+      required: false
+    },
+    RectSize: {
+      description: 'Size of the image rectangle (Vector2)',
+      type: 'Vector2',
+      default: 'Vector2.zero',
+      required: false
+    },
+    ScaleType: {
+      description: 'How the image should scale within its frame',
+      type: 'Enum.ScaleType',
+      default: 'Enum.ScaleType.Fit',
+      required: false
+    },
+    Height: {
+      description: 'Height of the image frame in pixels',
+      type: 'number',
+      default: '200',
+      required: false
+    },
+    Callback: {
+      description: 'Called when the image changes',
+      type: 'function',
+      default: 'function() end',
+      required: false
+    }
+  }}
+/>
+
+## Methods
+
+You can use the following methods to interact with the image element:
+
+#### SetImage
+Updates the displayed image.
+
+```lua
+Image:SetImage(image)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Image URL or asset ID | string | nil |
+
+#### SetTransparency
+Sets the transparency value.
+
+```lua
+Image:SetTransparency(value)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Transparency between 0 and 1 | number | nil |
+
+#### SetColor
+Applies a color tint.
+
+```lua
+Image:SetColor(color)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Color tint (`Color3`) | Color3 | nil |
+
+#### SetRectOffset
+Updates the rectangle offset.
+
+```lua
+Image:SetRectOffset(offset)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Offset (`Vector2`) | Vector2 | nil |
+
+#### SetRectSize
+Updates the rectangle size.
+
+```lua
+Image:SetRectSize(size)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Size (`Vector2`) | Vector2 | nil |
+
+#### SetScaleType
+Sets the frame scaling behaviour.
+
+```lua
+Image:SetScaleType(scaleType)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Scale type (`Enum.ScaleType`) | Enum.ScaleType | nil |
+
+#### SetHeight
+Adjusts the frame height.
+
+```lua
+Image:SetHeight(height)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Frame height in pixels | number | nil |
+
+## Example
+
+```lua
+local Options = Library.Options
+
+local Image = Groupbox:AddImage("MyAgaImage", {
+    Image = "http://www.roblox.com/asset/?id=135666356081915",
+    Transparency = 0,
+    Color = Color3.new(1, 1, 1),
+    RectOffset = Vector2.zero,
+    RectSize = Vector2.zero,
+    ScaleType = Enum.ScaleType.Fit,
+    Height = 200,
+})
+
+Image:SetImage(getcustomasset("mspaint.png"))
+Image:SetTransparency(0.1)
+Image:SetColor(Color3.fromRGB(255, 200, 200))
+```

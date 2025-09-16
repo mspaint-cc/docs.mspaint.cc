@@ -72,7 +72,7 @@ const docsTree: PageTree.Root = {
     {
       type: "page",
       name: "Color Pickers",
-      url: "/obsidian/elements/color-pickers",
+      url: "/obsidian/elements/colorpickers",
     },
     {
       type: "page",
@@ -85,17 +85,6 @@ const docsTree: PageTree.Root = {
       url: "/obsidian/elements/viewports",
     },
     { type: "page", name: "Images", url: "/obsidian/elements/images" },
-    /*{
-      type: "folder",
-      name: "React",
-      children: [
-        { type: "page", name: "Official Shop", url: "/purchase/mspaintcc" },
-        { type: "page", name: "BloxProducts", url: "/purchase/bloxproducts" },
-        { type: "page", name: "YESU", url: "/purchase/YESU" },
-        { type: "page", name: "Aero", url: "/purchase/aero" },
-        { type: "page", name: "Munchen Keys", url: "/purchase/munchen_keys" },
-      ],
-    },*/
   ],
 };
 

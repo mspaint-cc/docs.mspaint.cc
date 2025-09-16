@@ -3,10 +3,7 @@
 import Toggle from "@/components/obsidian/elements/Toggle";
 import KeyPicker from "@/components/obsidian/elements/addons/KeyPicker";
 import AddonContainer from "@/components/obsidian/elements/addons/AddonContainer";
-import {
-  UIStateProvider,
-  useUIValue,
-} from "@/components/obsidian/UIStateProvider";
+import { UIStateProvider } from "@/components/obsidian/UIStateProvider";
 import { Input } from "@/components/ui/input";
 import { Label as LabelPrimitive } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";

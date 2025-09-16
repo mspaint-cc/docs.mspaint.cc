@@ -1,0 +1,152 @@
+---
+title: 'Viewport'
+description: 'Viewports embed 3D objects inside your UI using Roblox viewport frames.'
+---
+
+import ViewportPlayground from '@/components/demo/playground/Viewport';
+import { TypeTable } from '@/components/type-table';
+
+## Playground
+
+<ViewportPlayground />
+
+## Usage
+
+You can create a Viewport by calling the `AddViewport` method on a Groupbox.
+
+### Arguments
+
+```lua
+local Viewport = Groupbox:AddViewport("MyViewport", {
+    Object = Instance.new("Part"),
+    Camera = Instance.new("Camera"),
+    Interactive = true,
+    AutoFocus = true,
+    Height = 200,
+})
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Index/ID of the viewport element | string | nil |
+| 2 | Viewport configuration table | table | nil |
+
+### Configuration Table
+
+<TypeTable
+  type={{
+    Object: {
+      description: '3D object instance to display in the viewport',
+      type: 'Instance',
+      default: 'nil',
+      required: true
+    },
+    Camera: {
+      description: 'Camera instance used to view the object',
+      type: 'Instance (Camera)',
+      default: 'Instance.new("Camera")',
+      required: false
+    },
+    Interactive: {
+      description: 'Whether the viewport supports user interaction (zoom/orbit)',
+      type: 'boolean',
+      default: 'false',
+      required: false
+    },
+    AutoFocus: {
+      description: 'Automatically focus the camera on the object',
+      type: 'boolean',
+      default: 'true',
+      required: false
+    },
+    Height: {
+      description: 'Height of the viewport frame in pixels',
+      type: 'number',
+      default: '200',
+      required: false
+    },
+    Callback: {
+      description: 'Function fired when the viewport is initialised',
+      type: 'function',
+      default: 'function() end',
+      required: false
+    }
+  }}
+/>
+
+## Methods
+
+You can use the following methods to interact with the viewport element:
+
+#### SetObject
+Changes the displayed 3D object.
+
+```lua
+Viewport:SetObject(object)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Object instance to display | Instance | nil |
+
+#### SetCamera
+Updates the camera instance.
+
+```lua
+Viewport:SetCamera(camera)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Camera instance | Instance (Camera) | nil |
+
+#### SetInteractive
+Toggles user interaction.
+
+```lua
+Viewport:SetInteractive(interactive)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Whether the viewport is interactive | boolean | nil |
+
+#### SetHeight
+Adjusts the viewport frame height.
+
+```lua
+Viewport:SetHeight(height)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Frame height in pixels | number | nil |
+
+#### Focus
+Focuses the camera on the object.
+
+```lua
+Viewport:Focus()
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | *No arguments* | – | – |
+
+## Example
+
+```lua
+local Options = Library.Options
+
+local Viewport = Groupbox:AddViewport("DemoViewport", {
+    Object = Instance.new("Part"),
+    Camera = Instance.new("Camera"),
+    Interactive = true,
+    AutoFocus = true,
+    Height = 240,
+})
+
+Viewport:SetInteractive(true)
+Viewport:SetHeight(260)
+Viewport:Focus()
+```

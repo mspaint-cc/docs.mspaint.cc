@@ -1,0 +1,138 @@
+---
+title: 'Color Picker'
+description: 'Color pickers let users choose colors (optionally with transparency) from a toggle or label reference.'
+---
+
+import ColorPickerPlayground from '@/components/demo/playground/ColorPicker';
+import { TypeTable } from '@/components/type-table';
+
+## Playground
+
+<ColorPickerPlayground />
+
+## Usage
+
+You can create a Color Picker by calling the `AddColorPicker` method on a toggle or label reference.
+
+### Arguments
+
+```lua
+local Toggle = Groupbox:AddToggle("MyToggle", {
+    Text = "This is a toggle",
+    Default = true,
+})
+
+local ColorPicker = Toggle:AddColorPicker("ColorPicker1", {
+    Default = Color3.new(1, 0, 0),
+    Title = "Some color",
+})
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Index/ID of the color picker | string | nil |
+| 2 | Color picker configuration table | table | nil |
+
+### Configuration Table
+
+<TypeTable
+  type={{
+    Default: {
+      description: 'Initial color value (Color3)',
+      type: 'Color3',
+      default: 'Color3.new(1, 1, 1)',
+      required: false
+    },
+    Title: {
+      description: 'Optional custom title shown inside the picker dialog',
+      type: 'string',
+      default: 'nil',
+      required: false
+    },
+    Transparency: {
+      description: 'Default transparency (0-1) and enables transparency editing',
+      type: 'number',
+      default: '0',
+      required: false
+    },
+    Callback: {
+      description: 'Function called when the color changes',
+      type: 'function',
+      default: 'function() end',
+      required: false
+    },
+    Changed: {
+      description: 'Alternate callback triggered when the picker updates',
+      type: 'function',
+      default: 'function() end',
+      required: false
+    }
+  }}
+/>
+
+## Methods
+
+You can use the following methods to interact with the color picker:
+
+#### SetValue
+Sets the color using HSV components.
+
+```lua
+ColorPicker:SetValue(hsv, transparency)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | HSV table (e.g. `{H = 0, S = 1, V = 1}`) | table | nil |
+| 2 | Transparency between 0 and 1 | number | nil |
+
+#### SetValueRGB
+Sets the color using an RGB `Color3` value.
+
+```lua
+ColorPicker:SetValueRGB(color, transparency)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | RGB color (`Color3`) | Color3 | nil |
+| 2 | Transparency between 0 and 1 | number | nil |
+
+#### OnChanged
+Registers an additional change callback.
+
+```lua
+ColorPicker:OnChanged(function)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Callback executed when the color changes | function | nil |
+
+## Example
+
+```lua
+local Options = Library.Options
+
+local Toggle = Groupbox:AddToggle("MyToggle", {
+    Text = "This is a toggle",
+    Default = true,
+})
+
+local ColorPicker = Toggle:AddColorPicker("ColorPicker1", {
+    Default = Color3.new(1, 0, 0),
+    Title = "Some color",
+    Transparency = 0,
+})
+
+Options.ColorPicker1:OnChanged(function()
+    print("Color changed!", Options.ColorPicker1.Value)
+    if Options.ColorPicker1.Transparency then
+        print("Transparency changed!", Options.ColorPicker1.Transparency)
+    end
+end)
+
+Options.ColorPicker1:SetValueRGB(Color3.fromRGB(0, 255, 140))
+```
+
+Color pickers can also be attached to labels via `AddLabel(...):AddColorPicker(...)` for static UI configuration.
