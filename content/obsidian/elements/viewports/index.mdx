@@ -41,6 +41,12 @@ local Viewport = Groupbox:AddViewport("MyViewport", {
       default: 'nil',
       required: true
     },
+    Clone: {
+      description: 'Whether to clone the object instance for the viewport',
+      type: 'boolean',
+      default: 'true',
+      required: false
+    },
     Camera: {
       description: 'Camera instance used to view the object',
       type: 'Instance (Camera)',
