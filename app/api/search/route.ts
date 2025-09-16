@@ -62,5 +62,3 @@ export async function GET(request: NextRequest) {
   const results = await api.search(query, { tag, locale });
   return Response.json(results);
 }
-
-export const { staticGET } = api;
