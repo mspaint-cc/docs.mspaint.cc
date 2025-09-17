@@ -38,7 +38,7 @@ local Tab = Window:AddTab("Main", "user")
 | Arg Idx | Argument Description | Type | Default |
 | --- | --- | --- | --- |
 | 1 | Name of the tab | string | nil |
-| 2 | Icon name from lucide.dev | string | nil |
+| 2 | Custom Icon or Icon name from lucide.dev | string | nil |
 | 3 | Tab description | string | nil |
 
 ### Configuration Table
@@ -65,7 +65,7 @@ local Tab = Window:AddTab({
       required: false
     },
     Icon: {
-      description: 'The icon name from lucide.dev',
+      description: 'Custom Icon or Icon name from lucide.dev',
       type: 'string',
       default: 'nil',
       required: false
