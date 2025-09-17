@@ -1,0 +1,53 @@
+---
+title: 'Dependency Boxes'
+description: 'Conditionally display a list of toggles and options based on the dependencies set.'
+---
+
+import DemoDependencyBox from "@/components/demo/DependencyBox";
+
+Dependency boxes are non visible containers that live inside the groupbox that created them used to hide and show elements contained within it based on the dependencies set.
+
+<DemoDependencyBox />
+
+## Usage
+
+You can create a Dependency Box by calling the `AddDependencyBox` method on a Groupbox.
+
+```lua
+local Toggles = Library.Toggles
+local LeftGroupbox = MainTab:AddLeftGroupbox("Settings", "wrench")
+
+LeftGroupbox:AddToggle("EnableAudio", {
+    Text = "Enable Audio",
+    Default = false
+})
+
+local AudioSettings = LeftGroupbox:AddDependencyBox()
+
+AudioSettings:AddSlider("Volume", {
+    Text = "Volume",
+    Default = 50,
+    Min = 0,
+    Max = 100,
+    Rounding = 0
+})
+
+AudioSettings:SetupDependencies({
+    { Toggles.EnableAudio, true }, -- Only show if EnableAudio is true
+    -- { Options.AudioMode, "Stereo" } -- And also only show if AudioMode is Stereo
+})
+```
+
+## Methods
+
+### SetupDependencies
+
+Setup the dependencies for the dependency box.
+
+```lua
+DependencyBox:SetupDependencies(dependencies)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | table of dependencies | table | nil |

@@ -53,6 +53,22 @@ const docsTree: PageTree.Root = {
       name: "Tabboxes",
       url: "/obsidian/structure/tabboxes",
     },
+    {
+      type: "folder",
+      name: "Dependency",
+      children: [
+        {
+          type: "page",
+          name: "Dependency Boxes",
+          url: "/obsidian/structure/dependencyboxes",
+        },
+        {
+          type: "page",
+          name: "Dependency Groupboxes",
+          url: "/obsidian/structure/dependencygroupboxes",
+        },
+      ],
+    },
 
     { type: "separator", name: "UI Elements" },
     {

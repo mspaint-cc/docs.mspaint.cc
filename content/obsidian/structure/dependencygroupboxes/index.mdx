@@ -1,0 +1,54 @@
+---
+title: 'Dependency Groupboxes'
+description: 'Conditionally display a groupbox with toggles and options based on the dependencies set.'
+---
+
+import DemoDependencyGroupbox from "@/components/demo/DependencyGroupbox";
+
+Dependency groupboxes much like [dependency boxes](/obsidian/structure/dependencyboxes) are containers that hide and show elements contained within it based on the dependencies set.
+
+The difference is that dependency groupboxes have actually "groupbox" like UI *(with no title and no side choice, the side is inherited from the parent groupbox's side)*.
+
+<DemoDependencyGroupbox />
+
+## Usage
+
+You can create a Dependency Groupbox by calling the `AddDependencyGroupbox` method on a Groupbox.
+
+```lua
+local Toggles = Library.Toggles
+local LeftGroupbox = MainTab:AddLeftGroupbox("Settings", "wrench")
+
+LeftGroupbox:AddToggle("EnableAudio", {
+    Text = "Enable Audio",
+    Default = false
+})
+
+local AudioSettings = LeftGroupbox:AddDependencyGroupbox()
+
+AudioSettings:AddSlider("Volume", {
+    Text = "Volume",
+    Default = 50,
+    Min = 0,
+    Max = 100,
+    Rounding = 0
+})
+
+AudioSettings:SetupDependencies({
+    { Toggles.EnableAudio, true }, -- Only show if EnableAudio is true
+})
+```
+
+## Methods
+
+### SetupDependencies
+
+Setup the dependencies for the dependency box.
+
+```lua
+DependencyGroupbox:SetupDependencies(dependencies)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | table of dependencies | table | nil |
