@@ -27,13 +27,19 @@ local Label = Groupbox:AddLabel("This is a label", false)
 | 1 | Text of the label | string | nil |
 | 2 | Whether to wrap the text | boolean | true |
 
+or
+
 ### Configuration Table
 
 ```lua
-local Label = Groupbox:AddLabel({
+local LabelOptions = {
     Text = "This is a label",
     DoesWrap = false
-})
+}
+
+local Label = Groupbox:AddLabel(LabelOptions)
+-- or local Label = Groupbox:AddLabel("MyLabel", LabelOptions)
+-- which allows you to do: Options.MyLabel:SetText("This is a label")
 ```
 
 <TypeTable
@@ -49,7 +55,56 @@ local Label = Groupbox:AddLabel({
       type: 'boolean',
       default: 'true',
       required: false
-    }
+    },
+    Size: {
+      description: 'The size of the label',
+      type: 'number',
+      default: '14',
+      required: false
+    },
+    Visible: {
+      description: 'Whether the label is visible',
+      type: 'boolean',
+      default: 'true',
+      required: false
+    },
   }}
 />
+
+## Methods
+
+You can use the following methods to interact with the label:
+
+#### SetText
+Sets the text of the label.
+
+```lua
+Label:SetText(text)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Text of the label | string | nil |
+
+#### SetSize
+Sets the size of the label.
+
+```lua
+Label:SetSize(size)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Size of the label | number | nil |
+
+#### SetVisible
+Shows or hides the label.
+
+```lua
+Label:SetVisible(boolean)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Whether to show the label | boolean | nil |
 

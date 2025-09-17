@@ -191,3 +191,70 @@ local Tabs = {
     ["UI Settings"] = Window:AddTab("UI Settings", "settings"),
 }
 ```
+
+---
+
+# Key Tabs
+
+Key tabs are used to display items at the center and it's intended use as a menu to display a key system page.
+
+![Example Key Tab](./keytab.png)
+
+### Usage
+
+You can create a Key Tab by calling the `AddKeyTab` method on a Window.
+
+### Arguments
+```lua
+local KeyTab = Window:AddKeyTab("Key System", "key")
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Title of the key tab | string | nil |
+| 2 | Custom Icon or Icon name from lucide.dev | string | nil |
+
+## Methods
+
+Key tabs inherit all methods from the [groupboxes](./groupboxes) and [tabboxes](./tabboxes) which means you can add any UI element to it as well.
+
+### AddKeyBox
+Adds a key box to the key tab.
+
+```lua
+-- Dynamic Check
+KeyTab:AddKeyBox(function(Success, ReceivedKey)
+	print("Expected Key: None | Success:", Success) -- true
+	Library:Notify("Success: " .. tostring(Success), 4)
+end)
+
+-- Static Check
+KeyTab:AddKeyBox("Banana", function(Success, ReceivedKey)
+	print("Expected Key: Banana | Success:", Success) -- true
+	Library:Notify("Success: " .. tostring(Success), 4)
+end)
+```
+
+## Example
+
+
+```lua
+local KeyTab = Window:AddKeyTab("Key System", "key")
+
+KeyTab:AddLabel({
+	Text = "mspaint key system",
+	DoesWrap = true,
+	Size = 20,
+})
+
+KeyTab:AddLabel({
+	Text = "Your support helps us continue developing mspaint, thank you!",
+	DoesWrap = true,
+	Size = 16,
+})
+
+KeyTab:AddKeyBox(function(Success, ReceivedKey)
+	print("Expected Key: None | Success:", Success)
+	Library:Notify("Success: " .. tostring(Success), 4)
+end)
+```
