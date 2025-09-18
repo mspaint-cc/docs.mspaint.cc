@@ -1,19 +1,19 @@
 ---
-title: 'Toggles'
-description: 'Toggles are used to toggle features in Obsidian'
+title: 'Checkboxes'
+description: 'Checkboxes are used to toggle features in Obsidian'
 ---
 
-import TogglePlayground from '@/components/demo/playground/Toggle';
+import CheckboxPlayground from '@/components/demo/playground/Checkbox';
 import { TypeTable } from '@/components/type-table';
 import { Tab, Tabs } from "fumadocs-ui/components/tabs";
 
 ## Playground
 
-<TogglePlayground />
+<CheckboxPlayground />
 
 ## Usage
 
-You can create a Toggle by calling the `AddToggle` method on a Groupbox.
+You can create a Checkbox by calling the `AddCheckbox` method on a Groupbox.
 
 <Callout type="info">
   You can override the default `:AddToggle` method to make a [checkbox](/obsidian/elements/checkboxes) element instead by doing:
@@ -25,7 +25,7 @@ You can create a Toggle by calling the `AddToggle` method on a Groupbox.
 ### Arguments
 
 ```lua
-local MyToggle = Groupbox:AddToggle("MyToggle", {
+local MyToggle = Groupbox:AddCheckbox("MyToggle", {
     Text = "Enable Speed Hack",
     Default = true,
 })
@@ -99,7 +99,7 @@ You can use the following methods to interact with the toggle:
 Sets the toggle value.
 
 ```lua
-Toggle:SetValue(boolean)
+Checkbox:SetValue(boolean)
 ```
 
 | Arg Idx | Argument Description | Type | Default |
@@ -110,7 +110,7 @@ Toggle:SetValue(boolean)
 Updates the toggle's text.
 
 ```lua
-Toggle:SetText(text)
+Checkbox:SetText(text)
 ```
 
 | Arg Idx | Argument Description | Type | Default |
@@ -121,7 +121,7 @@ Toggle:SetText(text)
 Enables or disables the toggle.
 
 ```lua
-Toggle:SetDisabled(boolean)
+Checkbox:SetDisabled(boolean)
 ```
 
 | Arg Idx | Argument Description | Type | Default |
@@ -132,7 +132,7 @@ Toggle:SetDisabled(boolean)
 Shows or hides the toggle.
 
 ```lua
-Toggle:SetVisible(boolean)
+Checkbox:SetVisible(boolean)
 ```
 
 | Arg Idx | Argument Description | Type | Default |
@@ -143,7 +143,7 @@ Toggle:SetVisible(boolean)
 Adds another callback function to the toggle. This is the recommended way to listen for changes in the toggle.
 
 ```lua
-Toggle:OnChanged(function)
+Checkbox:OnChanged(function)
 ```
 
 | Arg Idx | Argument Description | Type | Default |
@@ -159,7 +159,7 @@ Toggle:OnChanged(function)
     local Toggles = Library.Toggles
 
     -- Setup UI elements first
-    local MyToggle = Groupbox:AddToggle("MyToggle", {
+    local MyToggle = Groupbox:AddCheckbox("MyToggle", {
         Text = "Enable Speed Hack",
         Default = true,
     })
@@ -177,7 +177,7 @@ Toggle:OnChanged(function)
     local Options = Library.Options
     local Toggles = Library.Toggles
 
-    Groupbox:AddToggle("SilentAim", {
+    Groupbox:AddCheckbox("SilentAim", {
         Text = "Enable Silent Aim",
         Default = true,
 

@@ -7,19 +7,26 @@ import { Label as LabelPrimitive } from "@/components/ui/label";
 
 import { useMemo, useState } from "react";
 import { CopyPseudoComponent } from "./shared/CopyComponent";
-import { Switch } from "@/components/ui/switch";
 
-export default function TogglePlayground() {
+export default function CheckboxPlayground() {
   const [text, setText] = useState("Enable Speed Hack");
-  const [checked, setChecked] = useState(false);
+
+  const memoizedToggle = useMemo(
+    () => (
+      <UIStateProvider>
+        <Toggle text={text} checked={false} risky={false} />
+      </UIStateProvider>
+    ),
+    [text]
+  );
 
   function generatePseudoCode() {
-    return `Groupbox:AddToggle("MyPseudoCodeToggle", {
+    return `Groupbox:AddCheckbox("MyPseudoCodeCheckbox", {
 	Text = "${text.replaceAll('"', '\\"')}",
 	Default = true,
 })
   
-Toggles.MyPseudoCodeToggle:OnChanged(function(state)
+Toggles.MyPseudoCodeCheckbox:OnChanged(function(state)
     print("Toggle state changed to " .. tostring(state))
 end)`;
   }
@@ -30,22 +37,7 @@ end)`;
         <CopyPseudoComponent codegenfunc={generatePseudoCode} />
 
         <div className="flex items-center justify-center min-h-[150px] relative">
-          <div className="justify-center items-center flex flex-row">
-            <Switch
-              onCheckedChange={(checked) => setChecked(checked)}
-              checked={checked}
-            />
-
-            <span
-              className={`ml-[18px] text-left block text-sm select-none transition-opacity`}
-              style={{
-                opacity: checked == true ? 0.8 : 0.6,
-                color: "var(--color-white)",
-              }}
-            >
-              {text}
-            </span>
-          </div>
+          {memoizedToggle}
         </div>
 
         <div className="flex flex-col gap-2">

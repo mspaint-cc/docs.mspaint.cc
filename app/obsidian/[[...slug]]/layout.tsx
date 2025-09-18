@@ -86,6 +86,11 @@ const docsTree: PageTree.Root = {
       name: "Toggles",
       url: "/obsidian/elements/toggles",
     },
+    {
+      type: "page",
+      name: "Checkboxes",
+      url: "/obsidian/elements/checkboxes",
+    },
     { type: "page", name: "Inputs", url: "/obsidian/elements/inputs" },
     {
       type: "page",
