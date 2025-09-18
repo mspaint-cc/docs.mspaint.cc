@@ -17,6 +17,11 @@ const docsTree: PageTree.Root = {
   children: [
     { type: "separator", name: "Introduction" },
     { type: "page", name: "Getting Started", url: "/obsidian/" },
+    {
+      type: "page",
+      name: "Structuring",
+      url: "/obsidian/structure",
+    },
     { type: "page", name: "Installation", url: "/obsidian/installation" },
     { type: "page", name: "Contributing", url: "/obsidian/contributing" },
 
