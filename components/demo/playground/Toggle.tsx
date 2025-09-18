@@ -1,11 +1,9 @@
 "use client";
 
-import Toggle from "@/components/obsidian/elements/Toggle";
-import { UIStateProvider } from "@/components/obsidian/UIStateProvider";
 import { Input } from "@/components/ui/input";
 import { Label as LabelPrimitive } from "@/components/ui/label";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { CopyPseudoComponent } from "./shared/CopyComponent";
 import { Switch } from "@/components/ui/switch";
 
