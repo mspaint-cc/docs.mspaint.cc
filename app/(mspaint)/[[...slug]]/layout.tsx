@@ -32,6 +32,7 @@ const docsTree: PageTree.Root = {
       children: [
         { type: "page", name: "Official Shop", url: "/purchase/mspaintcc" },
         { type: "page", name: "BloxProducts", url: "/purchase/bloxproducts" },
+        { type: "page", name: "Outlaw", url: "/purchase/outlaw" },
         { type: "page", name: "YESU", url: "/purchase/YESU" },
         { type: "page", name: "Aero", url: "/purchase/aero" },
         { type: "page", name: "Munchen Keys", url: "/purchase/munchen_keys" },
