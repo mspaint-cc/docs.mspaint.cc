@@ -1,0 +1,131 @@
+---
+title: "HTML"
+description: "Install Obsidian in a HTML environment"
+---
+
+import { OpenInCodePenButton } from "@/components/open-in-codepen-button";
+import { OpenInV0Button } from "@/components/open-in-v0-button";
+import DemoObsidian from "@/components/demo/Obsidian";
+import { Tab, Tabs } from "fumadocs-ui/components/tabs";
+
+<Tabs items={['Preview', 'Code']}>
+  <Tab value="Preview">
+    <div className="flex flex-col gap-4 border rounded-lg p-4 min-h-[450px] relative">
+        <div className="flex items-center justify-end gap-2 px-2">
+            <OpenInCodePenButton className="w-fit" />
+        </div>
+        <div className="flex items-center justify-center min-h-[500px] relative">
+            <div className="max-w-[720px] max-h-[600px] scale-[0.8] max-sm:scale-[0.5] md:scale-90 lg:scale-100">
+            <DemoObsidian />
+            </div>
+        </div>
+    </div>
+  </Tab>
+
+  <Tab value="Code">
+    ```html
+<!DOCTYPE HTML>
+<html>
+      <head>
+        <meta charset="utf-8" />
+        
+        <!-- Tailwind CSS -->
+        <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+        
+        <!-- Obsidian -->
+        <script src="https://www.mspaint.cc/widgets/obsidian.js"></script>
+
+        <!-- Obsidian Scrollbar CSS -->
+        <style>
+          .no-scrollbar {
+            -ms-overflow-style: none; /* IE and Edge */
+            scrollbar-width: none;    /* Firefox */
+          }
+
+          .no-scrollbar::-webkit-scrollbar {
+            width: 0px;
+            height: 0px;
+            display: none;            /* Chrome, Safari, Opera */
+          }
+        </style>
+      </head>
+      <body>
+        <Obsidian
+          title="mspaint"
+          footer="version: example"
+          icon="https://www.mspaint.cc/icon.png"
+          ui-data-src="https://raw.githubusercontent.com/mspaint-cc/webmspaint/refs/heads/main/registry/obsidian-demo/ObsidianExtracted.json">
+        </Obsidian>
+      </body>
+  </html>
+    ```
+  </Tab>
+</Tabs>
+
+## Installation
+
+Obsidian depends on TailwindCSS so you need to first setup TailwindCSS.
+You can do this by adding this line of code to the `<head>` section of your HTML file:
+```html
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+```
+
+Then you can import the Obsidian widget script in the `<head>` section of your HTML file:
+```html
+<script src="https://www.mspaint.cc/widgets/obsidian.js"></script>
+```
+
+You will also need to add the following lines of code into a stylesheet.
+```css
+.no-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none;    /* Firefox */
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
+  display: none;            /* Chrome, Safari, Opera */
+}
+```
+
+---
+
+## Usage
+
+```html
+<Obsidian
+  title="mspaint"
+  footer="version: example"
+  icon="https://www.mspaint.cc/icon.png"
+  ui-data-src="https://raw.githubusercontent.com/mspaint-cc/webmspaint/refs/heads/main/registry/obsidian-demo/ObsidianExtracted.json">
+</Obsidian>
+```
+
+or
+
+```html
+<Obsidian
+  title="mspaint"
+  footer="version: example"
+  icon="https://www.mspaint.cc/icon.png"
+>
+  <!-- Obsidian UI Data -->
+  <script type="application/json">
+    { "tabs": { "Home": { "order": 1, "groups": [] } } }
+  </script>
+</Obsidian>
+```
+
+To check how the UI data is structured, you may refer to the [UI parser](https://github.com/mspaint-cc/webmspaint/blob/main/src/components/obsidian/DynamicTab.tsx) or the [UI Element Typedefs](https://github.com/mspaint-cc/webmspaint/blob/main/src/components/obsidian/element.types.ts).
+
+## Extra Resources
+If you want to automatically dump your obsidian UI to a JSON file, you can use the following script which will save a file named `ObsidianExtracted.json` in your executor's `workspace` folder:
+```lua
+loadstring(game:HttpGet("https://raw.githubusercontent.com/mspaint-cc/assets/refs/heads/main/uidata/extractor.lua"))()
+```
+This file can then be put in a static path and imported in the `ui-data-src` prop of the Obsidian component:
+
+```html
+<Obsidian title="mspaint" footer="version: example" icon="./icon.png" ui-data-src="./ObsidianExtracted.json"></Obsidian>
+```
