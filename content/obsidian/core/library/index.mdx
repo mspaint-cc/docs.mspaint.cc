@@ -132,6 +132,12 @@ local Window = Library:CreateWindow({
       type: 'boolean',
       default: 'false',
       required: false
+    },
+    UnlockMouseWhileOpen: {
+      description: 'Whether to allow mouse movement while the Window is open even when the cursor\'s position is locked to the center (for example when in first person)',
+      type: 'boolean',
+      default: 'true',
+      required: false
     }
   }}
 />
