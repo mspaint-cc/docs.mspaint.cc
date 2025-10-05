@@ -199,6 +199,6 @@ Options.AutoFarmKey:OnClick(function()
 end)
 
 Options.AutoFarmKey:OnChanged(function()
-    print("Key changed to:", Options.AutoFarmKey.Value)
+    print("Key changed to:", table.unpack(Options.AutoFarmKey.Modifiers or {}), Options.AutoFarmKey.Value)
 end)
 ```
