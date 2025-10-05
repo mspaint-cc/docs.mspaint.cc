@@ -51,6 +51,12 @@ local Keybind = Toggle:AddKeyPicker("MyKeybind", {
       default: '"None"',
       required: false
     },
+    DefaultModifiers: {
+      description: 'Initial modifier key(s) assigned to the main key ("LAlt", "RAlt", "LCtrl", "RCtrl", "LShift", "RShift", "Tab", "CapsLock")',
+      type: 'table',
+      default: '{}',
+      required: false
+    },
     Mode: {
       description: 'Operation mode ("Toggle", "Hold", "Always", "Press")',
       type: 'string',
@@ -115,7 +121,7 @@ Keybind:SetValue({ "F", "Toggle" })
 
 | Arg Idx | Argument Description | Type | Default |
 | --- | --- | --- | --- |
-| 1 | Table containing `{ key, mode }` | table | nil |
+| 1 | Table containing `{ key, mode, modifiers? }` | table | nil |
 
 #### GetState
 Returns whether the keybind is active.
