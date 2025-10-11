@@ -144,9 +144,121 @@ local Window = Library:CreateWindow({
       type: 'boolean',
       default: 'true',
       required: false
+    },
+    Compact: {
+      description: 'Render the sidebar in compact mode (icons only) on first open',
+      type: 'boolean',
+      default: 'false',
+      required: false
+    },
+    EnableSidebarResize: {
+      description: 'Show a draggable handle so players can resize the sidebar',
+      type: 'boolean',
+      default: 'false',
+      required: false
+    },
+    SidebarMinWidth: {
+      description: 'Smallest width the sidebar can collapse to before switching into compact mode',
+      type: 'number',
+      default: '180',
+      required: false
+    },
+    SidebarCompactWidth: {
+      description: 'Width used while the sidebar is compacted',
+      type: 'number',
+      default: '54',
+      required: false
+    },
+    SidebarCollapseThreshold: {
+      description: 'Fraction (0-1) of the sidebar width that triggers compact mode when dragging',
+      type: 'number',
+      default: '0.5',
+      required: false
+    },
+    SidebarHighlightCallback: {
+      description: 'Callback invoked with `(dividerFrame, isActive)` whenever the resize handle should highlight',
+      type: '(Frame, boolean) -> ()',
+      default: 'nil',
+      required: false
     }
   }}
 />
+
+### Sidebar Layout & Resizing
+
+Obsidian can expose a draggable handle that lets players resize the sidebar at runtime. Enable it and tweak the behaviour directly from your window configuration:
+
+```lua
+local Window = Library:CreateWindow({
+    Title = "mspaint",
+    EnableSidebarResize = true,
+    SidebarMinWidth = 200, -- stop shrinking when the sidebar hits 200px
+    SidebarCompactWidth = 56,
+    SidebarCollapseThreshold = 0.45, -- collapse if the dragger crosses 45% of the min width
+})
+```
+
+If you’d prefer to style the divider highlight yourself, supply a callback. The divider `Frame` and the current state are passed in so you can animate, tween or recolor however you’d like:
+
+```lua
+local Window = Library:CreateWindow({
+    Title = "mspaint",
+    EnableSidebarResize = true,
+    SidebarHighlightCallback = function(Divider, IsActive)
+        Divider.BackgroundColor3 = IsActive and Library.Scheme.AccentColor or Library.Scheme.OutlineColor
+        Divider.BackgroundTransparency = IsActive and 0 or 0.4
+    end,
+})
+```
+
+### Sidebar Methods
+
+All window instances expose helpers for responding to layout changes or driving your own resizing logic.
+
+#### GetSidebarWidth
+Returns the current sidebar width in pixels.
+
+```lua
+local CurrentWidth = Window:GetSidebarWidth()
+```
+
+#### IsSidebarCompacted
+Checks if the sidebar is currently in compact (icon-only) mode.
+
+```lua
+if Window:IsSidebarCompacted() then
+    print("Sidebar is collapsed")
+end
+```
+
+#### SetSidebarWidth
+Programmatically resize the sidebar. Values outside the configured bounds are clamped automatically.
+
+```lua
+Window:SetSidebarWidth(240)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Desired sidebar width in pixels | number | `SidebarMinWidth` |
+
+#### SetCompact
+Toggle compact mode explicitly. Pass `true` to force compact, or `false` to restore the last expanded width.
+
+```lua
+Window:SetCompact(true)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Whether the sidebar should stay compacted | boolean | — |
+
+#### ApplyLayout
+Re-apply all sidebar measurements.
+
+```lua
+Window:ApplyLayout()
+```
 
 ---
 
