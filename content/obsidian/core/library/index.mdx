@@ -414,3 +414,47 @@ Enable the custom cursor to render the Obsidian-styled pointer at your mouse pos
 ```lua
 Library.ShowCustomCursor = true
 ```
+---
+
+## Icons
+
+Icons originate from the [lucide icon pack](https://lucide.dev). You can change the icon library so long as you call it before creating any UI elements and it follows the expected return data.
+
+```lua
+local Library = require(game:GetService("ReplicatedStorage"):WaitForChild("Obsidian"))
+local Icons = require(game:GetService("ReplicatedStorage"):WaitForChild("Lucide"))
+
+-- Set Library Icon Module
+Library:SetIconModule(Icons)
+```
+
+The direct lucide module can be found [here](https://raw.githubusercontent.com/deividcomsono/lucide-roblox-direct/refs/heads/main/source.lua). (Our automation updates the icon spritesheet each month)
+
+### Custom Icon Registry
+
+If you'd like to make your own custom Icon Module, make sure it follows these types:
+
+```lua
+type Icon = {
+    Url: string,
+    Id: number,
+    IconName: string,
+    ImageRectOffset: Vector2,
+    ImageRectSize: Vector2,
+}
+
+type IconModule = {
+    Icons: { string },
+    GetAsset: (Name: string) -> Icon?,
+}
+
+local Icons: IconModule = {
+    Icons: {}
+}
+
+function Icons.GetAsset(Name: string)
+    return nil
+end
+
+return Icons
+```

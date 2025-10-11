@@ -10,9 +10,29 @@ To install Obsidian in Roblox Studio, you can copy the [Library.lua](https://raw
 local Library = require(game:GetService("ReplicatedStorage"):WaitForChild("Obsidian"))
 ```
 
+---
+
+If you want lucide icon support, save the [lucide spritesheet mapping script](https://raw.githubusercontent.com/deividcomsono/lucide-roblox-direct/refs/heads/main/source.lua) as a modulescript and require it.
+
+```lua
+local Library = require(game:GetService("ReplicatedStorage"):WaitForChild("Obsidian"))
+local Icons = require(game:GetService("ReplicatedStorage"):WaitForChild("Lucide"))
+
+-- Set Library Icon Module
+Library:SetIconModule(Icons)
+```
+
+<Callout type="warn">
+    Make sure to **use SetIconModule before you create anything UI related** (such as the window)
+</Callout>
+
+---
+
+
 Then, you should be good to go! You can start by checking out the [Window](/obsidian/core/library#Window) section to create your first window, tab, groupbox and UI elements.
 
 If you are too lazy to read the documentation, you can also check out the [example script](https://github.com/deividcomsono/Obsidian/blob/main/Example.lua).
+
 
 ## Addons
 Due to Roblox Studio's limitations, only one addon is available for Roblox Studio at the moment. The [ThemeManager](/obsidian/core/addons/thememanager) addon is available to use (and it will not be able to save themes).
