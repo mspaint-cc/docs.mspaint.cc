@@ -128,6 +128,12 @@ const docsTree: PageTree.Root = {
       url: "/obsidian/elements/viewports",
     },
     { type: "page", name: "Images", url: "/obsidian/elements/images" },
+    { type: "page", name: "Videos", url: "/obsidian/elements/videos" },
+    {
+      type: "page",
+      name: "UI Passthrough",
+      url: "/obsidian/elements/ui-passthrough",
+    },
   ],
 };
 
