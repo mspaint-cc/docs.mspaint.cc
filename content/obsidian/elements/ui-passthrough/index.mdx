@@ -1,0 +1,103 @@
+---
+title: 'UI Passthrough'
+description: 'UI Passthrough lets you embed your own GUI instances inside a groupbox.'
+---
+
+import UIPassthroughPlayground from '@/components/demo/playground/UIPassthrough';
+import { TypeTable } from '@/components/type-table';
+
+## Playground
+
+<UIPassthroughPlayground />
+
+## Usage
+
+`AddUIPassthrough` allows you to place any existing `GuiBase2d` instance inside the library layout.
+
+### Arguments
+
+```lua
+Groupbox:AddUIPassthrough("CustomUI", {
+    Instance = CustomFrame,
+})
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Index/ID of the UI passthrough element | string | nil |
+| 2 | UI passthrough configuration table | table | nil |
+
+### Configuration Table
+
+<TypeTable
+  type={{
+    Instance: {
+      description: 'GuiBase2d instance to parent inside the groupbox',
+      type: 'GuiBase2d',
+      default: 'nil',
+      required: true
+    },
+    Height: {
+      description: 'Height allocated for the passthrough container',
+      type: 'number',
+      default: '24',
+      required: false
+    },
+    Visible: {
+      description: 'Toggles the visibility of the passthrough container',
+      type: 'boolean',
+      default: 'true',
+      required: false
+    }
+  }}
+/>
+
+## Methods
+
+Once created, you can rearrange or update the passthrough using:
+
+#### SetInstance
+Replaces the embedded GUI instance.
+
+```lua
+Passthrough:SetInstance(newInstance)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | GuiBase2d instance to parent | GuiBase2d | nil |
+
+#### SetHeight
+Adjusts the allocated height.
+
+```lua
+Passthrough:SetHeight(height)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Height in pixels | number | nil |
+
+#### SetVisible
+Shows or hides the passthrough content.
+
+```lua
+Passthrough:SetVisible(visible)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Visibility toggle | boolean | nil |
+
+## Example
+
+```lua
+local Passthrough = Groupbox:AddUIPassthrough("CustomUI", {
+    Instance = CustomViewport,
+    Height = 180,
+})
+
+Passthrough:SetVisible(true)
+Passthrough:SetInstance(AnotherFrame)
+Passthrough:SetHeight(220)
+```

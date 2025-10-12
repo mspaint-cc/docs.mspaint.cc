@@ -1,0 +1,171 @@
+---
+title: 'Video'
+description: 'Videos embed Roblox VideoFrame content with playback controls.'
+---
+
+import VideoPlayground from '@/components/demo/playground/Video';
+import { TypeTable } from '@/components/type-table';
+
+## Playground
+
+<VideoPlayground />
+
+## Usage
+
+You can create a Video element by calling `AddVideo` on a Groupbox.
+
+### Arguments
+
+```lua
+Groupbox:AddVideo("Trailer", {
+    Video = "rbxassetid://1234567890",
+})
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Index/ID of the video element | string | nil |
+| 2 | Video configuration table | table | nil |
+
+### Configuration Table
+
+<TypeTable
+  type={{
+    Video: {
+      description: 'Video asset ID or URL to play',
+      type: 'string',
+      default: '""',
+      required: true
+    },
+    Looped: {
+      description: 'Replay the video automatically when it finishes',
+      type: 'boolean',
+      default: 'false',
+      required: false
+    },
+    Playing: {
+      description: 'Start the video in a playing state',
+      type: 'boolean',
+      default: 'false',
+      required: false
+    },
+    Volume: {
+      description: 'Playback volume',
+      type: 'number',
+      default: '1',
+      required: false
+    },
+    Height: {
+      description: 'Height of the video frame in pixels',
+      type: 'number',
+      default: '200',
+      required: false
+    },
+    Visible: {
+      description: 'Toggles the visibility of the element',
+      type: 'boolean',
+      default: 'true',
+      required: false
+    }
+  }}
+/>
+
+## Methods
+
+You can use the following methods to interact with the video element:
+
+#### SetVideo
+Updates the video source.
+
+```lua
+Video:SetVideo(assetId)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Video asset ID or URL | string | nil |
+
+#### SetLooped
+Changes whether the video loops.
+
+```lua
+Video:SetLooped(looped)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Whether the video should loop | boolean | nil |
+
+#### SetPlaying
+Starts or pauses playback.
+
+```lua
+Video:SetPlaying(playing)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Whether the video should be playing | boolean | nil |
+
+#### SetVolume
+Adjusts the playback volume.
+
+```lua
+Video:SetVolume(volume)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Volume | number | nil |
+
+#### Play
+Convenience wrapper that starts playback.
+
+```lua
+Video:Play()
+```
+
+#### Pause
+Convenience wrapper that pauses playback.
+
+```lua
+Video:Pause()
+```
+
+#### SetHeight
+Adjusts the frame height.
+
+```lua
+Video:SetHeight(height)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Frame height in pixels | number | nil |
+
+#### SetVisible
+Shows or hides the video element.
+
+```lua
+Video:SetVisible(visible)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Visibility toggle | boolean | nil |
+
+## Example
+
+```lua
+local Trailer = Groupbox:AddVideo("Trailer", {
+    Video = "rbxassetid://1234567890",
+    Looped = true,
+    Playing = true,
+    Volume = 0.4,
+    Height = 240,
+})
+
+Trailer:SetVolume(0.6)
+Trailer:Pause()
+Trailer:Play()
+```
