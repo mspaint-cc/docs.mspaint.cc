@@ -573,3 +573,17 @@ return Icons
 
 Obsidian is dependent on a few icons to be able to be displayed properly.
 Please make sure you have icons named: `check` (Toggles), `chevron-up` (Dropdowns), `move-diagonal-2` (Window Resizing Icon bottom right of the window), `key` (Key System Tab Icon), `search` (Searchbar), `move` (Window movement Icon top right of the window)
+
+## Menu Keybind
+
+In Obsidian, there is a helper field that you can set that allows you to easily bind a [Keybind](../elements/keybinds) to toggle the main window.
+
+```lua
+MenuGroup:AddLabel("Menu bind"):AddKeyPicker("MenuKeybind", {
+    Default = "RightShift",
+    NoUI = true,
+    Text = "Menu keybind"
+})
+
+Library.ToggleKeybind = Options.MenuKeybind 
+```
