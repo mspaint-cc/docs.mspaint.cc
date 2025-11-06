@@ -138,6 +138,7 @@ export const ElementParser: FC<{
             rectOffset={element.properties.rectOffset}
             height={element.properties.height}
             rectSize={element.properties.rectSize}
+            bgTransparency={0}
           />
         );
 
