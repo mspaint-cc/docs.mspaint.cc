@@ -139,6 +139,12 @@ local Window = Library:CreateWindow({
       default: 'UDim2.fromScale(1, 1)',
       required: false
     },
+    GlobalSearch: {
+      description: 'Whether to enable a global search that searches in all the tabs.',
+      type: 'boolean',
+      default: 'false',
+      required: false
+    },
     UnlockMouseWhileOpen: {
       description: 'Whether to allow mouse movement while the Window is open even when the cursor\'s position is locked to the center (for example when in first person)',
       type: 'boolean',
@@ -192,6 +198,8 @@ Obsidian can expose a draggable handle that lets players resize the sidebar at r
 local Window = Library:CreateWindow({
     Title = "mspaint",
     EnableSidebarResize = true,
+
+    -- Optional Sidebar Settings
     SidebarMinWidth = 200, -- stop shrinking when the sidebar hits 200px
     SidebarCompactWidth = 56,
     SidebarCollapseThreshold = 0.45, -- collapse if the dragger crosses 45% of the min width
