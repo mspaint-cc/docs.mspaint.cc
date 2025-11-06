@@ -22,6 +22,7 @@ function clamp01(value: number, fallback: number) {
 export default function ImagePlayground() {
   const [imageUrl, setImageUrl] = useState("rbxassetid://6767676767");
   const [transparency, setTransparency] = useState(0);
+  const [bgTransparency, setBgTransparency] = useState(0);
   const [r, setR] = useState(1);
   const [g, setG] = useState(1);
   const [b, setB] = useState(1);
@@ -52,6 +53,12 @@ export default function ImagePlayground() {
         `    Color = Color3.new(${Number(r.toFixed(3))}, ${Number(
           g.toFixed(3)
         )}, ${Number(b.toFixed(3))}),`
+      );
+    }
+
+    if (bgTransparency !== 0) {
+      lines.push(
+        `    BackgroundTransparency = ${Number(bgTransparency.toFixed(3))},`
       );
     }
 
@@ -90,6 +97,7 @@ export default function ImagePlayground() {
     r,
     scaleType,
     transparency,
+    bgTransparency,
   ]);
 
   const safeGeneratePseudoCode = () => pseudoCode;
@@ -108,6 +116,7 @@ export default function ImagePlayground() {
             rectOffset={parsedOffset}
             height={height}
             rectSize={parsedSize}
+            bgTransparency={bgTransparency}
           />
         </div>
       </div>
@@ -172,6 +181,21 @@ export default function ImagePlayground() {
             value={transparency}
             onChange={(event) =>
               setTransparency(clamp01(Number(event.target.value), 0))
+            }
+          />
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <LabelPrimitive htmlFor="image-bg-transparency">
+            Background Transparency (0-1)
+          </LabelPrimitive>
+          <Input
+            id="image-bg-transparency"
+            type="number"
+            step={0.01}
+            value={bgTransparency}
+            onChange={(event) =>
+              setBgTransparency(clamp01(Number(event.target.value), 0))
             }
           />
         </div>

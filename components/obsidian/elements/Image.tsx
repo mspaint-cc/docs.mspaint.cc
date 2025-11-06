@@ -5,6 +5,7 @@ export default function ObsidianImage({
   color,
   rectOffset,*/
   height,
+  bgTransparency,
 }: //rectSize,
 {
   image: string;
@@ -14,13 +15,16 @@ export default function ObsidianImage({
   rectOffset: { y: number; x: number };
   height: number;
   rectSize: { y: number; x: number };
+  bgTransparency: number;
 }) {
   return (
     <div
-      className={
-        "w-full rounded-[1px] bg-[rgb(25,25,25)] border-[rgb(40,40,40)] border flex items-center justify-center"
-      }
-      style={{ height: `${height}px` }}
+      className={"w-full rounded-[1px] border flex items-center justify-center"}
+      style={{
+        height: `${height}px`,
+        backgroundColor: `rgba(25,25,25,${1 - bgTransparency})`,
+        borderColor: `rgba(40,40,40,${1 - bgTransparency})`,
+      }}
     >
       <p className="text-center text-muted-foreground text-sm select-none">
         Image Unavailable
