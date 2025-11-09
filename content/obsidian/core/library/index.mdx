@@ -582,6 +582,57 @@ return Icons
 Obsidian is dependent on a few icons to be able to be displayed properly.
 Please make sure you have icons named: `check` (Toggles), `chevron-up` (Dropdowns), `move-diagonal-2` (Window Resizing Icon bottom right of the window), `key` (Key System Tab Icon), `search` (Searchbar), `move` (Window movement Icon top right of the window)
 
+### Custom Asset Icons
+
+If you'd like to use custom hosted images (like those on Github) with a Roblox Asset ID as a fallback, you can use the built-in ImageManager:
+
+```lua
+local ImageManager = Library.ImageManager
+```
+
+#### AddAsset
+
+Adds a custom asset to the ImageManager
+
+```lua
+ImageManager.AddAsset("mspaint_logo", 95816097006870, "https://www.mspaint.cc/icon.png")
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Asset Name | string | nil |
+| 2 | Roblox Asset ID | number | nil |
+| 3 | Asset URL | string | nil |
+| 4 | Force Redownload | boolean? | nil |
+
+#### GetAsset
+
+Retrieves the asset ID for the provided asset
+
+```lua
+local AssetID = ImageManager.GetAsset("mspaint_logo")
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Asset Name | string | nil |
+
+#### DownloadAsset
+
+Downloads the asset image to the workspace folder<br />
+<Callout type="info">
+  This runs automatically in AddAsset, so you don't need to call it separately (unless you want to redownload the asset image)
+</Callout>
+
+```lua
+ImageManager.DownloadAsset("mspaint_logo")
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Asset Name | string | nil |
+| 2 | Force Redownload | boolean? | nil |
+
 ## Menu Keybind
 
 In Obsidian, there is a helper field that you can set that allows you to easily bind a [Keybind](../elements/keybinds) to toggle the main window.
