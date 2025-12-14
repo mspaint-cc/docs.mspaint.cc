@@ -16,8 +16,7 @@ const docsTree: PageTree.Root = {
   name: "Documentation",
   children: [
     { type: "separator", name: "Guides" },
-    { type: "page", name: "Getting Started", url: "/" },
-    { type: "page", name: "Key System", url: "/key-system" },
+    { type: "page", name: "Introduction", url: "/" },
 
     { type: "separator", name: "Addons" },
     { type: "page", name: "Getting Started", url: "/addons/getting_started" },
@@ -37,6 +36,9 @@ const docsTree: PageTree.Root = {
         { type: "page", name: "Aero", url: "/purchase/aero" }
       ],
     },
+    
+    { type: "separator", name: "Key System" },
+    { type: "page", name: "Step By Step Guide", url: "/key-system" },
   ],
 };
 
