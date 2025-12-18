@@ -221,15 +221,11 @@ Key tabs inherit all methods from the [groupboxes](./groupboxes) and [tabboxes](
 Adds a key box to the key tab.
 
 ```lua
--- Dynamic Check
-KeyTab:AddKeyBox(function(Success, ReceivedKey)
-	print("Expected Key: None | Success:", Success) -- true
-	Library:Notify("Success: " .. tostring(Success), 4)
-end)
+KeyTab:AddKeyBox(function(ReceivedKey)
+    -- KeyBox only takes the callback for the button, you need to implement your own key check inside the callback
+	local Success = ReceivedKey == "Banana"
 
--- Static Check
-KeyTab:AddKeyBox("Banana", function(Success, ReceivedKey)
-	print("Expected Key: Banana | Success:", Success) -- true
+	print("Expected Key: Banana | Success:", Success)
 	Library:Notify("Success: " .. tostring(Success), 4)
 end)
 ```
@@ -252,8 +248,10 @@ KeyTab:AddLabel({
 	Size = 16,
 })
 
-KeyTab:AddKeyBox(function(Success, ReceivedKey)
-	print("Expected Key: None | Success:", Success)
+KeyTab:AddKeyBox(function(ReceivedKey)
+	local Success = true -- your key check here
+
+	print("Success:", Success)
 	Library:Notify("Success: " .. tostring(Success), 4)
 end)
 ```
