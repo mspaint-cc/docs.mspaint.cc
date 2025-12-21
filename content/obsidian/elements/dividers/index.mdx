@@ -3,7 +3,7 @@ title: 'Divider'
 description: 'Dividers add simple separation between controls inside a groupbox.'
 ---
 
-import DividerPlayground from '@/components/demo/playground/Divider';
+import DividerPlayground from '@/components/demo/playground/DividerPlayground';
 
 ## Playground
 
@@ -13,8 +13,14 @@ import DividerPlayground from '@/components/demo/playground/Divider';
 
 You can create a Divider by calling the `AddDivider` method on a Groupbox.
 
+Dividers are purely visual and do not expose configuration options or callbacks.
+
+## Positional Arguments
+
 ```lua
-Groupbox:AddDivider()
+Groupbox:AddDivider("This is a divider")
 ```
 
-Dividers are purely visual and do not expose configuration options or callbacks.
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Text in the middle of the divider | string | nil |
