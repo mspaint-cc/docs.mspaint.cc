@@ -6,6 +6,7 @@ description: 'The Library contains all essential functions and data used to crea
 import { InlineTOC } from 'fumadocs-ui/components/inline-toc';
 import { Tab, Tabs } from "fumadocs-ui/components/tabs";
 import { TypeTable } from '@/components/type-table';
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 
 <InlineTOC items={toc} />
 
@@ -455,6 +456,14 @@ Notification:Destroy()
 
 ## Watermark
 
+<Callout type="warn">
+  Watermarks are now deprecated. Please use `Library:AddDraggableLabel` instead.
+</Callout>
+
+
+<Accordions type = "single">
+
+<Accordion title="Deprecated Documentation">
 ![watermark](./watermark.png)
 
 The watermark is a compact, draggable overlay that typically lives in the top-left corner. It is ideal for surfacing live stats such as FPS, ping, server identifiers or script versions. The feature is inspired by the [LinoriaLib UI Library](https://github.com/mstudio45/linorialib).
@@ -462,6 +471,7 @@ The watermark is a compact, draggable overlay that typically lives in the top-le
 ### Methods
 
 #### SetVisibility
+
 Sets the watermark visibility.
 
 ```lua
@@ -505,6 +515,85 @@ local WatermarkConnection = game:GetService('RunService').RenderStepped:Connect(
     end;
 
     Library:SetWatermark(('Obsidian demo | %s fps | %s ms'):format(
+        math.floor(FPS),
+        math.floor(game:GetService('Stats').Network.ServerStatsItem['Data Ping']:GetValue())
+    ));
+end);
+```
+</Accordion>
+
+</Accordions>
+
+---
+
+## Draggable Labels
+
+![watermark](./watermark.png)
+
+Draggable Labels are compact, draggable overlays containing text. They are ideal for surfacing information such as FPS, ping, server info, etc. The feature is inspired by the [LinoriaLib UI Library Watermark feature](https://github.com/mstudio45/linorialib).
+
+### Methods
+
+#### AddDraggableLabel
+
+Adds a draggable label to the UI.
+
+```lua
+Library:AddDraggableLabel("Obsidian demo")
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Text to display in the draggable label | string | nil |
+
+#### SetText
+
+Sets the draggable label text.
+
+```lua
+local DraggableLabel = Library:AddDraggableLabel("Obsidian demo")
+DraggableLabel:SetText("Obsidian demo v2")
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Text to display in the draggable label | string | nil |
+
+#### SetVisible
+
+Sets the draggable label visibility.
+
+```lua
+local DraggableLabel = Library:AddDraggableLabel("Obsidian demo")
+DraggableLabel:SetVisible(false)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Whether to show the draggable label | boolean | true |
+
+### Example
+
+```lua
+-- Sets the draggable label visibility
+local DraggableLabel = Library:AddDraggableLabel("Obsidian demo")
+DraggableLabel:SetVisible(true)
+
+-- Example of dynamically-updating draggable label with common traits (fps and ping)
+local FrameTimer = tick()
+local FrameCounter = 0;
+local FPS = 60;
+
+local WatermarkConnection = game:GetService('RunService').RenderStepped:Connect(function()
+    FrameCounter += 1;
+
+    if (tick() - FrameTimer) >= 1 then
+        FPS = FrameCounter;
+        FrameTimer = tick();
+        FrameCounter = 0;
+    end;
+
+    DraggableLabel:SetText(('Obsidian demo | %s fps | %s ms'):format(
         math.floor(FPS),
         math.floor(game:GetService('Stats').Network.ServerStatsItem['Data Ping']:GetValue())
     ));
