@@ -152,19 +152,33 @@ local Window = Library:CreateWindow({
       default: 'true',
       required: false
     },
-    Compact: {
-      description: 'Render the sidebar in compact mode (icons only) on first open',
-      type: 'boolean',
-      default: 'false',
-      required: false
-    },
+
     EnableSidebarResize: {
       description: 'Show a draggable handle so players can resize the sidebar',
       type: 'boolean',
       default: 'false',
       required: false
     },
-    SidebarMinWidth: {
+    EnableCompacting: {
+      description: 'Whether to allow compacting the sidebar',
+      type: 'boolean',
+      default: 'true',
+      required: false
+    },
+    DisableCompactingSnap: {
+      description: 'Whether to disable snapping while compacting the sidebar',
+      type: 'boolean',
+      default: 'false',
+      required: false
+    },
+    SidebarCompacted: {
+      description: 'Render the sidebar in compact mode (icons only) on first open',
+      type: 'boolean',
+      default: 'false',
+      required: false
+    },
+
+    MinSidebarWidth: {
       description: 'Smallest width the sidebar can collapse to before switching into compact mode',
       type: 'number',
       default: '180',
@@ -173,19 +187,7 @@ local Window = Library:CreateWindow({
     SidebarCompactWidth: {
       description: 'Width used while the sidebar is compacted',
       type: 'number',
-      default: '54',
-      required: false
-    },
-    SidebarCollapseThreshold: {
-      description: 'Fraction (0-1) of the sidebar width that triggers compact mode when dragging',
-      type: 'number',
-      default: '0.5',
-      required: false
-    },
-    SidebarHighlightCallback: {
-      description: 'Callback invoked with `(dividerFrame, isActive)` whenever the resize handle should highlight',
-      type: '(Frame, boolean) -> ()',
-      default: 'nil',
+      default: '48',
       required: false
     }
   }}
@@ -201,22 +203,8 @@ local Window = Library:CreateWindow({
     EnableSidebarResize = true,
 
     -- Optional Sidebar Settings
-    SidebarMinWidth = 200, -- stop shrinking when the sidebar hits 200px
+    MinSidebarWidth = 200, -- stop shrinking when the sidebar hits 200px
     SidebarCompactWidth = 56,
-    SidebarCollapseThreshold = 0.45, -- collapse if the dragger crosses 45% of the min width
-})
-```
-
-If you’d prefer to style the divider highlight yourself, supply a callback. The divider `Frame` and the current state are passed in so you can animate, tween or recolor however you’d like:
-
-```lua
-local Window = Library:CreateWindow({
-    Title = "mspaint",
-    EnableSidebarResize = true,
-    SidebarHighlightCallback = function(Divider, IsActive)
-        Divider.BackgroundColor3 = IsActive and Library.Scheme.AccentColor or Library.Scheme.OutlineColor
-        Divider.BackgroundTransparency = IsActive and 0 or 0.4
-    end,
 })
 ```
 
@@ -249,7 +237,7 @@ Window:SetSidebarWidth(240)
 
 | Arg Idx | Argument Description | Type | Default |
 | --- | --- | --- | --- |
-| 1 | Desired sidebar width in pixels | number | `SidebarMinWidth` |
+| 1 | Desired sidebar width in pixels | number | `Width` |
 
 #### SetCompact
 Toggle compact mode explicitly. Pass `true` to force compact, or `false` to restore the last expanded width.
