@@ -26,6 +26,7 @@ local Label = Groupbox:AddLabel("This is a label", false)
 | --- | --- | --- | --- |
 | 1 | Text of the label | string | nil |
 | 2 | Whether to wrap the text | boolean | true |
+| 3 | Index/ID of the label | string | nil |
 
 or
 
@@ -39,7 +40,7 @@ local LabelOptions = {
 
 local Label = Groupbox:AddLabel(LabelOptions)
 -- or local Label = Groupbox:AddLabel("MyLabel", LabelOptions)
--- which allows you to do: Options.MyLabel:SetText("This is a label")
+-- which allows you to do: Library.Labels.MyLabel:SetText("This is a label")
 ```
 
 <TypeTable
