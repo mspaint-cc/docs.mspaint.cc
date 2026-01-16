@@ -611,6 +611,19 @@ Enable the custom cursor to render the Obsidian-styled pointer at your mouse pos
 ```lua
 Library.ShowCustomCursor = true
 ```
+
+These functions allow you to set your own image instead of the default custom cursor.
+
+```lua
+Library:ChangeCursorIcon(ImageId: string)
+
+-- If you need to change the cursor icon size:
+Library:ChangeCursorIconSize(Size: UDim2)
+
+-- To reset it back, use this function:
+Library:ResetCursorIcon()
+```
+
 ---
 
 ## Icons
