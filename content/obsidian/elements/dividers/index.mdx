@@ -4,6 +4,7 @@ description: 'Dividers add simple separation between controls inside a groupbox.
 ---
 
 import DividerPlayground from '@/components/demo/playground/DividerPlayground';
+import { TypeTable } from '@/components/type-table';
 
 ## Playground
 
@@ -15,7 +16,11 @@ You can create a Divider by calling the `AddDivider` method on a Groupbox.
 
 Dividers are purely visual and do not expose configuration options or callbacks.
 
-## Positional Arguments
+## Arguments
+
+Choose between positional arguments for quick calls or a configuration table for full control (allowing for custom top and bottom margin spacing).
+
+### Positional Arguments
 
 ```lua
 Groupbox:AddDivider("This is a divider")
@@ -24,3 +29,40 @@ Groupbox:AddDivider("This is a divider")
 | Arg Idx | Argument Description | Type | Default |
 | --- | --- | --- | --- |
 | 1 | Text in the middle of the divider | string | nil |
+
+### Table Parameters
+
+```lua
+Groupbox:AddDivider({
+    Text = "This is a divider",
+    MarginTop = 10,
+    MarginBottom = 10
+})
+```
+
+<TypeTable type={{
+  Text: {
+    description: 'The text displayed in the middle of the divider',
+    type: 'string',
+    default: 'nil',
+    required: false
+  },
+  Margin: {
+    description: 'General spacing applied both directly above and directly below the divider (can be overridden by `MarginTop` or `MarginBottom`)',
+    type: 'number',
+    default: '0',
+    required: false
+  },
+  MarginTop: {
+    description: 'Specific spacing directly above the divider (overrides `Margin`)',
+    type: 'number',
+    default: '0',
+    required: false
+  },
+  MarginBottom: {
+    description: 'Specific spacing directly below the divider (overrides `Margin`)',
+    type: 'number',
+    default: '0',
+    required: false
+  },
+}}/>
