@@ -615,6 +615,24 @@ Dialogs inherit methods from Groupboxes therefore you can call all standard Grou
     default: '{}',
     required: false
   },
+  Icon: {
+    description: 'The icon of the dialog',
+    type: 'string',
+    default: 'nil',
+    required: false
+  },
+  TitleColor: {
+    description: 'The color of the dialog title',
+    type: 'Color3',
+    default: 'FontColor (Inherited from theme)',
+    required: false
+  },
+  DescriptionColor: {
+    description: 'The color of the dialog description',
+    type: 'Color3',
+    default: 'FontColor (Inherited from theme +20% transparency if color is not set)',
+    required: false
+  },
 }}/>
 
 ### Custom Button Example
@@ -631,6 +649,8 @@ Confirm = {
     end
 }
 ```
+
+
 
 ### Methods
 <Callout type="info">
