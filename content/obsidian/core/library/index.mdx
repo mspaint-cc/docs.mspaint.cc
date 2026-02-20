@@ -288,12 +288,35 @@ Library:Notify("Hello world!", 4)
 
 #### Table parameters
 Pick an example that matches your use case:
-<Tabs items={['simple.lua', 'persistent.lua', 'update.lua', 'progress.lua']}>
+<Tabs items={['simple.lua', 'icon.lua', 'image.lua', 'persistent.lua', 'update.lua', 'progress.lua']}>
   <Tab value="simple.lua">
     ```lua
     Library:Notify({
         Title = "mspaint",
         Description = "Hello world!",
+        Time = 4,
+    })
+    ```
+  </Tab>
+
+  <Tab value="icon.lua">
+    ```lua
+    Library:Notify({
+        Title = "Icon Notification",
+        Description = "This notification has a neat little icon beside the text.",
+        Icon = "info", -- Lucide icon Name
+        Time = 4,
+    })
+    ```
+  </Tab>
+
+  <Tab value="image.lua">
+    ```lua
+    Library:Notify({
+        Title = "Big Icon Notification",
+        Description = "This notification is using the legacy 24x24 separated image layout.",
+        BigIcon = "rbxassetid://10204738596",
+        IconColor = Color3.new(0, 1, 0), -- Green
         Time = 4,
     })
     ```
@@ -393,6 +416,24 @@ Pick an example that matches your use case:
   SoundId: {
     description: 'The sound ID to play when the notification is shown',
     type: 'number',
+    default: 'nil',
+    required: false
+  },
+  Icon: {
+    description: 'The Lucide icon or Image to display inline in the notification',
+    type: 'string',
+    default: 'nil',
+    required: false
+  },
+  BigIcon: {
+    description: 'The legacy 24x24 separated image layout to display (e.g. "rbxassetid://123456")',
+    type: 'string',
+    default: 'nil',
+    required: false
+  },
+  IconColor: {
+    description: 'The Color3 to apply to the legacy image layout',
+    type: 'Color3 | string',
     default: 'nil',
     required: false
   },
