@@ -257,6 +257,47 @@ Re-apply all sidebar measurements.
 Window:ApplyLayout()
 ```
 
+#### ChangeTitle
+Changes the title of the window.
+
+```lua
+Window:ChangeTitle("New Title")
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | The new title of the window | string | nil |
+
+#### SetFooter
+Changes the footer of the window.
+
+```lua
+Window:SetFooter("New Footer")
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | The new footer of the window | string | nil |
+
+#### SetBackgroundImage
+Changes the background image of the window. (Only works if `BackgroundImage` was set in the constructor)
+
+```lua
+Window:SetBackgroundImage("rbxasset://textures/ui/GuiImagePlaceholder.png")
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | The new background image of the window | string/ID | nil |
+
+#### Toggle
+
+Toggles the visibility of the window.
+
+```lua
+Window:Toggle()
+```
+
 ---
 
 ## Notifications
