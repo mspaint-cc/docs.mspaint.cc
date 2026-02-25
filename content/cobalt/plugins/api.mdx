@@ -1,0 +1,771 @@
+---
+title: 'API Reference'
+description: 'API Reference for Cobalt Plugins'
+---
+
+import { TypeTable } from 'fumadocs-ui/components/type-table';
+
+## Cobalt
+This is the global table available in every plugin's environment. It provides access to all plugin APIs.
+
+### PluginData
+This is the table that contains the information about the plugin. It is **required** to be set and should be the first thing that executes in the file.
+
+<TypeTable
+  type={{
+    Name: {
+      description: 'The display name of the plugin.',
+      type: 'string',
+      required: true
+    },
+    Description: {
+      description: 'A short description of what the plugin does.',
+      type: 'string',
+      required: false,
+      default: '"No description provided."'
+    },
+    Author: {
+      description: 'The author of the plugin.',
+      type: 'string',
+      required: false,
+      default: '"N/A"'
+    },
+    Version: {
+      description: 'The version string of the plugin.',
+      type: 'string',
+      required: false,
+      default: '"0.0.0"'
+    },
+    Game: {
+      description: 'Which games the plugin loads in. Use `"*"` for all games, a PlaceId/GameId (string or number), or a table of ids.',
+      type: 'string | number | table',
+      required: false,
+      default: '"*"'
+    }
+  }}
+/>
+
+**Example**
+```lua
+Cobalt.PluginData = {
+    Name = "ByteNet",
+    Description = "Decodes ByteNet packets in Cobalt.",
+    Author = "upio",
+    Version = "1.0.0",
+    Game = "*",
+}
+```
+
+<Callout type="info">
+    If the current game does not match the `Game` field, the plugin thread is automatically cancelled and will not run.
+</Callout>
+
+---
+
+### Settings
+A proxy table that reads and writes persistent settings to `Cobalt/Settings.json`. This includes both built-in Cobalt settings and plugin settings.
+
+**Example**
+```lua
+-- Read a built-in setting
+local showWatermark = Cobalt.Settings["ShowWatermark"]
+
+-- Read a plugin setting (uses the full prefixed key)
+local suppress = Cobalt.Settings["PluginSettings-MyPlugin-SuppressRaw"]
+
+-- Write a setting
+Cobalt.Settings["MyCustomKey"] = true
+```
+
+---
+
+### Sonner
+The toast notification system. Exposes `success`, `error`, and other methods.
+
+**Example**
+```lua
+Cobalt.Sonner.success("Operation complete!")
+Cobalt.Sonner.error("Something went wrong.")
+```
+
+---
+
+### ExecutorSupport
+A table containing the results of executor capability checks. Use this to gate features based on what the executor supports.
+
+**Example**
+```lua
+if Cobalt.ExecutorSupport["run_on_actor"].IsWorking then
+    print("Actor support available!")
+end
+```
+
+---
+
+### BindToUnload
+
+Binds a cleanup callback that runs when the plugin is unloaded (e.g. on rescan or Cobalt exit).
+
+```lua
+Cobalt:BindToUnload(Callback: () -> ())
+```
+
+| Arg | Description | Type |
+| --- | --- | --- |
+| 1 | The function to call on unload | `() -> ()` |
+
+**Example**
+```lua
+Cobalt:BindToUnload(function()
+    myFolder:Destroy()
+    print("Plugin unloaded!")
+end)
+```
+
+<Callout type="warn">
+    Always clean up Instances, connections, and state in your unload callback to prevent memory leaks.
+</Callout>
+
+---
+
+### GetLog
+
+Gets the tracked log for a specific instance and direction.
+
+```lua
+Cobalt:GetLog(instance: Instance, type: "Incoming" | "Outgoing")
+```
+
+| Arg | Description | Type |
+| --- | --- | --- |
+| 1 | The remote instance | `Instance` |
+| 2 | The direction | `"Incoming" \| "Outgoing"` |
+
+**Example**
+```lua
+local log = Cobalt:GetLog(someRemote, "Outgoing")
+if log then
+    print("Total calls:", #log.Calls)
+end
+```
+
+---
+
+## Cobalt.Spy
+Functions for intercepting, appending, and clearing remote call logs.
+
+### InterceptExecutedCalls
+Hooks into the spy pipeline to intercept remote calls as they happen.
+
+```lua
+Cobalt.Spy:InterceptExecutedCalls(
+    Type: "Incoming" | "Outgoing" | "All",
+    Data: InterceptorFunction | { Callback: InterceptorFunction, Instance: Instance? }
+) -> () -> ()
+```
+
+The callback receives `(info, instance, callType)` where:
+- `info` contains `Arguments`, `Origin`, `Function`, `Line`, `IsExecutor`, etc.
+- `instance` is the `RemoteEvent` / `RemoteFunction` / etc.
+- `callType` is `"Incoming"` or `"Outgoing"`
+
+**Return values from the callback:**
+- Return nothing — allow the call through normally
+- Return `false` — suppress the log entry from appearing
+
+**Returns** a cleanup function that removes the interceptor when called.
+
+**Example — Global interceptor**
+```lua
+local cleanup = Cobalt.Spy:InterceptExecutedCalls("All", function(info, instance, callType)
+    if instance.Name == "ByteNetReliable" then
+        return false -- suppress from the log
+    end
+end)
+
+-- Later: cleanup()
+```
+
+**Example — Instance-specific interceptor**
+```lua
+local remote = game.ReplicatedStorage.MyRemote
+
+Cobalt.Spy:InterceptExecutedCalls("Outgoing", {
+    Instance = remote,
+    Callback = function(info, instance, callType)
+        print("Caught call:", info.Arguments)
+    end,
+})
+```
+
+---
+
+### AppendLog
+Injects a custom log entry for a remote instance. Commonly used with virtual `BindableEvent` instances to display decoded protocol traffic.
+
+```lua
+Cobalt.Spy:AppendLog(
+    Instance: Instance,
+    Type: "Incoming" | "Outgoing",
+    Data: table
+)
+```
+
+| Arg | Description | Type |
+| --- | --- | --- |
+| 1 | The remote instance (can be a virtual BindableEvent) | `Instance` |
+| 2 | The direction | `"Incoming" \| "Outgoing"` |
+| 3 | The call data table | `table` |
+
+<TypeTable
+  type={{
+    Arguments: {
+      description: 'The arguments of the call (use `table.pack(...)` format).',
+      type: 'table',
+      required: true
+    },
+    Origin: {
+      description: 'The origin script/source of the call.',
+      type: 'string?',
+      required: false
+    },
+    Function: {
+      description: 'The function name.',
+      type: 'string?',
+      required: false
+    },
+    Line: {
+      description: 'The line number of the call.',
+      type: 'number?',
+      required: false
+    },
+    IsExecutor: {
+      description: 'Whether the call originated from the executor.',
+      type: 'boolean?',
+      required: false
+    }
+  }}
+/>
+
+**Example**
+```lua
+local virtualRemote = Instance.new("BindableEvent")
+virtualRemote.Name = "MyProtocol::Packet"
+
+Cobalt.Spy:AppendLog(virtualRemote, "Incoming", {
+    Arguments = table.pack({ Health = 100, Position = Vector3.new(0, 5, 0) }),
+    Origin = "MyPlugin",
+})
+```
+
+---
+
+### ClearLogs
+Clears tracked logs, optionally filtering by instance and/or direction.
+
+```lua
+Cobalt.Spy:ClearLogs(Instance: Instance?, Type: ("Incoming" | "Outgoing" | "All")?)
+```
+
+| Arg | Description | Type |
+| --- | --- | --- |
+| 1 | Optional instance to clear logs for | `Instance?` |
+| 2 | Optional direction filter | `"Incoming" \| "Outgoing" \| "All"?` |
+
+**Example**
+```lua
+-- Clear all logs
+Cobalt.Spy:ClearLogs()
+
+-- Clear logs for a specific remote
+Cobalt.Spy:ClearLogs(someRemote, "Outgoing")
+```
+
+---
+
+## Cobalt.CodeGen
+Functions for intercepting and customizing code generation.
+
+### InterceptGeneration
+Intercepts Cobalt's code generation pipeline. If the callback returns a string, it replaces the default generated code. If it returns `nil`, the default code is used.
+
+```lua
+Cobalt.CodeGen:InterceptGeneration(
+    Type: "Call" | "Hook" | "InstancePath",
+    Callback: (Info: any, ...any) -> string?
+) -> () -> ()
+```
+
+| Arg | Description | Type |
+| --- | --- | --- |
+| 1 | The type of code generation to intercept | `"Call" \| "Hook" \| "InstancePath"` |
+| 2 | The interceptor callback | `function` |
+
+**Returns** a cleanup function.
+
+**Example — Custom call code**
+```lua
+Cobalt.CodeGen:InterceptGeneration("Call", function(callInfo)
+    if callInfo.Instance.Name == "MyRemote" then
+        return "-- Custom call code\nprint('Hello!')"
+    end
+    return nil -- fall through to default
+end)
+```
+
+**Example — Custom instance path for virtual instances**
+```lua
+Cobalt.CodeGen:InterceptGeneration("InstancePath", function(object, options)
+    if object.Name:find("ByteNet::") then
+        return "Net." .. object.Name:gsub("ByteNet::", "")
+    end
+    return nil
+end)
+```
+
+---
+
+### Serialize
+Serializes a value to Luau code.
+
+```lua
+Cobalt.CodeGen.Serialize(data: any, options: table?) -> string
+```
+
+**Example**
+```lua
+local code = Cobalt.CodeGen.Serialize({ key = "value", num = 42 }, { Prettify = true })
+```
+
+---
+
+### Indent
+Indents a code string by a given number of levels (4 spaces per level).
+
+```lua
+Cobalt.CodeGen.Indent(str: string, indent: number) -> string
+```
+
+**Example**
+```lua
+local indented = Cobalt.CodeGen.Indent("print('hello')", 2)
+-- Returns: "        print('hello')"
+```
+
+---
+
+## Cobalt.UI
+Functions for creating UI elements, modals, and extending Cobalt's interface.
+
+### New
+Creates a new Roblox GUI instance with sensible defaults applied (e.g. transparent backgrounds on labels, default font, `BorderSizePixel = 0`). Supports nested instance creation by passing tables as property values — the table key becomes the child's `ClassName` and the table value becomes its properties.
+
+```lua
+Cobalt.UI.New(ClassName: string, Properties: { [string | number]: any }) -> Instance
+```
+
+| Arg | Description | Type |
+| --- | --- | --- |
+| 1 | The Roblox class name to create | `string` |
+| 2 | Properties to apply. Table values create child instances, numeric keys clone Instance values as children. | `table` |
+
+**Example**
+```lua
+local Button = Cobalt.UI.New("TextButton", {
+    Text = "Click Me",
+    Size = UDim2.new(1, 0, 0, 32),
+    BackgroundColor3 = Color3.fromRGB(25, 25, 25),
+    Parent = someFrame,
+
+    -- Nested children: key = ClassName, value = properties
+    ["UICorner"] = {
+        CornerRadius = UDim.new(0, 6),
+    },
+    ["UIStroke"] = {
+        Color = Color3.fromRGB(50, 50, 50),
+        Thickness = 1,
+    },
+    ["TextLabel"] = {
+        Text = "Subtitle",
+        TextSize = 12,
+        Size = UDim2.fromScale(1, 0.5),
+    },
+})
+```
+
+<Callout type="info">
+    Default properties are applied per class (e.g. `TextLabel` gets white text, the default font, `RichText = true`, and transparent background). You can override any default by specifying it in the properties table.
+</Callout>
+
+---
+
+### NewIcon
+Creates an `ImageLabel` with a [Lucide](https://lucide.dev/) icon applied. Accepts the same properties table as `New`.
+
+```lua
+Cobalt.UI.NewIcon(IconName: string, Properties: { [string]: any }) -> ImageLabel
+```
+
+| Arg | Description | Type |
+| --- | --- | --- |
+| 1 | The Lucide icon name (e.g. `"search"`, `"settings"`, `"x"`) | `string` |
+| 2 | Properties to apply to the ImageLabel | `table` |
+
+**Example**
+```lua
+local icon = Cobalt.UI.NewIcon("search", {
+    Size = UDim2.fromOffset(16, 16),
+    Position = UDim2.fromOffset(8, 8),
+    Parent = someFrame,
+})
+```
+
+---
+
+### HideCorner
+Creates an opaque `Frame` that visually hides a rounded corner of a parent frame. Useful for making tab-style interfaces where some corners should appear square.
+
+```lua
+Cobalt.UI.HideCorner(Frame: GuiObject, Size: UDim2, Offset: Vector2) -> Frame
+```
+
+| Arg | Description | Type |
+| --- | --- | --- |
+| 1 | The parent frame whose corner to hide | `GuiObject` |
+| 2 | The size of the hiding frame | `UDim2` |
+| 3 | The anchor/position offset (e.g. `Vector2.new(0, 1)` for bottom-left) | `Vector2` |
+
+---
+
+### CreatePluginSettings
+Creates a settings section for your plugin, visible when clicking the plugin in the Plugins list. Returns a `SectionBuilder` that you can use to add UI elements. All settings created through this section are **automatically persisted** to disk.
+
+```lua
+Cobalt.UI:CreatePluginSettings() -> SectionBuilder
+```
+
+The returned `SectionBuilder` has the following methods:
+
+#### AddLabel
+```lua
+SectionBuilder:AddLabel(Text: string, TextSize: number?) -> TextLabel
+```
+
+#### CreateButton
+```lua
+SectionBuilder:CreateButton(Text: string, Callback: () -> (), TextSize: number?) -> TextButton
+```
+
+#### CreateCheckbox
+```lua
+SectionBuilder:CreateCheckbox(Idx: string, Options: table) -> Checkbox
+```
+
+<TypeTable
+  type={{
+    Text: {
+      description: 'The label text for the checkbox.',
+      type: 'string',
+      required: true
+    },
+    Default: {
+      description: 'The default value.',
+      type: 'boolean',
+      required: false,
+      default: 'false'
+    },
+    Callback: {
+      description: 'Called when the value changes.',
+      type: '(boolean) -> ()',
+      required: false
+    }
+  }}
+/>
+
+#### CreateTextBox
+```lua
+SectionBuilder:CreateTextBox(Idx: string, Options: table) -> TextSetting
+```
+
+<TypeTable
+  type={{
+    Text: {
+      description: 'The label text for the text box.',
+      type: 'string',
+      required: true
+    },
+    Default: {
+      description: 'The default value.',
+      type: 'string',
+      required: false,
+      default: '""'
+    },
+    Placeholder: {
+      description: 'Placeholder text when empty.',
+      type: 'string',
+      required: false
+    },
+    ClearTextOnFocus: {
+      description: 'Whether to clear text when focused.',
+      type: 'boolean',
+      required: false,
+      default: 'false'
+    },
+    Width: {
+      description: 'Width of the text box in pixels.',
+      type: 'number',
+      required: false,
+      default: '160'
+    },
+    NumericOnly: {
+      description: 'Whether to allow only numeric input.',
+      type: 'boolean',
+      required: false,
+      default: 'false'
+    },
+    Callback: {
+      description: 'Called when the value changes.',
+      type: '(string) -> ()',
+      required: false
+    }
+  }}
+/>
+
+#### CreateDropdown
+```lua
+SectionBuilder:CreateDropdown(Idx: string, Options: table) -> Dropdown
+```
+
+<TypeTable
+  type={{
+    Text: {
+      description: 'The label text for the dropdown.',
+      type: 'string',
+      required: true
+    },
+    Values: {
+      description: 'The list of selectable values.',
+      type: 'table',
+      required: true
+    },
+    Default: {
+      description: 'The default selected value.',
+      type: 'any',
+      required: false
+    },
+    Multi: {
+      description: 'Whether multiple values can be selected.',
+      type: 'boolean',
+      required: false,
+      default: 'false'
+    },
+    AllowNull: {
+      description: 'Whether null/no selection is allowed.',
+      type: 'boolean',
+      required: false,
+      default: 'false'
+    },
+    Callback: {
+      description: 'Called when the selection changes.',
+      type: '(any) -> ()',
+      required: false
+    }
+  }}
+/>
+
+#### CreateRow
+Creates a horizontal sub-row for placing multiple elements side-by-side. Returns a new `SectionBuilder`.
+
+```lua
+SectionBuilder:CreateRow(Padding: UDim?) -> SectionBuilder
+```
+
+**Full Example**
+```lua
+local Settings = Cobalt.UI:CreatePluginSettings()
+
+local status = Settings:AddLabel("Status: Ready", 15)
+
+Settings:CreateCheckbox("SuppressRaw", {
+    Text = "Suppress raw logs",
+    Default = false,
+})
+
+Settings:CreateButton("Rescan", function()
+    Cobalt.Sonner.success("Rescan complete!")
+end)
+
+Settings:CreateTextBox("ApiKey", {
+    Text = "API Key",
+    Placeholder = "Enter key...",
+})
+
+Settings:CreateDropdown("Mode", {
+    Text = "Mode",
+    Values = { "Simple", "Advanced" },
+    Default = "Simple",
+})
+```
+
+---
+
+### CreateModal
+Creates a resizable, blank modal dialog.
+
+```lua
+Cobalt.UI:CreateModal(Title: string, Icon: string) -> ModalInterface
+```
+
+| Arg | Description | Type |
+| --- | --- | --- |
+| 1 | The title of the modal | `string` |
+| 2 | A Lucide icon name | `string` |
+
+The returned `ModalInterface` has the following properties/methods:
+
+| Property/Method | Description |
+| --- | --- |
+| `Container` | The content `ScrollingFrame` |
+| `Open()` | Opens the modal |
+| `Close()` | Closes the modal |
+| `OnClose` | Signal that fires when the modal is closed |
+| `AddTab(name, icon)` | Adds a tab, returns tab content frame |
+| `SelectTab(name)` | Switches to a specific tab |
+| `AddFooterButton(icon, title, options)` | Adds a dropdown button to the footer |
+
+**Example**
+```lua
+local modal = Cobalt.UI:CreateModal("My Modal", "search")
+
+local tab1 = modal:AddTab("General", "settings")
+local tab2 = modal:AddTab("Advanced", "sliders-horizontal")
+
+modal:AddFooterButton("export", "Export", {
+    { Text = "As JSON", Callback = function() end },
+    { Text = "As Lua", Callback = function() end },
+})
+
+modal:Open()
+```
+
+---
+
+### GetSelectedRemote
+Gets the currently selected remote instance in the UI.
+
+```lua
+Cobalt.UI:GetSelectedRemote() -> (Instance?, string?)
+```
+
+**Returns** the selected remote instance and its type, or `nil` if nothing is selected.
+
+---
+
+### ColorizeLuauCode
+Colorizes Luau code using Cobalt's built-in syntax highlighter. Returns a RichText-compatible string.
+
+```lua
+Cobalt.UI.ColorizeLuauCode(code: string) -> string
+```
+
+---
+
+## Cobalt.UI.RemoteInfo
+Functions for extending the remote info panel that opens when you click a remote.
+
+### CreateTab
+Adds a custom tab to the remote info modal.
+
+```lua
+Cobalt.UI.RemoteInfo:CreateTab(TabName: string, Icon: string) -> (Frame, Frame)
+```
+
+**Returns** `(TabContent, TabUI)` — the content frame you can parent elements to, and the tab UI frame.
+
+---
+
+### BindToModalOpen
+Binds a callback that fires whenever the remote info modal is opened.
+
+```lua
+Cobalt.UI.RemoteInfo:BindToModalOpen(
+    Callback: (CallInfo) -> ()
+) -> () -> ()
+```
+
+**Returns** a cleanup function.
+
+---
+
+### InterceptModalOpen
+Adds an interceptor that can block the remote info modal from opening. Return `false` to block.
+
+```lua
+Cobalt.UI.RemoteInfo:InterceptModalOpen(
+    Callback: (CallInfo) -> boolean?
+) -> () -> ()
+```
+
+**Returns** a cleanup function.
+
+---
+
+### AddFooterButton
+Adds a custom footer button to a specific Remote Info tab.
+
+```lua
+Cobalt.UI.RemoteInfo:AddFooterButton(
+    TabName: string,
+    Icon: string,
+    Title: string,
+    Options: table
+) -> () -> ()
+```
+
+**Returns** a cleanup function that removes the button.
+
+---
+
+### DisableDefaultButtons
+Disables the default footer buttons for a specific Remote Info tab.
+
+```lua
+Cobalt.UI.RemoteInfo:DisableDefaultButtons(TabName: string)
+```
+
+---
+
+## Cobalt.UI.ContextMenu
+Functions for adding custom right-click context menu options.
+
+### AddOption
+Adds a custom option to a context menu.
+
+```lua
+Cobalt.UI.ContextMenu:AddOption(
+    MenuType: "RemoteList" | "CallList",
+    Icon: string,
+    Title: string,
+    Callback: (InteractionData) -> ()
+) -> () -> ()
+```
+
+| Arg | Description | Type |
+| --- | --- | --- |
+| 1 | Which context menu to add to | `"RemoteList" \| "CallList"` |
+| 2 | A Lucide icon name | `string` |
+| 3 | The option text | `string` |
+| 4 | Callback receiving the relevant log or call data | `function` |
+
+**Returns** a cleanup function.
+
+**Example**
+```lua
+Cobalt.UI.ContextMenu:AddOption("RemoteList", "trash", "Clear Logs", function(log)
+    Cobalt.Spy:ClearLogs(log.Instance)
+end)
+
+Cobalt.UI.ContextMenu:AddOption("CallList", "copy", "Copy Raw Args", function(callInfo)
+    -- callInfo contains the call data
+end)
+```

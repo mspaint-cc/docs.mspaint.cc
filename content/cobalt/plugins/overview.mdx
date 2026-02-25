@@ -1,0 +1,35 @@
+---
+title: 'Overview'
+description: 'An overview of how to create plugins for Cobalt'
+---
+
+## What are plugins?
+Plugins are scripts that extend the functionality of Cobalt. The plugin API gives you access to the spy, UI, code generation, and settings systems — allowing you to intercept remote calls, add custom UI, modify generated code, and more.
+
+## Getting Started
+
+On load, Cobalt creates the folder `Cobalt/Plugins` in your executor's workspace directory. To create a plugin, add a `.luau` or `.lua` file to that folder and set `Cobalt.PluginData` at the top of the file.
+
+```lua
+Cobalt.PluginData = {
+    Name = "My Plugin",
+    Description = "A short description of what this plugin does.",
+    Author = "YourName",
+    Version = "1.0.0",
+    Game = "*",
+}
+```
+
+## What can plugins do?
+
+- **Intercept remote calls** — Hook into incoming and outgoing remote events/functions, suppress or modify log entries
+- **Append virtual logs** — Inject decoded protocol traffic (e.g. ByteNet packets) as custom log entries
+- **Customize code generation** — Override the generated code when copying calls, hooks, or instance paths
+- **Create settings UI** — Add checkboxes, buttons, text inputs, and dropdowns that persist automatically
+- **Build custom modals** — Create resizable, tabbed modal dialogs with footer buttons
+- **Extend remote info** — Add custom tabs and footer buttons to the remote info panel
+- **Add context menu options** — Add right-click options to the remote list and call list
+- **Show notifications** — Display toast messages via `Cobalt.Sonner`
+- **Lifecycle management** — Clean up resources when the plugin is unloaded
+
+For the full API reference, see the [API Reference](./api) page.

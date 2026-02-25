@@ -1,0 +1,82 @@
+---
+title: 'Local Development'
+description: 'Local Development for Cobalt'
+---
+
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import CobaltLoadstringPlayground from '@/components/demo/playground/CobaltLoadstring';
+
+Cobalt uses the [wax](https://github.com/latte-soft/wax) [bundler](https://en.wikipedia.org/wiki/Module_bundler) to bundle the script. If wax is not setup, you must use the following instructions to build the script:
+
+## Setup
+
+### 1. Installing Rokit
+
+[Rokit](https://github.com/rojo-rbx/rokit) is a toolchain manager for Roblox projects. Open a terminal and run the install command for your operating system:
+
+<Tabs items={["macOS / Linux", "Windows"]}>
+  <Tab value="macOS / Linux">
+    Open **Terminal** and run the following command:
+
+    ```bash
+    curl -sSf https://raw.githubusercontent.com/rojo-rbx/rokit/main/scripts/install.sh | bash
+    ```
+  </Tab>
+  <Tab value="Windows">
+    Open **PowerShell** and run the following command:
+
+    ```powershell
+    Invoke-RestMethod https://raw.githubusercontent.com/rojo-rbx/rokit/main/scripts/install.ps1 | Invoke-Expression
+    ```
+  </Tab>
+</Tabs>
+
+### 2. Clone the Repository
+
+```bash
+git clone https://github.com/notpoiu/cobalt.git
+cd cobalt
+```
+
+### 3. Install Toolchain
+
+Once inside the Cobalt directory, install the required tools with Rokit:
+
+```bash
+rokit install
+```
+
+If prompted to trust any tools, select **yes** to allow them to be installed.
+
+### 4. Building Cobalt
+
+You can build Cobalt using the **VSCode build task** or the **command line**.
+
+<Tabs items={["VSCode Build Task", "Command Line"]}>
+  <Tab value="VSCode Build Task">
+    Press <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>B</kbd> (or <kbd>⌘</kbd> + <kbd>Shift</kbd> + <kbd>B</kbd> on macOS) to run the default build task.
+  </Tab>
+  <Tab value="Command Line">
+    Navigate to the Cobalt directory and run:
+
+    ```bash
+    lune run Build bundle header=Build/Header.luau
+    ```
+  </Tab>
+</Tabs>
+
+### 5. Testing Your Changes
+
+We recommend using the [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) extension for VSCode to serve the built script locally.
+
+1. Install the [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) extension in VSCode.
+2. Open the Cobalt project folder in VSCode.
+3. Click the **"Go Live"** button in the bottom-right corner of VSCode's status bar.
+4. Make sure the port matches the one in your loadstring below (default is `5500`).
+5. Use the loadstring below in your executor to load the locally served script.
+
+## Playground
+
+Use the playground below to generate a loadstring with a custom base URL. This is useful when testing local builds or hosting the script yourself.
+
+<CobaltLoadstringPlayground />

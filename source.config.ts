@@ -11,6 +11,10 @@ export const { docs: obsidianDocs, meta: obsidianMeta } = defineDocs({
   dir: "content/obsidian",
 });
 
+export const { docs: cobaltDocs, meta: cobaltMeta } = defineDocs({
+  dir: "content/cobalt",
+});
+
 export default defineConfig({
   mdxOptions: {
     providerImportSource: "@/app/mdx-components",
