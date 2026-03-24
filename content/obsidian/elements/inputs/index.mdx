@@ -74,6 +74,12 @@ LeftGroupBox:AddInput("MyTextbox", {
       default: 'true',
       required: false
     },
+    ClearTextOnBlur: {
+      description: 'Whether to clear the text when the input box loses focus or the user clicks away. This option has no effect when Finished is false.',
+      type: 'boolean',
+      default: 'false',
+      required: false
+    },
     Placeholder: {
       description: 'Placeholder text when empty',
       type: 'string',
@@ -114,6 +120,12 @@ LeftGroupBox:AddInput("MyTextbox", {
       description: 'Called when the input changes',
       type: 'function',
       default: 'function() end',
+      required: false
+    },
+    VerifyValue: {
+      description: 'Called before the input changes. Obsidian expects the function to return a boolean -> if the returned value is not true, the new value will be set to EmptyReset. This function will also be called when the input gets created to verify the Default value.',
+      type: 'function',
+      default: 'function() return true end',
       required: false
     },
     Disabled: {

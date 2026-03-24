@@ -87,6 +87,30 @@ local Keybind = Toggle:AddKeyPicker("MyKeybind", {
       default: 'false',
       required: false
     },
+    Blacklist: {
+      description: 'List of disallowed keys',
+      type: 'table',
+      default: '{}',
+      required: false
+    },
+    Whitelisted: {
+      description: 'List of allowed keys (overrides all other keys if not empty)',
+      type: 'table',
+      default: '{}',
+      required: false
+    },
+    BlacklistModifiers: {
+      description: 'List of disallowed modifier keys',
+      type: 'table',
+      default: '{}',
+      required: false
+    },
+    WhitelistedModifiers: {
+      description: 'List of allowed modifier keys',
+      type: 'table',
+      default: '{}',
+      required: false
+    },
     Callback: {
       description: 'Function fired when the keybind state changes',
       type: 'function',
