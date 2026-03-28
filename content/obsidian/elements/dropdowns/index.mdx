@@ -94,6 +94,12 @@ local Dropdown = Groupbox:AddDropdown("MyDropdown", {
       default: 'nil',
       required: false
     },
+    FormatListValue: {
+      description: 'Function to format values inside the context menu list',
+      type: 'function',
+      default: 'nil',
+      required: false
+    },
     DisabledValues: {
       description: 'Values that cannot be selected',
       type: 'table',
