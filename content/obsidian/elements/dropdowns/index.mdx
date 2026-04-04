@@ -95,7 +95,7 @@ local Dropdown = Groupbox:AddDropdown("MyDropdown", {
       required: false
     },
     FormatListValue: {
-      description: 'Function to format values inside the context menu list',
+      description: 'Function to format values inside the context menu list (Randomized formatting will not be preserved as the function is called every time the context menu is rebuilt)',
       type: 'function',
       default: 'nil',
       required: false
