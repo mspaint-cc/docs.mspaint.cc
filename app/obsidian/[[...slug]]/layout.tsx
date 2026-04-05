@@ -25,12 +25,7 @@ const docsTree: PageTree.Root = {
     { type: "page", name: "Installation", url: "/obsidian/installation" },
     { type: "page", name: "Contributing", url: "/obsidian/contributing" },
 
-    { type: "separator", name: "Core" },
-    {
-      type: "page",
-      name: "Library",
-      url: "/obsidian/core/library/",
-    },
+    { type: "separator", name: "Addons" },
     {
       type: "page",
       name: "SaveManager",
@@ -40,6 +35,33 @@ const docsTree: PageTree.Root = {
       type: "page",
       name: "ThemeManager",
       url: "/obsidian/core/addons/thememanager",
+    },
+
+    { type: "separator", name: "Library" },
+    {
+      type: "page",
+      name: "Loading",
+      url: "/obsidian/core/library/loading",
+    },
+    {
+      type: "page",
+      name: "Window",
+      url: "/obsidian/core/library/window",
+    },
+    {
+      type: "page",
+      name: "Notifications",
+      url: "/obsidian/core/library/notifications",
+    },
+    {
+      type: "page",
+      name: "Dialogs",
+      url: "/obsidian/core/library/dialogs",
+    },
+    {
+      type: "page",
+      name: "Utility",
+      url: "/obsidian/core/library/utility",
     },
 
     { type: "separator", name: "Structure" },

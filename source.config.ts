@@ -1,18 +1,17 @@
 import { defineDocs } from "fumadocs-mdx/config";
 import { defineConfig } from "fumadocs-mdx/config";
-import { transformerTwoslash } from "fumadocs-twoslash";
 import { rehypeCodeDefaultOptions } from "fumadocs-core/mdx-plugins";
 
 export const { docs, meta } = defineDocs({
-  dir: "content/docs",
+  dir: "content/docs"
 });
 
 export const { docs: obsidianDocs, meta: obsidianMeta } = defineDocs({
-  dir: "content/obsidian",
+  dir: "content/obsidian"
 });
 
 export const { docs: cobaltDocs, meta: cobaltMeta } = defineDocs({
-  dir: "content/cobalt",
+  dir: "content/cobalt"
 });
 
 export default defineConfig({
@@ -29,7 +28,6 @@ export default defineConfig({
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ...((rehypeCodeDefaultOptions.transformers ?? []) as any[]),
-        transformerTwoslash() as unknown,
       ],
     },
   },

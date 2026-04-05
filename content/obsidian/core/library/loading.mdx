@@ -1,0 +1,240 @@
+---
+title: 'Loading'
+description: 'A modal multi-stage initialization handler with optional sidebar support.'
+---
+
+import { InlineTOC } from 'fumadocs-ui/components/inline-toc';
+import { Tab, Tabs } from "fumadocs-ui/components/tabs";
+import { TypeTable } from '@/components/type-table';
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
+
+<InlineTOC items={toc} />
+
+---
+
+## Loading
+
+<iframe
+  className="w-full aspect-video rounded-xl border-none pointer-events-none"
+  src="https://www.youtube.com/embed/sjbM-YKULJU?controls=0&autoplay=1&mute=1&loop=1&playlist=sjbM-YKULJU&modestbranding=1&rel=0&iv_load_policy=3"
+  title="Loading GUI Showcase"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+  referrerPolicy="strict-origin-when-cross-origin"
+  allowFullScreen
+></iframe>
+
+The `Loading` GUI is a specialized modal overlay designed to manage multi-stage script initialization. It provides a centered loading interface with a progress bar and an optional sidebar for showing information or interactive elements.
+
+### Usage
+Create a loading instance with `Library:CreateLoading()`:
+
+```lua
+local Loading = Library:CreateLoading({
+    Title = "mspaint",
+    Icon = 95816097006870,
+    TotalSteps = 4
+})
+
+-- Loading...
+Loading:SetMessage("Initializing...")
+Loading:SetDescription("Waiting for game to load...")
+task.wait(1)
+
+Loading:SetCurrentStep(1)
+Loading:SetDescription("Loading configuration...")
+task.wait(1)
+
+-- Show sidebar with information
+Loading:SetCurrentStep(2)
+Loading:ShowSidebarPage(true)
+Loading.Sidebar:AddLabel("User: " .. game.Players.LocalPlayer.Name)
+Loading.Sidebar:AddLabel("Version: v1.0.0")
+task.wait(1)
+
+Loading:SetCurrentStep(3)
+Loading:SetDescription("Ready to start!")
+task.wait(1)
+
+Loading:SetCurrentStep(4)
+Loading:Continue() -- Destroys the loader and opens the main window
+```
+
+### Configuration
+<TypeTable
+  type={{
+    Title: {
+      description: 'The title displayed at the top of the loading window',
+      type: 'string',
+      default: '"mspaint"',
+      required: false
+    },
+    Icon: {
+      description: 'Top-bar icon for the window',
+      type: 'string/ID',
+      default: '95816097006870',
+      required: false
+    },
+    IconSize: {
+      description: 'Size of the top-bar icon',
+      type: 'UDim2',
+      default: 'UDim2.fromOffset(30, 30)',
+      required: false
+    },
+    LoadingIcon: {
+      description: 'The rotating asset displayed in the center',
+      type: 'string/ID',
+      default: '"rbxassetid://97544096941083"',
+      required: false
+    },
+    LoadingIconTweenTime: {
+      description: 'Rotation tween time',
+      type: 'number',
+      default: '1',
+      required: false
+    },
+    LoadingIconColor: {
+      description: 'The color applied to the loading icon',
+      type: 'Color3',
+      default: 'WhiteColor (if custom icon provided), AccentColor (with default loading icon)',
+      required: false
+    },
+    CurrentStep: {
+      description: 'Initial progress value',
+      type: 'number',
+      default: '0',
+      required: false
+    },
+    TotalSteps: {
+      description: 'Max progress value for the bar',
+      type: 'number',
+      default: '10',
+      required: false
+    },
+    ShowSidebar: {
+      description: 'Whether to open the sidebar on initial create',
+      type: 'boolean',
+      default: 'false',
+      required: false
+    },
+    WindowWidth: {
+      description: 'Width of the window (this option is ignored if sidebar is open -> uses ContentWidth + SidebarWidth)',
+      type: 'number',
+      default: '450',
+      required: false
+    },
+    WindowHeight: {
+      description: 'Height of the window',
+      type: 'number',
+      default: '275',
+      required: false
+    },
+    ContentWidth: {
+      description: 'Width of the main content area (used when sidebar is open)',
+      type: 'number',
+      default: '450',
+      required: false
+    },
+    SidebarWidth: {
+      description: 'Width of the sidebar area',
+      type: 'number',
+      default: '250',
+      required: false
+    }
+  }}
+/>
+
+### Methods
+
+#### SetMessage
+Updates the primary status message.
+```lua
+Loading:SetMessage("Loading...")
+```
+
+#### SetDescription
+Updates the secondary descriptive text.
+```lua
+Loading:SetDescription("Connecting to server...")
+```
+
+#### SetCurrentStep
+Updates the progress bar and step counter.
+```lua
+Loading:SetCurrentStep(5)
+```
+
+#### SetTotalSteps
+Updates the total steps needed.
+```lua
+Loading:SetTotalSteps(20)
+```
+
+#### SetLoadingIcon
+Switches the central rotating icon.
+```lua
+Loading:SetLoadingIcon("info") -- Lucide icon or roblox asset
+```
+
+#### SetLoadingIconTweenTime
+Updates the rotation tween time. Setting this to `0` stops rotation of the loading icom.
+```lua
+Loading:SetLoadingIconTweenTime(2)
+```
+
+#### SetLoadingIconColor
+Dynamically updates the color of the loading icon.
+```lua
+Loading:SetLoadingIconColor(Color3.new(1, 0, 0))
+```
+
+#### ShowSidebarPage
+Toggles the visibility of the sidebar.
+```lua
+Loading:ShowSidebarPage(true)
+```
+
+#### ShowErrorPage
+Switches to the error state view.
+```lua
+Loading:ShowErrorPage(true)
+```
+
+#### SetErrorMessage
+Updates the text on the error screen.
+```lua
+Loading:SetErrorMessage("Failed to authenticate.")
+```
+
+#### SetErrorButtons
+Replaces the buttons on the error screen. (same layout as the FooterButtons in Modals)
+```lua
+Loading:SetErrorButtons({
+    Retry = {
+        Title = "Retry Connection",
+        Variant = "Primary",
+        Callback = function() -- logic end
+    }
+})
+```
+
+#### Destroy
+Closes the loader. If `CreateWindow` was already called, this will restore the main window's visibility.
+```lua
+Loading:Destroy()
+```
+
+#### Continue
+Alias for `Destroy()`.
+```lua
+Loading:Continue()
+```
+
+---
+
+### Sidebar Interface
+The `Loading.Sidebar` frame works like a groupbox. You are able to use every UI element inside the sidebar.
+
+```lua
+Loading.Sidebar:AddLabel("Version: 1.2.0")
+Loading.Sidebar:AddButton("Print Hello World", function() print("Hello World") end)
+```
