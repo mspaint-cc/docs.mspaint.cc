@@ -1,33 +1,37 @@
 import { memo, useMemo, FC } from "react";
 
-import { TabData, UIElement, Addons } from "./element.types";
-import { Groupbox } from "./elements/GroupBox";
-import { TabContainer, TabLeft, TabRight } from "./elements/Tab";
-import Divider from "./elements/Divider";
-import Toggle from "./elements/Toggle";
-import Button from "./elements/Button";
-import ObsidianImage from "./elements/Image";
-import Label from "./elements/Label";
-import Tabbox from "./elements/TabBox";
-import Dropdown from "./elements/Dropdown";
-import Input from "./elements/Input";
-import Slider from "./elements/Slider";
-import KeyPicker from "./elements/addons/KeyPicker";
-import AddonContainer from "./elements/addons/AddonContainer";
-import ColorPicker from "./elements/addons/ColorPicker";
-import ObsidianWarningBox from "./elements/WarningBox";
+import { TabData, UIElement, Addons } from "../element.types";
+import { Groupbox } from "../elements/GroupBox";
+import { TabContainer, TabLeft, TabRight } from "../elements/Tab";
+import Divider from "../elements/Divider";
+import Toggle from "../elements/Toggle";
+import Button from "../elements/Button";
+import ObsidianImage from "../elements/Image";
+import ObsidianVideo from "../elements/Video";
+import ObsidianViewport from "../elements/Viewport";
+import ObsidianUIPassthrough from "../elements/UIPassthrough";
+import Label from "../elements/Label";
+import Tabbox from "../elements/TabBox";
+import Dropdown from "../elements/Dropdown";
+import Input from "../elements/Input";
+import Slider from "../elements/Slider";
+import KeyPicker from "../elements/addons/KeyPicker";
+import AddonContainer from "../elements/addons/AddonContainer";
+import ColorPicker from "../elements/addons/ColorPicker";
+import ObsidianWarningBox from "../elements/WarningBox";
 
 // Parsers //
-const renderAddons = (
+export const renderAddons = (
   element: UIElement,
   addons?: Addons[],
-  stateKeyPrefix?: string
+  stateKeyPrefix?: string,
+  node?: React.ReactNode
 ) => {
   if (!addons || addons.length === 0) return null;
 
   const scope = stateKeyPrefix || "global";
   return (
-    <AddonContainer className="absolute inset-0 pointer-events-none">
+    <AddonContainer>
       {addons.map((addon, idx) => {
         const addonKey = `${scope}:addon:${addon.type}:${element.index}:${idx}`;
 
@@ -57,6 +61,7 @@ const renderAddons = (
             return null;
         }
       })}
+      {node}
     </AddonContainer>
   );
 };
@@ -70,23 +75,36 @@ export const ElementParser: FC<{
   const scope = stateKeyPrefix || "global";
   const addons = (element as unknown as { properties?: { addons?: Addons[] } })
     .properties?.addons;
+  let customHandlerForAddons = false;
+
   const core = (() => {
     switch (element.type) {
       case "Toggle":
+        customHandlerForAddons = element.properties.variant === undefined || element.properties.variant === "Switch";
         return (
           <Toggle
             text={element.text}
             risky={element.properties.risky}
             checked={element.value}
+            variant={element.properties.variant}
             stateKey={`${scope}:el:Toggle:${element.index}`}
+            addonData={[element, addons, stateKeyPrefix]}
           />
         );
 
       case "Label":
-        return <Label>{element.text}</Label>;
+        return (
+          <Label doesWrap={element.properties.doesWrap}>{element.text}</Label>
+        );
 
       case "Button":
-        return <Button text={element.text} subButton={element.subButton} />;
+        return (
+          <Button
+            text={element.text}
+            subButton={element.subButton}
+            risky={element.properties?.risky}
+          />
+        );
 
       case "Dropdown":
         return (
@@ -95,6 +113,7 @@ export const ElementParser: FC<{
             value={element.value}
             options={element.properties.values}
             multi={element.properties.multi === true}
+            searchable={element.properties.searchable === true}
             disabledValues={element.properties.disabledValues || []}
             stateKey={`${scope}:el:Dropdown:${element.index}`}
           />
@@ -108,6 +127,7 @@ export const ElementParser: FC<{
             min={element.properties.min}
             max={element.properties.max}
             compact={element.properties.compact}
+            hideMax={element.properties.hideMax}
             rounding={element.properties.rounding}
             prefix={element.properties.prefix}
             suffix={element.properties.suffix}
@@ -126,7 +146,13 @@ export const ElementParser: FC<{
         );
 
       case "Divider":
-        return <Divider />;
+        return (
+          <Divider
+            text={element.properties?.text}
+            marginTop={element.properties?.marginTop}
+            marginBottom={element.properties?.marginBottom}
+          />
+        );
 
       case "Image":
         return (
@@ -138,9 +164,17 @@ export const ElementParser: FC<{
             rectOffset={element.properties.rectOffset}
             height={element.properties.height}
             rectSize={element.properties.rectSize}
-            bgTransparency={0}
           />
         );
+
+      case "Video":
+        return <ObsidianVideo height={element.properties.height} />;
+
+      case "Viewport":
+        return <ObsidianViewport height={element.properties.height} />;
+
+      case "UIPassthrough":
+        return <ObsidianUIPassthrough height={element.properties.height} />;
 
       default:
         return (
@@ -155,7 +189,7 @@ export const ElementParser: FC<{
   return (
     <div className="relative">
       {core}
-      {renderAddons(element, addons, stateKeyPrefix)}
+      {customHandlerForAddons == false && renderAddons(element, addons, stateKeyPrefix)}
     </div>
   );
 };
@@ -167,8 +201,8 @@ const TabParserComponent: FC<{ tabData: TabData | null }> = ({ tabData }) => {
     () =>
       groupboxes?.Left
         ? Object.values(groupboxes.Left).sort(
-            (a, b) => (a.order ?? 0) - (b.order ?? 0)
-          )
+          (a, b) => (a.order ?? 0) - (b.order ?? 0)
+        )
         : [],
     [groupboxes?.Left]
   );
@@ -177,8 +211,8 @@ const TabParserComponent: FC<{ tabData: TabData | null }> = ({ tabData }) => {
     () =>
       groupboxes?.Right
         ? Object.values(groupboxes.Right).sort(
-            (a, b) => (a.order ?? 0) - (b.order ?? 0)
-          )
+          (a, b) => (a.order ?? 0) - (b.order ?? 0)
+        )
         : [],
     [groupboxes?.Right]
   );
@@ -206,6 +240,7 @@ const TabParserComponent: FC<{ tabData: TabData | null }> = ({ tabData }) => {
           lockSize={warningBox.LockSize}
         />
       )}
+
       <TabContainer>
         <TabLeft>
           {leftTabboxes.map((tabbox) => (
@@ -215,6 +250,7 @@ const TabParserComponent: FC<{ tabData: TabData | null }> = ({ tabData }) => {
               scope={`tab:${tabData.name}:left:tabbox:${tabbox.name}`}
             />
           ))}
+
           {leftGroupboxes.map((gb) => (
             <Groupbox key={gb.name} title={gb.name}>
               {gb.elements.map((el) => (
@@ -227,6 +263,7 @@ const TabParserComponent: FC<{ tabData: TabData | null }> = ({ tabData }) => {
             </Groupbox>
           ))}
         </TabLeft>
+
         <TabRight>
           {rightTabboxes.map((tabbox) => (
             <Tabbox
@@ -235,6 +272,7 @@ const TabParserComponent: FC<{ tabData: TabData | null }> = ({ tabData }) => {
               scope={`tab:${tabData.name}:right:tabbox:${tabbox.name}`}
             />
           ))}
+
           {rightGroupboxes.map((gb) => (
             <Groupbox key={gb.name} title={gb.name}>
               {gb.elements.map((el) => (

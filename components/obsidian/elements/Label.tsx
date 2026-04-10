@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import createDOMPurify from "dompurify";
-import type { ReactNode, CSSProperties } from "react";
+import { type ReactNode, type CSSProperties, useEffect, useState } from "react";
 
 function escapeHtml(input: string) {
   return input
@@ -128,27 +128,42 @@ export default function Label({
   children,
   className,
   style,
+  doesWrap = true,
 }: {
   children: ReactNode;
   className?: string;
   style?: CSSProperties;
+  doesWrap?: boolean;
 }) {
-  const finalClassName = cn("text-left block text-white text-sm", className);
+  const finalClassName = cn("text-left block text-white text-xs", className, doesWrap ? "" : "whitespace-nowrap");
+  const [sanitized, setSanitized] = useState<string | TrustedHTML>("");
 
-  if (typeof children === "string") {
-    const htmlUnsafe = robloxRichTextToHtml(children);
-    const DOMPurify =
-      typeof window !== "undefined" ? createDOMPurify(window) : undefined;
-    const html =
-      DOMPurify?.sanitize(htmlUnsafe, {
+  useEffect(() => {
+    if (typeof children !== "string") {
+      setSanitized("");
+      return;
+    };
+
+    if (typeof window === "undefined") {
+      setSanitized(`<span>${children}</span>"`);
+      return;
+    };
+
+    const DOMPurify = createDOMPurify(window as unknown as import("dompurify").WindowLike);
+    setSanitized(
+      DOMPurify.sanitize(robloxRichTextToHtml(String(children)), {
         ALLOWED_TAGS: ["b", "i", "u", "s", "br", "span"],
-        ALLOWED_ATTR: ["style"],
-      }) ?? htmlUnsafe;
+        ALLOWED_ATTR: ["style"]
+      })
+    );
+  }, [children]);
+
+  if (sanitized !== "") {
     return (
       <span
         className={finalClassName}
         style={style}
-        dangerouslySetInnerHTML={{ __html: html }}
+        dangerouslySetInnerHTML={{ __html: sanitized }}
       />
     );
   }

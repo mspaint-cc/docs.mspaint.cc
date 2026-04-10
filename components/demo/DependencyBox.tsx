@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import { Groupbox } from "../obsidian/elements/GroupBox";
 import Toggle from "../obsidian/elements/Toggle";
-import { UIStateProvider, useUIValue } from "../obsidian/UIStateProvider";
+import { UIStateProvider, useUIValue } from "../obsidian/providers/UIStateProvider";
 import Slider from "../obsidian/elements/Slider";
 
 function ObsidianComponent() {

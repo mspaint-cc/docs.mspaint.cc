@@ -1,3 +1,4 @@
+// Data Structures //
 export interface Color3 {
   r: number;
   g: number;
@@ -32,6 +33,8 @@ interface BaseElement {
   type: string;
   text: string;
   disabled: boolean;
+  tooltip?: string;
+  disabledTooltip?: string;
 }
 
 export interface ToggleElement extends BaseElement {
@@ -39,6 +42,7 @@ export interface ToggleElement extends BaseElement {
   value: boolean;
   properties: {
     risky: boolean;
+    variant?: "Switch" | "Checkbox";
     addons?: Addons[] | undefined;
   };
 }
@@ -52,9 +56,18 @@ export interface LabelElement extends BaseElement {
 }
 
 export interface ButtonElement extends BaseElement {
+  text: string;
   type: "Button";
+  properties: {
+    risky?: boolean;
+    doubleClick?: boolean;
+  };
   subButton?: {
     text: string;
+    properties: {
+      risky?: boolean;
+      doubleClick?: boolean;
+    };
   };
 }
 
@@ -65,6 +78,7 @@ export interface DropdownElement extends BaseElement {
     values: string[];
     disabledValues: string[] | undefined;
     multi: boolean | undefined;
+    searchable: boolean | undefined;
   };
 }
 
@@ -76,6 +90,7 @@ export interface SliderElement extends BaseElement {
     max: number;
     compact: boolean | undefined;
     rounding: number | undefined;
+    hideMax: boolean | undefined;
     prefix: string;
     suffix: string;
   };
@@ -96,7 +111,11 @@ export interface InputElement extends BaseElement {
 
 export interface DividerElement extends BaseElement {
   type: "Divider";
-  properties: object;
+  properties: {
+    text?: string;
+    marginTop?: number;
+    marginBottom?: number;
+  };
 }
 
 export interface ImageElement extends BaseElement {
@@ -113,6 +132,33 @@ export interface ImageElement extends BaseElement {
   };
 }
 
+export interface VideoElement extends BaseElement {
+  type: "Video";
+  properties: {
+    video: string;
+    looped: boolean;
+    playing: boolean;
+    volume: number;
+    height: number;
+  };
+}
+
+export interface ViewportElement extends BaseElement {
+  type: "Viewport";
+  properties: {
+    height: number;
+    interactive: boolean;
+    autoFocus: boolean;
+  };
+}
+
+export interface UIPassthroughElement extends BaseElement {
+  type: "UIPassthrough";
+  properties: {
+    height: number;
+  };
+}
+
 export type UIElement =
   | ToggleElement
   | LabelElement
@@ -121,7 +167,10 @@ export type UIElement =
   | SliderElement
   | InputElement
   | DividerElement
-  | ImageElement;
+  | ImageElement
+  | VideoElement
+  | ViewportElement
+  | UIPassthroughElement;
 
 // JSON File Types //
 export interface GroupboxData {
@@ -151,6 +200,7 @@ export interface TabData {
   name: string;
   type: string;
   icon: string;
+  description?: string;
   order: number;
   tabboxes: {
     Left: TabboxData[];
@@ -174,5 +224,9 @@ export interface TabData {
 export interface UIData {
   tabs: {
     [key: string]: TabData;
+  };
+  metadata?: {
+    cornerRadius?: number;
+    forceCheckbox?: boolean;
   };
 }

@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import { Groupbox } from "../obsidian/elements/GroupBox";
 import Toggle from "../obsidian/elements/Toggle";
-import { UIStateProvider, useUIValue } from "../obsidian/UIStateProvider";
+import { UIStateProvider, useUIValue } from "../obsidian/providers/UIStateProvider";
 import Slider from "../obsidian/elements/Slider";
 
 function ObsidianComponent() {
@@ -19,12 +19,13 @@ function ObsidianComponent() {
           text="Enable Audio"
           checked={false}
           risky={false}
+          variant="Switch"
           stateKey="demo:audio"
         />
       </Groupbox>
 
       {externalChecked === true && (
-        <Groupbox>
+        <Groupbox title="">
           <Slider text="Volume" value={50} min={0} max={100} rounding={0} />
         </Groupbox>
       )}

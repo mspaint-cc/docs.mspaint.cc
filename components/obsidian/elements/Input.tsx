@@ -1,7 +1,8 @@
 import React from "react";
 import { ButtonBase } from "./Button";
 import Label from "./Label";
-import { useUIState } from "../UIStateProvider";
+import { useUIState } from "../providers/UIStateProvider";
+import { useCornerRadius } from "../providers/ObsidianDataProvider";
 import { cn } from "@/lib/utils";
 
 export default function Input({
@@ -50,7 +51,7 @@ export default function Input({
             name="input"
             type="text"
             className={cn(
-              "w-full h-full text-white opacity-100 ml-1 text-xs bg-transparent outline-none",
+              "w-full h-full text-white opacity-100 text-xs bg-transparent outline-none px-1",
               inputClassName
             )}
             value={local}

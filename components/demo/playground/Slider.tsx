@@ -7,7 +7,7 @@ import { Switch } from "@/components/ui/switch";
 
 import { useEffect, useMemo, useState } from "react";
 import { CopyPseudoComponent } from "./shared/CopyComponent";
-import { UIStateProvider } from "@/components/obsidian/UIStateProvider";
+import { UIStateProvider } from "@/components/obsidian/providers/UIStateProvider";
 
 function parseNumber(value: string, fallback: number) {
   const next = Number(value);

@@ -1,6 +1,6 @@
 import { useCornerRadius } from "../providers/ObsidianDataProvider";
 
-export default function ObsidianVideo({
+export default function ObsidianViewport({
 	height = 200,
 }: {
 	height?: number;

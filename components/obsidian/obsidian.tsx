@@ -12,7 +12,7 @@ import type {
   Vector2,
   TabboxData,
 } from "./element.types";
-import { UIStateProvider } from "./UIStateProvider";
+import { UIStateProvider } from "./providers/UIStateProvider";
 import { ObsidianWindow } from "./Window";
 
 // Root wrapper props
@@ -31,6 +31,7 @@ export type ObsidianTabProps = {
   name: string;
   order?: number;
   icon?: string;
+  description?: string;
   children?: ReactNode;
 };
 
@@ -46,6 +47,7 @@ export type OToggleProps = {
   text: string;
   defaultChecked?: boolean;
   risky?: boolean;
+  variant?: "Switch" | "Checkbox";
   visible?: boolean;
   disabled?: boolean;
 };
@@ -59,9 +61,11 @@ export type OLabelProps = {
 
 export type OButtonProps = {
   text: string;
+  risky?: boolean;
   visible?: boolean;
   disabled?: boolean;
   subButtonText?: string;
+  subButtonRisky?: boolean;
 };
 
 export type ODropdownProps = {
@@ -70,6 +74,7 @@ export type ODropdownProps = {
   options: string[];
   disabledValues?: string[];
   multi?: boolean;
+  searchable?: boolean;
   visible?: boolean;
   disabled?: boolean;
 };
@@ -80,6 +85,7 @@ export type OSliderProps = {
   min?: number;
   max?: number;
   compact?: boolean;
+  hideMax?: boolean;
   rounding?: number;
   prefix?: string;
   suffix?: string;
@@ -96,6 +102,27 @@ export type OInputProps = {
 };
 
 export type ODividerProps = {
+  text?: string;
+  marginTop?: number;
+  marginBottom?: number;
+  visible?: boolean;
+  disabled?: boolean;
+};
+
+export type OVideoProps = {
+  height?: number;
+  visible?: boolean;
+  disabled?: boolean;
+};
+
+export type OViewportProps = {
+  height?: number;
+  visible?: boolean;
+  disabled?: boolean;
+};
+
+export type OUIPassthroughProps = {
+  height?: number;
   visible?: boolean;
   disabled?: boolean;
 };
@@ -135,6 +162,9 @@ const TAGS = {
   Input: "obsidian-input",
   Divider: "obsidian-divider",
   Image: "obsidian-image",
+  Video: "obsidian-video",
+  Viewport: "obsidian-viewport",
+  UIPassthrough: "obsidian-uipassthrough",
   TabWarning: "obsidian-tabwarning",
 } as const;
 
@@ -160,6 +190,9 @@ export const OSlider = makeMarker<OSliderProps>("OSlider");
 export const OInput = makeMarker<OInputProps>("OInput");
 export const ODivider = makeMarker<ODividerProps>("ODivider");
 export const OImage = makeMarker<OImageProps>("OImage");
+export const OVideo = makeMarker<OVideoProps>("OVideo");
+export const OViewport = makeMarker<OViewportProps>("OViewport");
+export const OUIPassthrough = makeMarker<OUIPassthroughProps>("OUIPassthrough");
 export const TabWarning = makeMarker<TabWarningProps>("TabWarning");
 
 // Long-form aliases for convenience in pages
@@ -171,6 +204,9 @@ export { OSlider as ObsidianSlider };
 export { OInput as ObsidianInput };
 export { ODivider as ObsidianDivider };
 export { OImage as ObsidianImage };
+export { OVideo as ObsidianVideo };
+export { OViewport as ObsidianViewport };
+export { OUIPassthrough as ObsidianUIPassthrough };
 export { TabWarning as ObsidianTabWarning };
 
 // Parsing helpers
@@ -254,7 +290,7 @@ function parseElements(
         text: p.text,
         disabled: p.disabled ?? false,
         value: p.defaultChecked ?? false,
-        properties: { risky: p.risky ?? false },
+        properties: { risky: p.risky ?? false, variant: p.variant ?? "Switch" },
       } as unknown as UIElement);
       return;
     }
@@ -286,7 +322,8 @@ function parseElements(
         type: "Button",
         text: p.text,
         disabled: p.disabled ?? false,
-        subButton: p.subButtonText ? { text: p.subButtonText } : undefined,
+        properties: { risky: p.risky ?? false, doubleClick: false },
+        subButton: p.subButtonText ? { text: p.subButtonText, risky: p.subButtonRisky } : undefined,
       } as unknown as UIElement);
       return;
     }
@@ -307,6 +344,7 @@ function parseElements(
           values: p.options ?? [],
           disabledValues: p.disabledValues ?? [],
           multi: p.multi ?? false,
+          searchable: p.searchable ?? false,
         },
       } as unknown as UIElement);
       return;
@@ -330,6 +368,7 @@ function parseElements(
           min,
           max,
           compact: p.compact,
+          hideMax: p.hideMax,
           rounding: p.rounding,
           prefix: p.prefix ?? "",
           suffix: p.suffix ?? "",
@@ -373,7 +412,11 @@ function parseElements(
         type: "Divider",
         text: "",
         disabled: p.disabled ?? false,
-        properties: {},
+        properties: {
+          text: p.text,
+          marginTop: p.marginTop ?? 0,
+          marginBottom: p.marginBottom ?? 0,
+        },
       } as unknown as UIElement);
       return;
     }
@@ -397,6 +440,66 @@ function parseElements(
           height: p.height ?? 30,
           scaleType: p.scaleType ?? "Fit",
           transparency: p.transparency ?? 1,
+        },
+      } as unknown as UIElement);
+      return;
+    }
+    if (
+      isElementOfType(child, OVideo) ||
+      isMarker(child, "Video") ||
+      isTag(child, TAGS.Video)
+    ) {
+      const p = child.props as OVideoProps;
+      elements.push({
+        index: idx++,
+        visible: p.visible ?? true,
+        type: "Video",
+        text: "",
+        disabled: p.disabled ?? false,
+        properties: {
+          video: "",
+          looped: false,
+          playing: false,
+          volume: 1,
+          height: p.height ?? 200,
+        },
+      } as unknown as UIElement);
+      return;
+    }
+    if (
+      isElementOfType(child, OViewport) ||
+      isMarker(child, "Viewport") ||
+      isTag(child, TAGS.Viewport)
+    ) {
+      const p = child.props as OViewportProps;
+      elements.push({
+        index: idx++,
+        visible: p.visible ?? true,
+        type: "Viewport",
+        text: "",
+        disabled: p.disabled ?? false,
+        properties: {
+          height: p.height ?? 200,
+          interactive: false,
+          autoFocus: true,
+        },
+      } as unknown as UIElement);
+      return;
+    }
+    if (
+      isElementOfType(child, OUIPassthrough) ||
+      isMarker(child, "UIPassthrough") ||
+      isTag(child, TAGS.UIPassthrough)
+    ) {
+      const p = child.props as OUIPassthroughProps;
+      elements.push({
+        index: idx++,
+        visible: p.visible ?? true,
+        type: "UIPassthrough",
+        text: "",
+        disabled: p.disabled ?? false,
+        properties: {
+          height: p.height ?? 24,
         },
       } as unknown as UIElement);
       return;
@@ -470,19 +573,20 @@ function parseTabs(children: ReactNode): UIData {
 
     const left = leftNode
       ? parseGroupboxes(
-          (leftNode.props as { children?: React.ReactNode }).children
-        )
+        (leftNode.props as { children?: React.ReactNode }).children
+      )
       : { byName: {} };
     const right = rightNode
       ? parseGroupboxes(
-          (rightNode.props as { children?: React.ReactNode }).children
-        )
+        (rightNode.props as { children?: React.ReactNode }).children
+      )
       : { byName: {} };
 
     const tabData: TabData = {
       name: p.name,
       type: "Tab",
       icon: p.icon ?? "",
+      description: p.description,
       order: p.order ?? 0,
       tabboxes: { Left: [], Right: [], Unknown: [] },
       groupboxes: {
@@ -513,7 +617,8 @@ function buildUIData(children?: ReactNode): UIData | undefined {
 // Accepts a variety of shapes and normalizes into UIData
 function normalizeUIData(data: unknown): UIData | undefined {
   if (!data || typeof data !== "object") return undefined;
-  const anyData = data as { tabs?: unknown };
+
+  const anyData = data as { tabs?: unknown, metadata?: unknown };
   const tabsSrc =
     anyData.tabs && typeof anyData.tabs === "object"
       ? (anyData.tabs as Record<string, unknown>)
@@ -528,6 +633,7 @@ function normalizeUIData(data: unknown): UIData | undefined {
       name?: string;
       type?: string;
       icon?: string;
+      description?: string;
       order?: unknown;
       tabboxes?: {
         Left?: unknown;
@@ -579,6 +685,7 @@ function normalizeUIData(data: unknown): UIData | undefined {
       name: (rawTab.name ?? name) as string,
       type: (rawTab.type ?? "Tab") as string,
       icon: (rawTab.icon ?? "") as string,
+      description: rawTab.description,
       order: Number(rawTab.order ?? 0),
       tabboxes: {
         Left: normalizeTabSide(tabboxes.Left),
@@ -600,7 +707,7 @@ function normalizeUIData(data: unknown): UIData | undefined {
     } as TabData;
   }
 
-  return { tabs: outTabs } as UIData;
+  return { tabs: outTabs, metadata: anyData.metadata as UIData["metadata"] } as UIData;
 }
 
 export function Obsidian({

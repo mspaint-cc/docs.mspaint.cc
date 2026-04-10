@@ -7,7 +7,7 @@ import { Switch } from "@/components/ui/switch";
 
 import { useMemo, useState } from "react";
 import { CopyPseudoComponent } from "./shared/CopyComponent";
-import { UIStateProvider } from "@/components/obsidian/UIStateProvider";
+import { UIStateProvider } from "@/components/obsidian/providers/UIStateProvider";
 
 function splitList(value: string) {
   return value

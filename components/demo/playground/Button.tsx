@@ -17,7 +17,7 @@ export default function ButtonPlayground() {
     () => (
       <Button
         text={text}
-        subButton={hasSubButton ? { text: subButtonText } : undefined}
+        subButton={hasSubButton ? { text: subButtonText, properties: { risky: false } } : undefined}
       />
     ),
     [text, hasSubButton, subButtonText]

@@ -1,4 +1,5 @@
-"use client";
+import { cn } from "@/lib/utils";
+import { useCornerRadius } from "../providers/ObsidianDataProvider";
 
 export default function Divider({
   text,
@@ -9,27 +10,45 @@ export default function Divider({
   marginTop?: number;
   marginBottom?: number;
 }) {
-  const marginStyle = {
-    marginTop: `${marginTop}px`,
-    marginBottom: `${marginBottom}px`,
-  };
+  const br = useCornerRadius();
+  const dividerStyle = "h-[4px] bg-[rgb(25,25,25)] border border-[rgb(40,40,40)]";
 
-  if (!text || text.length === 0) {
+  marginTop = marginTop + 2;
+  marginBottom = marginBottom + 2;
+
+  if (text) {
     return (
       <div
-        style={marginStyle}
-        className="w-full min-h-1 h-[4px] border-[rgb(40,40,40)] border"
-      />
+        className="w-full flex items-center gap-2"
+        style={{
+          marginTop: `${marginTop}px`,
+          marginBottom: `${marginBottom}px`,
+        }}
+      >
+        <div className={cn("flex-1", dividerStyle)} style={{ borderRadius: br }} />
+
+        <span
+          className="text-white text-xs opacity-30 whitespace-nowrap select-none"
+          style={{
+            lineHeight: `4px`,
+          }}
+        >
+          {text}
+        </span>
+
+        <div className={cn("flex-1", dividerStyle)} style={{ borderRadius: br }} />
+      </div>
     );
   }
 
   return (
-    <div style={marginStyle} className="w-full flex items-center gap-1">
-      <div className="flex-grow h-[4px] border-[rgb(40,40,40)] border" />
-      <span className="text-[12px] text-white/50 whitespace-nowrap leading-none">
-        {text}
-      </span>
-      <div className="flex-grow h-[4px] border-[rgb(40,40,40)] border" />
-    </div>
+    <hr
+      className={cn("w-full mt-0 mb-0", dividerStyle)}
+      style={{
+        marginTop: `${marginTop}px`,
+        marginBottom: `${marginBottom}px`,
+        borderRadius: br,
+      }}
+    />
   );
 }

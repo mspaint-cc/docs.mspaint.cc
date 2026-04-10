@@ -4,7 +4,8 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 import { ButtonBase } from "./Button";
 import Label from "./Label";
-import { useUIValue } from "../UIStateProvider";
+import { useUIValue } from "../providers/UIStateProvider";
+import { useCornerRadius } from "../providers/ObsidianDataProvider";
 
 export default function Slider({
   text,
@@ -14,7 +15,8 @@ export default function Slider({
   max = 100,
   step = 1,
   compact,
-  rounding,
+  hideMax,
+  rounding = 0,
   prefix,
   suffix,
   className,
@@ -28,6 +30,7 @@ export default function Slider({
   max?: number;
   step?: number;
   compact?: boolean;
+  hideMax?: boolean;
   rounding?: number;
   prefix?: string;
   suffix?: string;
@@ -53,11 +56,8 @@ export default function Slider({
   }, [stateValue, isControlled]);
 
   const roundValue = (num: number) => {
-    if (rounding !== undefined && rounding >= 0) {
-      const multiplier = Math.pow(10, rounding);
-      return Math.round(num * multiplier) / multiplier;
-    }
-    return num;
+    const multiplier = Math.pow(10, rounding);
+    return Math.round(num * multiplier) / multiplier;
   };
 
   const trackRef = React.useRef<HTMLDivElement | null>(null);
@@ -67,9 +67,8 @@ export default function Slider({
     const range = max - min;
     if (step <= 0 || !Number.isFinite(step) || range === 0) return n;
 
-    const roundingStep =
-      rounding !== undefined && rounding >= 0 ? Math.pow(10, -rounding) : null;
-    const effectiveStep = roundingStep ? Math.min(step, roundingStep) : step;
+    const roundingStep = Math.pow(10, -rounding);
+    const effectiveStep = Math.min(step, roundingStep);
     const steps = Math.round((n - min) / effectiveStep);
     const snapped = min + steps * effectiveStep;
 
@@ -97,7 +96,7 @@ export default function Slider({
     draggingRef.current = true;
     try {
       (e.currentTarget as HTMLDivElement).setPointerCapture(e.pointerId);
-    } catch {}
+    } catch { }
     setFromClientX(e.clientX);
 
     const move = (ev: PointerEvent) => {
@@ -119,18 +118,19 @@ export default function Slider({
 
   const displayValue = roundValue(currentValue);
   const displayMax = roundValue(max);
-  const formatValue = (num: number) =>
-    rounding !== undefined && rounding >= 0
-      ? Number(num).toFixed(rounding)
-      : String(num);
+  const formatValue = (num: number) => {
+    const fixed = Number(num).toFixed(rounding);
+    return parseFloat(fixed).toString();
+  };
 
   const fraction = max > min ? (currentValue - min) / (max - min) : 0;
   const percent = Math.min(100, Math.max(0, fraction * 100));
+  const br = useCornerRadius();
 
   if (compact) {
-    const sliderText = `${prefix || ""}${text}${suffix || ""}: ${formatValue(
+    const sliderText = `${text}: ${prefix || ""}${formatValue(
       displayValue as number
-    )}`;
+    )}${suffix || ""}`;
 
     return (
       <ButtonBase
@@ -145,7 +145,8 @@ export default function Slider({
             aria-valuemin={min}
             aria-valuemax={max}
             aria-valuenow={displayValue}
-            className="absolute inset-0 z-10 cursor-pointer overflow-hidden rounded-[1px] select-none touch-none pointer-events-auto"
+            className="absolute inset-0 z-10 cursor-pointer overflow-hidden select-none touch-none pointer-events-auto"
+            style={{ borderRadius: br }}
             onPointerDown={onPointerDown}
             onPointerMove={(e) => {
               if (!draggingRef.current) return;
@@ -159,7 +160,7 @@ export default function Slider({
           </div>
           <span
             className={cn(
-              `text-center text-white text-sm truncate z-30 pointer-events-none`,
+              `text-center text-white text-xs truncate z-30 pointer-events-none`,
               "select-none"
             )}
             style={{
@@ -179,14 +180,18 @@ export default function Slider({
   return (
     <div className={cn("flex flex-col gap-1", className)}>
       <Label className="text-white opacity-100">{text}</Label>
-      <div className="relative w-full h-[20px] rounded-[1px] bg-[rgb(25,25,25)] border-[rgb(40,40,40)] border">
+      <div
+        className="relative w-full h-[20px] bg-[rgb(25,25,25)] border-[rgb(40,40,40)] border"
+        style={{ borderRadius: br }}
+      >
         <div
           ref={trackRef}
           role="slider"
           aria-valuemin={min}
           aria-valuemax={max}
           aria-valuenow={displayValue}
-          className="absolute inset-0 cursor-pointer overflow-hidden rounded-[1px] select-none touch-none"
+          className="absolute inset-0 cursor-pointer overflow-hidden select-none touch-none"
+          style={{ borderRadius: br }}
           onPointerDown={onPointerDown}
           onPointerMove={(e) => {
             if (!draggingRef.current) return;
@@ -201,7 +206,7 @@ export default function Slider({
         </div>
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <span
-            className="text-center text-white text-sm select-none"
+            className="text-center text-white text-xs select-none"
             style={{
               WebkitTextStroke: "0.1px #000",
               WebkitTextFillColor: "white",
@@ -209,8 +214,9 @@ export default function Slider({
                 "0 1px 0 #000, 1px 0 0 #000, 0 -1px 0 #000, -1px 0 0 #000",
             }}
           >
-            {formatValue(displayValue as number)}/
-            {formatValue(displayMax as number)}
+            {hideMax === true
+              ? `${prefix || ""}${formatValue(displayValue as number)}${suffix || ""}`
+              : `${prefix || ""}${formatValue(displayValue as number)}/${formatValue(displayMax as number)}${suffix || ""}`}
           </span>
         </div>
       </div>

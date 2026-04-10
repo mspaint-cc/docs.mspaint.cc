@@ -1,34 +1,32 @@
+import { cn } from "@/lib/utils";
+import { useCornerRadius } from "../providers/ObsidianDataProvider";
+
 export default function ObsidianImage({
-  /*image,
-  transparency,
-  scaleType,
-  color,
-  rectOffset,*/
-  height,
-  bgTransparency,
-}: //rectSize,
-{
-  image: string;
-  transparency: number;
-  scaleType: string;
-  color: { b: number; g: number; r: number };
-  rectOffset: { y: number; x: number };
-  height: number;
-  rectSize: { y: number; x: number };
-  bgTransparency: number;
+	image,
+	transparency,
+	scaleType,
+	color,
+	rectOffset,
+	height,
+	rectSize,
+}: {
+	image: string;
+	transparency: number;
+	scaleType: string;
+	color: { b: number; g: number; r: number };
+	rectOffset: { y: number; x: number };
+	height: number;
+	rectSize: { y: number; x: number };
 }) {
-  return (
-    <div
-      className={"w-full rounded-[1px] border flex items-center justify-center"}
-      style={{
-        height: `${height}px`,
-        backgroundColor: `rgba(25,25,25,${1 - bgTransparency})`,
-        borderColor: `rgba(40,40,40,${1 - bgTransparency})`,
-      }}
-    >
-      <p className="text-center text-muted-foreground text-sm select-none">
-        Image Unavailable
-      </p>
-    </div>
-  );
+	const br = useCornerRadius();
+	return (
+		<div
+			className={"w-full bg-[rgb(25,25,25)] border-[rgb(40,40,40)] border flex items-center justify-center"}
+			style={{ height: `${height}px`, borderRadius: br }}
+		>
+			<p className="text-center text-muted-foreground text-xs select-none">
+				Unavailable
+			</p>
+		</div>
+	);
 }

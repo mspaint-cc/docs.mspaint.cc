@@ -3,7 +3,7 @@
 import Divider from "@/components/obsidian/elements/Divider";
 import { CopyPseudoComponent } from "./shared/CopyComponent";
 import Button from "@/components/obsidian/elements/Button";
-import { UIStateProvider } from "@/components/obsidian/UIStateProvider";
+import { UIStateProvider } from "@/components/obsidian/providers/UIStateProvider";
 import Toggle from "@/components/obsidian/elements/Toggle";
 
 import { Input } from "@/components/ui/input";
@@ -47,7 +47,7 @@ export default function DividerPlayground() {
           <UIStateProvider>
             <Toggle text="Create Logs" checked={false} risky={false} />
             <Divider text={text} marginTop={activeMarginTop} marginBottom={activeMarginBottom} />
-            <Button text="Join Discord" subButton={{ text: "Copy Link" }} />
+            <Button text="Join Discord" subButton={{ text: "Copy Link", properties: { risky: false } }} />
             <Button text="Unload" />
           </UIStateProvider>
         </div>

@@ -1,15 +1,16 @@
 "use client";
 
+import React from "react";
 import { ChevronUp } from "lucide-react";
+import { createPortal } from "react-dom";
+import { useUIValue } from "../providers/UIStateProvider";
 import { ButtonBase } from "./Button";
 import Label from "./Label";
-import React from "react";
 import { cn } from "@/lib/utils";
 import { IBMMono } from "../fonts";
-import { useUIValue } from "../UIStateProvider";
 
-function useClickOutside(
-  ref: React.RefObject<HTMLElement>,
+function useClickOutside<T extends HTMLElement>(
+  ref: React.RefObject<T | null>,
   onOutside: () => void
 ) {
   React.useEffect(() => {
@@ -33,6 +34,7 @@ export default function Dropdown({
   value,
   options,
   multi,
+  searchable,
   disabledValues = [],
   stateKey,
 }: {
@@ -40,6 +42,7 @@ export default function Dropdown({
   value: string | string[] | { [key: string]: boolean };
   options: string[];
   multi: boolean | undefined;
+  searchable?: boolean;
   disabledValues?: string[];
   stateKey?: string;
 }) {
@@ -47,6 +50,34 @@ export default function Dropdown({
   const [externalSelected, setExternalSelected] = useUIValue<
     string | { [key: string]: boolean }
   >(stateKey, undefined);
+
+  // Positioning state
+  const [position, setPosition] = React.useState({ top: 0, left: 0, width: 0 });
+  const anchorRef = React.useRef<HTMLDivElement>(null);
+  const portalRef = React.useRef<HTMLDivElement>(null);
+
+  const updatePosition = React.useCallback(() => {
+    if (anchorRef.current) {
+      const rect = anchorRef.current.getBoundingClientRect();
+      setPosition({
+        top: rect.bottom + window.scrollY,
+        left: rect.left + window.scrollX,
+        width: rect.width,
+      });
+    }
+  }, []);
+
+  React.useEffect(() => {
+    if (isOpen) {
+      updatePosition();
+      window.addEventListener("scroll", updatePosition, true);
+      window.addEventListener("resize", updatePosition);
+      return () => {
+        window.removeEventListener("scroll", updatePosition, true);
+        window.removeEventListener("resize", updatePosition);
+      };
+    }
+  }, [isOpen, updatePosition]);
 
   const initial = React.useMemo(() => externalSelected, [externalSelected]);
   const normalizeInitial = React.useCallback(():
@@ -135,6 +166,14 @@ export default function Dropdown({
     [setExternalSelected, stateKey]
   );
 
+  const [searchQuery, setSearchQuery] = React.useState("");
+
+  const filteredOptions = React.useMemo(() => {
+    if (!searchable || !searchQuery.trim()) return options;
+    const q = searchQuery.toLowerCase();
+    return options.filter((opt) => opt.toLowerCase().includes(q));
+  }, [options, searchable, searchQuery]);
+
   const ITEM_HEIGHT = 24;
   const MAX_PANEL_HEIGHT = 168;
   const OVERSCAN = 6;
@@ -147,20 +186,18 @@ export default function Dropdown({
         0,
         Math.floor(scrollTop / ITEM_HEIGHT) - Math.floor(OVERSCAN / 2)
       );
-      const endIdx = Math.min(options.length, startIdx + visibleCount);
+      const endIdx = Math.min(filteredOptions.length, startIdx + visibleCount);
       return {
-        visibleOptions: options.slice(startIdx, endIdx),
+        visibleOptions: filteredOptions.slice(startIdx, endIdx),
         startIndex: startIdx,
         topSpacer: startIdx * ITEM_HEIGHT,
-        bottomSpacer: (options.length - endIdx) * ITEM_HEIGHT,
+        bottomSpacer: (filteredOptions.length - endIdx) * ITEM_HEIGHT,
       };
-    }, [scrollTop, options]);
+    }, [scrollTop, filteredOptions]);
 
-  // close on outside click
-  const rootRef = React.useRef<HTMLDivElement | null>(null);
-  useClickOutside(rootRef as unknown as React.RefObject<HTMLElement>, () =>
-    setIsOpen(false)
-  );
+  useClickOutside(anchorRef, () => {
+    setIsOpen(false);
+  });
 
   const displayText = React.useMemo(() => {
     if (multi) {
@@ -193,7 +230,7 @@ export default function Dropdown({
         const selMap: Record<string, boolean> =
           typeof selected === "object" && !Array.isArray(selected)
             ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              (selected as any)
+            (selected as any)
             : {};
         const isSelected = !!selMap[option];
         updateSelected({ ...selMap, [option]: !isSelected });
@@ -206,19 +243,20 @@ export default function Dropdown({
   );
 
   const listboxId = React.useId();
+
   return (
     <div className="flex flex-col gap-1">
       <Label className="text-white opacity-100">{text}</Label>
 
-      <div
-        className="relative"
-        ref={rootRef as unknown as React.RefObject<HTMLDivElement>}
-      >
+      <div className="relative" ref={anchorRef}>
         <ButtonBase
           text={displayText}
-          className="absolute w-[calc(100%-35px)] text-left text-white opacity-100 m-1 text-xs"
+          className="absolute w-[calc(100%-35px)] text-left text-white opacity-100 text-xs"
           containerClassName="justify-start flex relative"
-          onClick={() => setIsOpen((v) => !v)}
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsOpen((v) => !v);
+          }}
           aria-haspopup="listbox"
           aria-expanded={isOpen}
           aria-controls={listboxId}
@@ -230,63 +268,88 @@ export default function Dropdown({
           </div>
         </ButtonBase>
 
-        {isOpen && (
-          <div
-            role="listbox"
-            id={listboxId}
-            aria-multiselectable={!!multi}
-            className={cn(
-              NoAnimationClassName,
-              "absolute left-0 right-0 z-50 max-h-[168px]",
-              "rounded-[1px] bg-[rgb(15,15,15)] border-[rgb(40,40,40)] border",
-              "overflow-scroll",
-              "no-scrollbar",
-              "text-white"
-            )}
-            onScroll={onScroll}
-          >
-            {topSpacer > 0 && <div style={{ height: `${topSpacer}px` }} />}
-            {visibleOptions.map((option, i) => (
-              <div
-                key={startIndex + i}
-                className={cn(
-                  "py-0 gap-1 px-1 flex items-center cursor-pointer",
-                  (() => {
-                    const isSelected = multi
-                      ? typeof selected === "object" &&
+        {isOpen &&
+          createPortal(
+            <div
+              ref={portalRef}
+              onMouseDown={(e) => e.stopPropagation()}
+              role="listbox"
+              id={listboxId}
+              aria-multiselectable={!!multi}
+              className={cn(
+                NoAnimationClassName,
+                "fixed z-[9999] max-h-[168px]",
+                "rounded-[1px] bg-[rgb(15,15,15)] border-[rgb(40,40,40)] border",
+                "overflow-scroll",
+                "no-scrollbar",
+                "text-white"
+              )}
+              style={{
+                top: position.top,
+                left: position.left,
+                width: position.width,
+              }}
+              onScroll={onScroll}
+            >
+              {searchable && (
+                <div className="sticky top-0 z-10 bg-[rgb(15,15,15)] border-b border-b-[rgb(40,40,40)] px-1">
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    value={searchQuery}
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value);
+                      setScrollTop(0);
+                    }}
+                    className="w-full bg-transparent text-white text-xs py-1 outline-none placeholder-[rgb(100,100,100)]"
+                    autoFocus
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                </div>
+              )}
+              {topSpacer > 0 && <div style={{ height: `${topSpacer}px` }} />}
+              {visibleOptions.map((option, i) => (
+                <div
+                  key={startIndex + i}
+                  className={cn(
+                    "py-0 gap-1 px-1 flex items-center cursor-pointer",
+                    (() => {
+                      const isSelected = multi
+                        ? typeof selected === "object" &&
                         selected !== null &&
                         !Array.isArray(selected) &&
                         (selected as Record<string, boolean>)[option] === true
-                      : selected === option;
-                    return isSelected && "bg-[rgb(40,40,40)]";
-                  })(),
-                  disabledValues.includes(option) &&
+                        : selected === option;
+                      return isSelected && "bg-[rgb(40,40,40)]";
+                    })(),
+                    disabledValues.includes(option) &&
                     "bg-[rgb(0,0,0)] opacity-40 cursor-not-allowed",
-                  IBMMono.className
-                )}
-                role="option"
-                aria-selected={
-                  multi
-                    ? !!(
+                    IBMMono.className
+                  )}
+                  role="option"
+                  aria-selected={
+                    multi
+                      ? !!(
                         typeof selected === "object" &&
                         selected &&
                         !Array.isArray(selected) &&
                         (selected as Record<string, boolean>)[option]
                       )
-                    : selected === option
-                }
-                onClick={() => onSelectOption(option)}
-                style={{ height: `${ITEM_HEIGHT}px` }}
-              >
-                <div className="px-0 py-0.75 text-xs">{option}</div>
-              </div>
-            ))}
+                      : selected === option
+                  }
+                  onClick={() => onSelectOption(option)}
+                  style={{ height: `${ITEM_HEIGHT}px` }}
+                >
+                  <div className="px-0 py-0.75 text-xs">{option}</div>
+                </div>
+              ))}
 
-            {bottomSpacer > 0 && (
-              <div style={{ height: `${bottomSpacer}px` }} />
-            )}
-          </div>
-        )}
+              {bottomSpacer > 0 && (
+                <div style={{ height: `${bottomSpacer}px` }} />
+              )}
+            </div>,
+            document.body
+          )}
       </div>
     </div>
   );

@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import Tabbox from "../obsidian/elements/TabBox";
-import { UIStateProvider } from "../obsidian/UIStateProvider";
+import { UIStateProvider } from "../obsidian/providers/UIStateProvider";
 
 export default function DemoTabbox() {
   const memoizedComponent = useMemo(

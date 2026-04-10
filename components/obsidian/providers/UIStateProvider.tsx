@@ -9,16 +9,25 @@ type UIStateContextType = {
 	state: Readonly<UIState>;
 	setState: (key: string, value: unknown) => void;
 	resetState: (prefix?: string) => void;
+
 	subscribe: (key: string, callback: () => void) => () => void;
 	get: (key: string) => unknown;
+
+	game: Readonly<string>;
+	setGame: (newGame: string) => void;
+
+	footerGame: Readonly<string>;
+	setFooterGame: (newFooterGame: string) => void;
 };
 
 const UIStateContext = React.createContext<UIStateContextType | null>(null);
 
 export function UIStateProvider({ children }: { children: ReactNode }) {
 	const [state, setStateMap] = React.useState<UIState>({});
-	const stateRef = React.useRef<UIState>({});
+	const [game, setGame] = React.useState("DOORS - The Hotel");
+  	const [footerGame, setFooterGame] = React.useState("DOORS");
 
+	const stateRef = React.useRef<UIState>({});
 	const listenersRef = React.useRef<Map<string, Set<() => void>>>(new Map());
 	const notify = React.useCallback((key: string) => {
 		const set = listenersRef.current.get(key);
@@ -84,7 +93,7 @@ export function UIStateProvider({ children }: { children: ReactNode }) {
 	const get = React.useCallback((key: string) => stateRef.current[key], []);
 
 	return (
-		<UIStateContext.Provider value={{ state, setState, resetState, subscribe, get }}>
+		<UIStateContext.Provider value={{ state, setState, resetState, subscribe, get, game, setGame, footerGame, setFooterGame }}>
 			{children}
 		</UIStateContext.Provider>
 	);

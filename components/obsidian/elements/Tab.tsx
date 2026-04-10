@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 
 export function TabContainer({ children }: { children: ReactNode }) {
     return (
-        <div className="w-full flex flex-1 flex-col min-h-0 overflow-hidden">
+        <div className="w-full flex flex-1 flex-col min-h-0 overflow-hidden mt-1">
             <div className="flex flex-row w-full overflow-hidden" style={{ minHeight: 0 }}>{children}</div>
         </div>
     );

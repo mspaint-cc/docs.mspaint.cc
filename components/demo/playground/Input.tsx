@@ -6,7 +6,7 @@ import { Label as LabelPrimitive } from "@/components/ui/label";
 
 import { useMemo, useState } from "react";
 import { CopyPseudoComponent } from "./shared/CopyComponent";
-import { UIStateProvider } from "@/components/obsidian/UIStateProvider";
+import { UIStateProvider } from "@/components/obsidian/providers/UIStateProvider";
 
 export default function InputPlayground() {
   const [label, setLabel] = useState("Notification Sound ID");

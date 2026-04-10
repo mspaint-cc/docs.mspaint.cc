@@ -4,9 +4,10 @@ import { cn } from "@/lib/utils";
 import React from "react";
 import { createPortal } from "react-dom";
 import { Color3 } from "../../element.types";
-import { useUIState } from "../../UIStateProvider";
+import { useUIState } from "../../providers/UIStateProvider";
 import Input from "../Input";
 import Label from "../Label";
+import { useCornerRadius } from "../../providers/ObsidianDataProvider";
 
 // color conversion utils //
 const colorUtils = {
@@ -353,6 +354,8 @@ export default function ColorPicker({
   const updatePosition = usePositioning(anchorRef, isActive, setPosition);
   const createDragHandler = useDragHandler();
 
+  const br = useCornerRadius();
+
   // input handlers //
   const handleHexInput = React.useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -438,10 +441,10 @@ export default function ColorPicker({
         type="button"
         ref={anchorRef}
         className={cn(
-          "relative flex justify-center items-center w-[24px] h-[22px] border border-[rgb(40,40,40)] cursor-pointer",
+          "relative flex justify-center items-center w-[21px] h-[20px] border border-[rgb(40,40,40)] cursor-pointer",
           className
         )}
-        style={{ backgroundColor: `rgb(${rgbString})` }}
+        style={{ backgroundColor: `rgb(${rgbString})`, borderRadius: br }}
         aria-label="Open color picker"
         aria-haspopup="dialog"
         aria-expanded={isActive}
@@ -463,7 +466,8 @@ export default function ColorPicker({
               style={{
                 left: position.left,
                 top: position.top,
-                height: title ? "243px" : "223px",
+                height: title ? "240px" : "223px",
+                borderRadius: br,
               }}
               onClick={(e) => e.stopPropagation()}
               onMouseDown={(e) => e.stopPropagation()}
@@ -480,19 +484,21 @@ export default function ColorPicker({
                   className="relative w-[240px] border border-[rgb(50,50,50)] cursor-crosshair"
                   style={{
                     background: `
-                    linear-gradient(to top, black, rgba(0,0,0,0)), 
-                    linear-gradient(to right, white, hsl(${hsv.h}, 100%, 50%))
-                  `,
+                      linear-gradient(to top, black, rgba(0,0,0,0)), 
+                      linear-gradient(to right, white, hsl(${hsv.h}, 100%, 50%))
+                    `,
+                    borderRadius: br
                   }}
                   onMouseDown={svDragHandler}
                   onTouchStart={svDragHandler}
                 >
                   <div
-                    className="absolute w-[6px] h-[7px] border border-black rounded-full bg-white box-content pointer-events-none"
+                    className="absolute w-[6px] h-[7px] border border-black bg-white box-content pointer-events-none"
                     style={{
                       left: `${hsv.s * 100}%`,
                       top: `${(1 - hsv.v) * 100}%`,
                       transform: "translate(-50%, -50%)",
+                      borderRadius: br,
                     }}
                   />
                 </div>
@@ -504,6 +510,7 @@ export default function ColorPicker({
                   style={{
                     background:
                       "linear-gradient(to top, red, yellow, lime, cyan, blue, magenta, red)",
+                    borderRadius: br
                   }}
                   onMouseDown={hueDragHandler}
                   onTouchStart={hueDragHandler}
@@ -513,6 +520,7 @@ export default function ColorPicker({
                     style={{
                       top: `${(1 - hsv.h / 360) * 100}%`,
                       transform: "translateY(-50%)",
+                      borderRadius: br,
                     }}
                   />
                 </div>

@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { ElementParser } from "../DynamicTab";
+import { ElementParser } from "../ui/DynamicTab";
 import { TabboxTab } from "../element.types";
+import { useCornerRadius } from "../providers/ObsidianDataProvider";
 
 export default function Tabbox({
   tabs,
@@ -27,22 +28,30 @@ export default function Tabbox({
     }
   }, [tabNames, tabs, activeTab]);
 
+  const br = useCornerRadius();
+
   if (tabNames.length === 0) return null;
   return (
-    <div className="mt-1 ml-2 mb-3 rounded-[3px] bg-[rgb(15,15,15)] border border-[rgb(40,40,40)] relative font-normal">
-      <div className="w-full h-[38px] flex flex-row bg-[rgb(15,15,15)]">
+    <div
+      className="mt-1 ml-2 mb-3 bg-[rgb(15,15,15)] border border-[rgb(40,40,40)] relative font-normal"
+      style={{ borderRadius: br }}
+    >
+      <div className="w-full h-[38px] flex flex-row bg-[rgb(15,15,15)]" style={{ borderRadius: br }}>
         {/* Buttons */}
         <div className="flex flex-row items-center w-full border-b border-b-[rgb(40,40,40)]">
           {tabNames &&
-            tabNames.map((name) => (
+            tabNames.map((name, index) => (
               <button
                 key={name}
                 onClick={() => setActiveTab(name)}
-                className={`flex-1 h-full text-[13px] ${
-                  activeTab === name
-                    ? "text-white"
-                    : "bg-[rgb(40,40,40)] text-white opacity-50"
-                }`}
+                className={`flex-1 h-full text-[13px] ${activeTab === name
+                  ? "text-white"
+                  : "bg-[rgb(40,40,40)] text-white opacity-50"
+                  }`}
+                style={{
+                  borderTopLeftRadius: index === 0 ? br : undefined,
+                  borderTopRightRadius: index === tabNames.length - 1 ? br : undefined,
+                }}
               >
                 {name}
               </button>
@@ -51,7 +60,7 @@ export default function Tabbox({
       </div>
 
       {/* Content */}
-      <div className="flex flex-col right p-2 gap-2">
+      <div className="flex flex-col right p-[0.35rem] pb-2 gap-[0.35rem]">
         {activeTabData?.elements?.map((el) => (
           <ElementParser
             key={`${activeTab}-${el.index}`}

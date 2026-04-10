@@ -1,4 +1,5 @@
 import Label from "./Label";
+import { useCornerRadius } from "../providers/ObsidianDataProvider";
 
 const ColorScheme = {
   ["Warning"]: {
@@ -16,8 +17,6 @@ const ColorScheme = {
   },
 } as const;
 
-const MAX_HEIGHT_PX = 120;
-
 export default function ObsidianWarningBox({
   text,
   title,
@@ -31,9 +30,11 @@ export default function ObsidianWarningBox({
   lockSize: boolean;
   visible: boolean;
 }) {
+  const br = useCornerRadius();
+
   if (!visible) return null;
   if (title && title.includes("Latest Changelog")) return null;
-  
+
   const scheme = isNormal ? ColorScheme.Normal : ColorScheme.Warning;
   const role = isNormal ? "note" : "alert";
   const ariaLive = isNormal ? "polite" : "assertive";
@@ -42,8 +43,8 @@ export default function ObsidianWarningBox({
     <div
       role={role}
       aria-live={ariaLive}
-      className="w-[calc(100%-20px)] flex flex-col rounded-[3px] m-2.5 px-2 py-1 border"
-      style={{ backgroundColor: scheme.Background, borderColor: scheme.Border }}
+      className="w-[calc(100%-20px)] flex flex-col m-2.5 mb-0 px-2 py-1 border"
+      style={{ backgroundColor: scheme.Background, borderColor: scheme.Border, borderRadius: br }}
     >
       <Label
         className="text-[12px] font-normal select-text"
@@ -53,9 +54,9 @@ export default function ObsidianWarningBox({
       </Label>
       <div
         className={lockSize ? "overflow-y-auto" : "overflow-visible"}
-        style={lockSize ? { maxHeight: MAX_HEIGHT_PX } : undefined}
+        style={lockSize ? { maxHeight: 120 } : undefined}
       >
-        <Label className="text-[13px] font-normal">{text}</Label>
+        <Label className="text-xs font-normal">{text}</Label>
       </div>
     </div>
   );

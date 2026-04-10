@@ -3,7 +3,8 @@
 import { cn } from "@/lib/utils";
 import Label from "../Label";
 import { useEffect, useState, useMemo } from "react";
-import { useUIState } from "../../UIStateProvider";
+import { useUIState } from "../../providers/UIStateProvider";
+import { useCornerRadius } from "../../providers/ObsidianDataProvider";
 
 export default function KeyPicker({
   defaultValue,
@@ -15,6 +16,7 @@ export default function KeyPicker({
   stateKey?: string;
 }) {
   const { state, setState } = useUIState();
+  const br = useCornerRadius();
 
   const storedValue = useMemo(
     () => (stateKey ? (state[stateKey] as string | undefined) : undefined),
@@ -57,6 +59,7 @@ export default function KeyPicker({
         "flex justify-center items-center h-[22px] bg-[rgb(25,25,25)] hover:bg-[rgb(35,35,35)] border-[rgb(40,40,40)] border",
         className
       )}
+      style={{ borderRadius: br }}
       onClick={(e) => {
         e.preventDefault();
         setIsListening(true);
