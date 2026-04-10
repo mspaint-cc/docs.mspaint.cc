@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 import { useCornerRadius } from "../providers/ObsidianDataProvider";
-import { cn } from "@/lib/utils";
 
 export function Groupbox({ icon: Icon, title, children }: { icon?: React.ElementType, title: string, children: ReactNode }) {
     const br = useCornerRadius();

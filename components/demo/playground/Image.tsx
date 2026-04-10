@@ -116,7 +116,6 @@ export default function ImagePlayground() {
             rectOffset={parsedOffset}
             height={height}
             rectSize={parsedSize}
-            bgTransparency={bgTransparency}
           />
         </div>
       </div>

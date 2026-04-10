@@ -52,10 +52,6 @@ export default function VideoPlayground() {
       <div className="flex items-center justify-center min-h-[200px] relative w-full">
         <div className="max-w-[200px] w-[200px] mb-5">
           <ObsidianVideo
-            video={videoUrl}
-            looped={looped}
-            playing={playing}
-            volume={volume}
             height={height}
           />
         </div>

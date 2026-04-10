@@ -45,6 +45,7 @@ export default function DemoTabbox() {
                     values: ["Blatant", "Legit"],
                     disabledValues: [],
                     multi: false,
+                    searchable: false,
                   },
                 },
 
@@ -63,6 +64,9 @@ export default function DemoTabbox() {
                   index: 2,
                   visible: true,
                   disabled: false,
+                  properties: {
+                    risky: false
+                  }
                 },
               ],
             },

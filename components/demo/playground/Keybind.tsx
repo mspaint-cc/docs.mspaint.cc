@@ -42,11 +42,11 @@ function KeybindControl({
   toggleText: string;
   defaultKey: string;
 }) {
+  /* innerClassName="left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-auto" */
   return (
     <div className="flex flex-col items-center gap-3">
       <AddonContainer
         className="absolute inset-0 pointer-events-none"
-        innerClassName="left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-auto"
       >
         <Toggle text={toggleText} checked={false} risky={false} />
         <KeyPicker

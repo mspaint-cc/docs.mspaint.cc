@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useCornerRadius } from "../providers/ObsidianDataProvider";
 
 export default function ObsidianImage({
@@ -19,6 +19,7 @@ export default function ObsidianImage({
 	rectSize: { y: number; x: number };
 }) {
 	const br = useCornerRadius();
+
 	return (
 		<div
 			className={"w-full bg-[rgb(25,25,25)] border-[rgb(40,40,40)] border flex items-center justify-center"}

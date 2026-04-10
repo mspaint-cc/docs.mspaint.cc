@@ -43,9 +43,7 @@ export default function UIPassthroughPlayground() {
       <div className="flex items-center justify-center min-h-[200px] relative w-full">
         <div className="max-w-[200px] w-[200px] mb-5">
           <ObsidianUIPassthrough
-            instanceName={instanceName.trim() || "CustomFrame"}
             height={height}
-            visible={visible}
           />
         </div>
       </div>
