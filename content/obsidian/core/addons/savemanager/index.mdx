@@ -202,3 +202,17 @@ SaveManager:BuildConfigSection(tab)
 | 1 | Tab to populate | Tab (table) | nil |
 
 This call also ignores the config management controls when saving.
+
+#### SetLoadingOrder
+Allows you to change the order of element types when loading any config.
+
+```lua
+SaveManager:SetLoadingOrder(enabled, order)
+
+-- Example: SaveManager:SetLoadingOrder(true, { "Dropdown", "ColorPicker", "KeyPicker", "Slider", "Input", "Toggle" })
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Is Enabled? | boolean | false |
+| 1 | Element Types (Toggle, Slider, Dropdown, ColorPicker, KeyPicker, Input) | table | nil |
