@@ -88,6 +88,12 @@ local Dropdown = Groupbox:AddDropdown("MyDropdown", {
       default: 'false',
       required: false
     },
+    EnablePlayerImages: {
+      description: 'For Player type, enables player avatar headshots',
+      type: 'boolean',
+      default: 'false',
+      required: false
+    },
     FormatDisplayValue: {
       description: 'Function to format displayed values',
       type: 'function',
@@ -102,6 +108,12 @@ local Dropdown = Groupbox:AddDropdown("MyDropdown", {
     },
     DisabledValues: {
       description: 'Values that cannot be selected',
+      type: 'table',
+      default: '{}',
+      required: false
+    },
+    ValueImages: {
+      description: 'A table mapping to add images to values',
       type: 'table',
       default: '{}',
       required: false
@@ -197,6 +209,28 @@ Dropdown:AddDisabledValues(value)
 | Arg Idx | Argument Description | Type | Default |
 | --- | --- | --- | --- |
 | 1 | Value or table of values to disable | any | nil |
+
+#### SetValueImages
+Replaces value to image mapping.
+
+```lua
+Dropdown:SetValueImages(table)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Table mapping values to images | table | nil |
+
+#### AddValueImages
+Adds new value to image mapping into the existing ones.
+
+```lua
+Dropdown:AddValueImages(table)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Table mapping values to images to add | table | nil |
 
 #### SetText
 Updates the dropdown's label text.
