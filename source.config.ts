@@ -1,22 +1,24 @@
-import { defineDocs } from "fumadocs-mdx/config";
-import { defineConfig } from "fumadocs-mdx/config";
+import { defineDocs, defineConfig } from 'fumadocs-mdx/config';
 import { rehypeCodeDefaultOptions } from "fumadocs-core/mdx-plugins";
 
-export const { docs, meta } = defineDocs({
-  dir: "content/docs"
+export const docs = defineDocs({
+  dir: "src/content/mspaint",
+  docs: { postprocess: { includeProcessedMarkdown: true } },
 });
 
-export const { docs: obsidianDocs, meta: obsidianMeta } = defineDocs({
-  dir: "content/obsidian"
+export const obsidianDocs = defineDocs({
+  dir: "src/content/obsidian",
+  docs: { postprocess: { includeProcessedMarkdown: true } },
 });
 
-export const { docs: cobaltDocs, meta: cobaltMeta } = defineDocs({
-  dir: "content/cobalt"
+export const cobaltDocs = defineDocs({
+  dir: "src/content/cobalt",
+  docs: { postprocess: { includeProcessedMarkdown: true } },
 });
 
 export default defineConfig({
   mdxOptions: {
-    providerImportSource: "@/app/mdx-components",
+    providerImportSource: "@/components/mdx",
     rehypeCodeOptions: {
       themes: {
         light: "github-light",
