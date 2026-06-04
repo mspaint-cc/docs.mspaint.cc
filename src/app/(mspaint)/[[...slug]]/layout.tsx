@@ -34,8 +34,8 @@ const docsTree: Root = {
         { type: "page", name: "cheapkeyz", url: "/purchase/cheapkeyz" },
         { type: "page", name: "YESU", url: "/purchase/YESU" },
         { type: "page", name: "bennnyr", url: "/purchase/bennnyr" },
+        { type: "page", name: "temie.cc", url: "/purchase/temiecc" },
         { type: "page", name: "lunor.wtf", url: "/purchase/lunor" },
-        { type: "page", name: "temie.cc", url: "/purchase/temiecc" }
       ],
     },
     
