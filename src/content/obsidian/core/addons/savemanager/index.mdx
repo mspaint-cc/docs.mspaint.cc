@@ -194,12 +194,13 @@ Returns `boolean, string?` describing the outcome.
 Creates the SaveManager UI in your library tab so users can create, load, overwrite and manage configs directly.
 
 ```lua
-SaveManager:BuildConfigSection(tab)
+SaveManager:BuildConfigSection(tab, icon)
 ```
 
 | Arg Idx | Argument Description | Type | Default |
 | --- | --- | --- | --- |
 | 1 | Tab to populate | Tab (table) | nil |
+| 2 | Groupbox icon | string | nil |
 
 This call also ignores the config management controls when saving.
 

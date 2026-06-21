@@ -174,12 +174,13 @@ ThemeManager:CreateThemeManager(groupbox)
 Helper that creates the standard “Themes” groupbox on the left side of a tab.
 
 ```lua
-local groupbox = ThemeManager:CreateGroupBox(tab)
+local groupbox = ThemeManager:CreateGroupBox(tab, icon)
 ```
 
 | Arg Idx | Argument Description | Type | Default |
 | --- | --- | --- | --- |
 | 1 | Tab returned by `Window:AddTab` | Tab (table) | nil |
+| 2 | Icon to use for the groupbox | string | nil |
 
 Returns the created groupbox so you can customize it further before calling `CreateThemeManager`.
 
@@ -187,12 +188,13 @@ Returns the created groupbox so you can customize it further before calling `Cre
 Creates a groupbox within the tab and installs the ThemeManager UI into it.
 
 ```lua
-ThemeManager:ApplyToTab(tab)
+ThemeManager:ApplyToTab(tab, icon)
 ```
 
 | Arg Idx | Argument Description | Type | Default |
 | --- | --- | --- | --- |
 | 1 | Tab returned by `Window:AddTab` | Tab (table) | nil |
+| 2 | Icon to use for the groupbox created inside the tab | string | nil |
 
 #### ApplyToGroupbox
 Installs the ThemeManager UI into an existing groupbox.
