@@ -28,6 +28,8 @@ local DraggableLabel = Library:AddDraggableLabel("Obsidian demo")
 | Arg Idx | Argument Description | Type | Default |
 | --- | --- | --- | --- |
 | 1 | Text to display in the draggable label | string | nil |
+| 2 | Icon to display in the draggable label (Lucide icon Name or Roblox Asset ID) | string | number | nil |
+| 3 | Position of the icon (either "Left" or "Right") | string | "Left" |
 
 ### Methods
 
@@ -55,6 +57,14 @@ DraggableLabel:SetVisible(false)
 | --- | --- | --- | --- |
 | 1 | Whether to show the draggable label | boolean | true |
 
+#### Destroy
+
+Destroys the draggable label.
+
+```lua
+DraggableLabel:Destroy()
+```
+
 ### Example
 
 ```lua
@@ -78,7 +88,7 @@ local WatermarkConnection = game:GetService('RunService').RenderStepped:Connect(
 
     DraggableLabel:SetText(('Obsidian demo | %s fps | %s ms'):format(
         math.floor(FPS),
-        math.floor(game:GetService('Stats').Network.ServerStatsItem['Data Ping']:GetValue())
+        math.floor(game:GetService('Stats').Network.ServerStatsItem['Data Ping']:GetValue()) -- Use LocalPlayer:GetNetworkPing() inside Studio
     ));
 end);
 ```
@@ -106,6 +116,8 @@ end)
 | 1 | Text to display on the button | string | nil |
 | 2 | Callback fired when clicked (receives the button table) | function | nil |
 | 3 | Whether to exclude DPI scaling from this button | boolean? | false |
+| 4 | Icon to display on the button (Lucide icon Name or Roblox Asset ID) | string \| number | nil |
+| 5 | Position of the icon (either "Left" or "Right") | string | "Left" |
 
 ### Methods
 
@@ -120,6 +132,14 @@ DraggableButton:SetText("New Text")
 | Arg Idx | Argument Description | Type | Default |
 | --- | --- | --- | --- |
 | 1 | Text to display on the button | string | nil |
+
+#### Destroy
+
+Destroys the draggable button.
+
+```lua
+DraggableButton:Destroy()
+```
 
 ---
 
@@ -143,6 +163,16 @@ local Holder, Container = Library:AddDraggableMenu("My Menu")
 | Arg Idx | Argument Description | Type | Default |
 | --- | --- | --- | --- |
 | 1 | Title text for the menu header | string | nil |
+
+### Methods
+
+#### Destroy
+
+Destroys the draggable menu.
+
+```lua
+Holder:Destroy()
+```
 
 ### Example
 

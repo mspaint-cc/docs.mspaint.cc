@@ -113,6 +113,12 @@ local Slider = Groupbox:AddSlider("Sensitivity", {
       default: 'nil',
       required: false
     },
+    AllowRightClickInput: {
+      description: 'Right click/double tap to open text input for specific value',
+      type: 'boolean',
+      default: 'false',
+      required: false
+    },
     Disabled: {
       description: 'Whether the slider is interactive',
       type: 'boolean',
@@ -230,6 +236,13 @@ Slider:OnChanged(function)
 | Arg Idx | Argument Description | Type | Default |
 | --- | --- | --- | --- |
 | 1 | Callback executed on value change | function | nil |
+
+#### Destroy
+Destroys the slider and removes it from the UI.
+
+```lua
+Slider:Destroy()
+```
 
 ## Example
 

@@ -275,7 +275,14 @@ local count = Dropdown:GetActiveValues(true)
 
 | Arg Idx | Argument Description | Type | Default |
 | --- | --- | --- | --- |
-| 1 | Return count | boolean? | false |
+| 1 | Return count for multi dropdowns | boolean? | false |
+
+#### Destroy
+Destroys the dropdown and removes it from the UI.
+
+```lua
+Dropdown:Destroy()
+```
 
 #### OnChanged
 Adds another callback function.

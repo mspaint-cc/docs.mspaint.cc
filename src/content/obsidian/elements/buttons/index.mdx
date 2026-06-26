@@ -93,6 +93,17 @@ Groupbox:AddButton({
   }}
 />
 
+## Methods
+
+You can use the following methods to interact with the button:
+
+#### Destroy
+Destroys the button and removes it from the UI.
+
+```lua
+MainButton:Destroy()
+```
+
 ## Sub Button
 
 You can also add a sub button to a button.
@@ -110,5 +121,29 @@ MainButton:AddButton({
     Func = function()
         print("Sub button clicked!")
     end
+})
+```
+
+## KeyPicker
+
+You can add a KeyPicker to a button. Note that this only works with the 'Press' mode of the KeyPicker.
+When the button is triggered by the KeyPicker, the callback will receive `true` as the `FromKeyPicker` argument.
+
+```lua
+local CoolButton = Groupbox:AddButton({
+    Text = "Cool Button",
+    Func = function(FromKeyPicker)
+        if FromKeyPicker then
+            print("Button was triggered by the Key Picker!")
+        else
+            print("Button was clicked manually!")
+        end
+    end
+})
+
+CoolButton:AddKeyPicker("ButtonKeyPicker", {
+    Default = "V",
+    Text = "Button Bind",
+    Mode = "Press",
 })
 ```
