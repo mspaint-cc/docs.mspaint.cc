@@ -25,3 +25,32 @@ local RightGroupBox = Tab:AddRightGroupbox("Right Groupbox")
 | 1 | Title of the groupbox | string | nil |
 | 2 | Custom Icon or Icon name from lucide.dev | string | nil |
 
+## Methods
+
+### SetVisible
+
+Sets the visibility of the groupbox.
+
+```lua
+Groupbox:SetVisible(Visible: boolean)
+```
+
+| Argument | Type | Description |
+| --- | --- | --- |
+| Visible | boolean | Whether the groupbox should be visible |
+
+### Show
+
+Shows the groupbox. This is an alias for `SetVisible(true)`.
+
+```lua
+Groupbox:Show()
+```
+
+### Hide
+
+Hides the groupbox. This is an alias for `SetVisible(false)`.
+
+```lua
+Groupbox:Hide()
+```
