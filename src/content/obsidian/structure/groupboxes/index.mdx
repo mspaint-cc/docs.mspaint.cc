@@ -24,6 +24,8 @@ local RightGroupBox = Tab:AddRightGroupbox("Right Groupbox")
 | --- | --- | --- | --- |
 | 1 | Title of the groupbox | string | nil |
 | 2 | Custom Icon or Icon name from lucide.dev | string | nil |
+| 3 | Whether the groupbox should be initially visible | boolean | true |
+| 4 | Whether the groupbox should be initially collapsed | boolean | false |
 
 ## Methods
 
@@ -53,4 +55,12 @@ Hides the groupbox. This is an alias for `SetVisible(false)`.
 
 ```lua
 Groupbox:Hide()
+```
+
+### AddTabbox
+
+Creates a Tabbox inside this groupbox, allowing you to nest tabs.
+
+```lua
+local MyTabbox = Groupbox:AddTabbox()
 ```

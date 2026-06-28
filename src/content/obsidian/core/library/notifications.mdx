@@ -142,11 +142,23 @@ Pick an example that matches your use case:
     default: '"No Title"',
     required: false
   },
+  TitleColor: {
+    description: 'The Color3 to apply to the notification title',
+    type: 'Color3 | string',
+    default: 'nil',
+    required: false
+  },
   Description: {
     description: 'The description of the notification',
     type: 'string',
     default: '"No Description"',
     required: true
+  },
+  DescriptionColor: {
+    description: 'The Color3 to apply to the notification description',
+    type: 'Color3 | string',
+    default: 'nil',
+    required: false
   },
   Time: {
     description: 'The duration of the notification in seconds',
