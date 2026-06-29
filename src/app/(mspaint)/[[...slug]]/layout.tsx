@@ -33,7 +33,7 @@ const docsTree: Root = {
 
         { type: "page", name: "BloxProducts", url: "/purchase/bloxproducts" },
         { type: "page", name: "cheapkeyz", url: "/purchase/cheapkeyz" },
-        { type: "page", name: "Temie Empire", url: "/purchase/temiecc" },
+        { type: "page", name: "Chara Market", url: "/purchase/suomi" },
         { type: "page", name: "YESU", url: "/purchase/YESU" },
         { type: "page", name: "bennnyr", url: "/purchase/bennnyr" },
         { type: "page", name: "lunor.wtf", url: "/purchase/lunor" },
