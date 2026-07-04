@@ -25,7 +25,7 @@ const UIStateContext = React.createContext<UIStateContextType | null>(null);
 export function UIStateProvider({ children }: { children: ReactNode }) {
 	const [state, setStateMap] = React.useState<UIState>({});
 	const [game, setGame] = React.useState("DOORS - The Hotel");
-  	const [footerGame, setFooterGame] = React.useState("DOORS");
+	const [footerGame, setFooterGame] = React.useState("DOORS");
 
 	const stateRef = React.useRef<UIState>({});
 	const listenersRef = React.useRef<Map<string, Set<() => void>>>(new Map());
@@ -33,48 +33,54 @@ export function UIStateProvider({ children }: { children: ReactNode }) {
 		const set = listenersRef.current.get(key);
 		if (!set) return;
 		for (const cb of Array.from(set)) {
-			try { cb(); }
-			catch (err) {
+			try {
+				cb();
+			} catch (err) {
 				if (process.env.NODE_ENV !== "production") {
-					// eslint-disable-next-line no-console
 					console.error("[UIState.notify] listener threw:", err);
 				}
 			}
 		}
 	}, []);
 
-	const setState = React.useCallback((key: string, value: unknown) => {
-		const prev = (stateRef.current as Record<string, unknown>)[key];
-		if (Object.is(prev, value)) return;
+	const setState = React.useCallback(
+		(key: string, value: unknown) => {
+			const prev = (stateRef.current as Record<string, unknown>)[key];
+			if (Object.is(prev, value)) return;
 
-		const next = { ...stateRef.current, [key]: value };
-		stateRef.current = next;
-		setStateMap(next);
-		notify(key);
-	}, [notify]);
+			const next = { ...stateRef.current, [key]: value };
+			stateRef.current = next;
+			setStateMap(next);
+			notify(key);
+		},
+		[notify]
+	);
 
-	const resetState = React.useCallback((prefix?: string) => {
-		if (prefix === undefined) {
-			// notify all keys //
-			stateRef.current = {};
-			setStateMap({});
-			for (const key of listenersRef.current.keys()) notify(key);
-			return;
-		}
+	const resetState = React.useCallback(
+		(prefix?: string) => {
+			if (prefix === undefined) {
+				// notify all keys //
+				stateRef.current = {};
+				setStateMap({});
+				for (const key of listenersRef.current.keys()) notify(key);
+				return;
+			}
 
-		const prev = stateRef.current;
-		const next: UIState = {};
-		for (const [k, v] of Object.entries(prev)) {
-			if (!k.startsWith(prefix)) next[k] = v;
-		}
+			const prev = stateRef.current;
+			const next: UIState = {};
+			for (const [k, v] of Object.entries(prev)) {
+				if (!k.startsWith(prefix)) next[k] = v;
+			}
 
-		// notify keys under the prefix //
-		stateRef.current = next;
-		setStateMap(next);
-		for (const key of listenersRef.current.keys()) {
-			if (key.startsWith(prefix)) notify(key);
-		}
-	}, [notify]);
+			// notify keys under the prefix //
+			stateRef.current = next;
+			setStateMap(next);
+			for (const key of listenersRef.current.keys()) {
+				if (key.startsWith(prefix)) notify(key);
+			}
+		},
+		[notify]
+	);
 
 	const subscribe = React.useCallback((key: string, callback: () => void) => {
 		let listeners = listenersRef.current.get(key);
@@ -93,7 +99,19 @@ export function UIStateProvider({ children }: { children: ReactNode }) {
 	const get = React.useCallback((key: string) => stateRef.current[key], []);
 
 	return (
-		<UIStateContext.Provider value={{ state, setState, resetState, subscribe, get, game, setGame, footerGame, setFooterGame }}>
+		<UIStateContext.Provider
+			value={{
+				state,
+				setState,
+				resetState,
+				subscribe,
+				get,
+				game,
+				setGame,
+				footerGame,
+				setFooterGame
+			}}
+		>
 			{children}
 		</UIStateContext.Provider>
 	);
@@ -110,7 +128,10 @@ export function useResetUIState() {
 	return resetState;
 }
 
-export function useUIValue<T = unknown>(key: string | undefined, initialValue?: T): [T | undefined, (value: T | ((prev: T | undefined) => T)) => void] {
+export function useUIValue<T = unknown>(
+	key: string | undefined,
+	initialValue?: T
+): [T | undefined, (value: T | ((prev: T | undefined) => T)) => void] {
 	const ctx = React.useContext(UIStateContext);
 	if (!ctx) throw new Error("useUIValue must be used within UIStateProvider");
 
@@ -123,10 +144,13 @@ export function useUIValue<T = unknown>(key: string | undefined, initialValue?: 
 
 	const getServerSnapshot = React.useCallback(() => initialValue as T | undefined, [initialValue]);
 
-	const subscribeKey = React.useCallback((onStoreChange: () => void) => {
-		if (!key) return () => { };
-		return subscribe(key, onStoreChange);
-	}, [subscribe, key]);
+	const subscribeKey = React.useCallback(
+		(onStoreChange: () => void) => {
+			if (!key) return () => {};
+			return subscribe(key, onStoreChange);
+		},
+		[subscribe, key]
+	);
 
 	const value = React.useSyncExternalStore(
 		subscribeKey,
@@ -134,13 +158,17 @@ export function useUIValue<T = unknown>(key: string | undefined, initialValue?: 
 		getServerSnapshot as unknown as () => T | undefined
 	);
 
-	const set = React.useCallback((v: T | ((prev: T | undefined) => T)) => {
-		if (!key) return;
-		const next = typeof v === "function"
-			? (v as (prev: T | undefined) => T)((get(key) as T | undefined) ?? (initialValue as T | undefined))
-			: v;
-		setState(key, next as T);
-	}, [setState, key, get, initialValue]);
+	const set = React.useCallback(
+		(v: T | ((prev: T | undefined) => T)) => {
+			if (!key) return;
+			const next =
+				typeof v === "function"
+					? (v as (prev: T | undefined) => T)((get(key) as T | undefined) ?? (initialValue as T | undefined))
+					: v;
+			setState(key, next as T);
+		},
+		[setState, key, get, initialValue]
+	);
 
 	return [value, set];
 }

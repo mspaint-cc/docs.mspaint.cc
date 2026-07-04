@@ -2,6 +2,7 @@
 
 import Toggle from "@/components/obsidian/elements/Toggle";
 import { UIStateProvider } from "@/components/obsidian/providers/UIStateProvider";
+import { ObsidianDataProvider } from "@/components/obsidian/providers/ObsidianDataProvider";
 import { Input } from "@/components/ui/input";
 import { Label as LabelPrimitive } from "@/components/ui/label";
 
@@ -14,7 +15,9 @@ export default function CheckboxPlayground() {
   const memoizedToggle = useMemo(
     () => (
       <UIStateProvider>
-        <Toggle text={text} checked={false} risky={false} variant="Checkbox" />
+        <ObsidianDataProvider scheme={{}}>
+          <Toggle text={text} checked={false} risky={false} variant="Checkbox" />
+        </ObsidianDataProvider>
       </UIStateProvider>
     ),
     [text]

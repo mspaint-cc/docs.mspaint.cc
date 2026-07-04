@@ -1,9 +1,8 @@
 "use client";
 
 import Toggle from "@/components/obsidian/elements/Toggle";
-import AddonContainer from "@/components/obsidian/elements/addons/AddonContainer";
-import ColorPicker from "@/components/obsidian/elements/addons/ColorPicker";
 import { UIStateProvider } from "@/components/obsidian/providers/UIStateProvider";
+import { ObsidianDataProvider } from "@/components/obsidian/providers/ObsidianDataProvider";
 import { Input } from "@/components/ui/input";
 import { Label as LabelPrimitive } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -200,7 +199,9 @@ function InternalColorPickerPlayground() {
 export default function ColorPickerPlayground() {
   return (
     <UIStateProvider>
-      <InternalColorPickerPlayground />
+      <ObsidianDataProvider scheme={{}}>
+        <InternalColorPickerPlayground />
+      </ObsidianDataProvider>
     </UIStateProvider>
   );
 }

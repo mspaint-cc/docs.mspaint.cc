@@ -3,6 +3,8 @@
 import Label from "@/components/obsidian/elements/Label";
 import { Input } from "@/components/ui/input";
 import { Label as LabelPrimitive } from "@/components/ui/label";
+import { UIStateProvider } from "@/components/obsidian/providers/UIStateProvider";
+import { ObsidianDataProvider } from "@/components/obsidian/providers/ObsidianDataProvider";
 
 import { useMemo, useState } from "react";
 import { CopyPseudoComponent } from "./shared/CopyComponent";
@@ -12,7 +14,16 @@ export default function LabelPlayground() {
     '[<font color="rgb(73, 230, 133)">Obsidian</font>] every text component (ex: Notification Title, Descriptions, etc.) supports <b>Rich Text</b> by default!'
   );
 
-  const memoizedLabel = useMemo(() => <Label>{text}</Label>, [text]);
+  const memoizedLabel = useMemo(
+    () => (
+      <UIStateProvider>
+        <ObsidianDataProvider scheme={{}}>
+          <Label>{text}</Label>
+        </ObsidianDataProvider>
+      </UIStateProvider>
+    ),
+    [text]
+  );
 
   function generatePseudoCode() {
     return `Groupbox:AddLabel("${text.replaceAll('"', '\\"')}")`;

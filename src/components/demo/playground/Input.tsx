@@ -7,6 +7,7 @@ import { Label as LabelPrimitive } from "@/components/ui/label";
 import { useMemo, useState } from "react";
 import { CopyPseudoComponent } from "./shared/CopyComponent";
 import { UIStateProvider } from "@/components/obsidian/providers/UIStateProvider";
+import { ObsidianDataProvider } from "@/components/obsidian/providers/ObsidianDataProvider";
 
 export default function InputPlayground() {
   const [label, setLabel] = useState("Notification Sound ID");
@@ -16,12 +17,14 @@ export default function InputPlayground() {
   const memoizedInput = useMemo(
     () => (
       <UIStateProvider>
-        <InputElement
-          text={label}
-          value={value}
-          placeholder={placeholder}
-          onChanged={(event) => setValue(event.target.value)}
-        />
+        <ObsidianDataProvider scheme={{}}>
+          <InputElement
+            text={label}
+            value={value}
+            placeholder={placeholder}
+            onChanged={(event) => setValue(event.target.value)}
+          />
+        </ObsidianDataProvider>
       </UIStateProvider>
     ),
     [label, placeholder, value]

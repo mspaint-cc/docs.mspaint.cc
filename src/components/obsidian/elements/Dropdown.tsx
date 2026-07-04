@@ -2,356 +2,284 @@
 
 import React from "react";
 import { ChevronUp } from "lucide-react";
-import { createPortal } from "react-dom";
 import { useUIValue } from "../providers/UIStateProvider";
 import { ButtonBase } from "./Button";
 import Label from "./Label";
 import { cn } from "@/lib/utils";
 import { IBMMono } from "../fonts";
+import { useCornerRadius } from "../providers/ObsidianDataProvider";
+import { useClickOutside } from "../utils/hooks";
 
-function useClickOutside<T extends HTMLElement>(
-  ref: React.RefObject<T | null>,
-  onOutside: () => void
-) {
-  React.useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (!ref.current) return;
-      if (!ref.current.contains(e.target as Node)) onOutside();
-    };
-    document.addEventListener("mousedown", handler, {
-      passive: true,
-    } as AddEventListenerOptions);
-    return () =>
-      document.removeEventListener("mousedown", handler as EventListener);
-  }, [ref, onOutside]);
-}
-
-const NoAnimationClassName =
-  "data-[state=open]:animate-none data-[state=closed]:animate-none data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0";
+const NoAnimationClassName = "data-[state=open]:animate-none data-[state=closed]:animate-none data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0";
+const ITEM_HEIGHT = 24;
+const MAX_PANEL_HEIGHT = 168;
+const OVERSCAN = 6;
 
 export default function Dropdown({
-  text,
-  value,
-  options,
-  multi,
-  searchable,
-  disabledValues = [],
-  stateKey,
+	text,
+	value,
+	options,
+	multi,
+	searchable,
+	disabledValues = [],
+	stateKey
 }: {
-  text: string;
-  value: string | string[] | { [key: string]: boolean };
-  options: string[];
-  multi: boolean | undefined;
-  searchable?: boolean;
-  disabledValues?: string[];
-  stateKey?: string;
+	text: string;
+	value: string | string[] | { [key: string]: boolean };
+	options: string[];
+	multi: boolean | undefined;
+	searchable?: boolean;
+	disabledValues?: string[];
+	stateKey?: string;
 }) {
-  const [isOpen, setIsOpen] = React.useState(false);
-  const [externalSelected, setExternalSelected] = useUIValue<
-    string | { [key: string]: boolean }
-  >(stateKey, undefined);
+	const br = useCornerRadius();
 
-  // Positioning state
-  const [position, setPosition] = React.useState({ top: 0, left: 0, width: 0 });
-  const anchorRef = React.useRef<HTMLDivElement>(null);
-  const portalRef = React.useRef<HTMLDivElement>(null);
+	const [scrollTop, setScrollTop] = React.useState(0);
+	const listboxRef = React.useRef<HTMLDivElement>(null);
+	const listboxId = React.useId();
 
-  const updatePosition = React.useCallback(() => {
-    if (anchorRef.current) {
-      const rect = anchorRef.current.getBoundingClientRect();
-      setPosition({
-        top: rect.bottom + window.scrollY,
-        left: rect.left + window.scrollX,
-        width: rect.width,
-      });
-    }
-  }, []);
+	const [isOpen, setIsOpen] = React.useState(false);
+	const [externalSelected, setExternalSelected] = useUIValue<string | string[] | { [key: string]: boolean }>(stateKey, undefined);
 
-  React.useEffect(() => {
-    if (isOpen) {
-      updatePosition();
-      window.addEventListener("scroll", updatePosition, true);
-      window.addEventListener("resize", updatePosition);
-      return () => {
-        window.removeEventListener("scroll", updatePosition, true);
-        window.removeEventListener("resize", updatePosition);
-      };
-    }
-  }, [isOpen, updatePosition]);
+	const anchorRef = React.useRef<HTMLDivElement>(null);
+	const clickOutsideRefs = React.useMemo(() => [anchorRef] as React.RefObject<HTMLElement | null>[], []);
+	const closeDropdown = React.useCallback(() => setIsOpen(false), []);
 
-  const initial = React.useMemo(() => externalSelected, [externalSelected]);
-  const normalizeInitial = React.useCallback(():
-    | string
-    | { [key: string]: boolean } => {
-    if (multi) {
-      if (initial !== undefined) {
-        if (
-          initial !== null &&
-          typeof initial === "object" &&
-          !Array.isArray(initial)
-        )
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          return initial as any;
+	const initial = React.useMemo(() => externalSelected, [externalSelected]);
+	const normalizeInitial = React.useCallback((): string | { [key: string]: boolean } => {
+		if (multi) {
+			if (initial !== undefined) {
+				if (initial !== null && typeof initial === "object" && !Array.isArray(initial)) return initial as Record<string, boolean>;
+				if (Array.isArray(initial)) return (initial as string[]).reduce((acc, k) => ({ ...acc, [k]: true }), {} as Record<string, boolean>);
+				if (typeof initial === "string") return { [initial]: true };
+			}
 
-        if (Array.isArray(initial))
-          return (initial as string[]).reduce(
-            (acc, k) => ({ ...acc, [k]: true }),
-            {} as Record<string, boolean>
-          );
+			if (Array.isArray(value)) return (value as string[]).reduce((acc, k) => ({ ...acc, [k]: true }), {} as Record<string, boolean>);
+			if (typeof value === "object" && value !== null && !Array.isArray(value)) return value as Record<string, boolean>;
+			if (typeof value === "string") return { [value]: true };
+			return {};
+		}
 
-        if (typeof initial === "string") return { [initial]: true };
-      }
+		if (initial !== undefined) {
+			if (typeof initial === "string") return initial as string;
+			if (Array.isArray(initial)) return (initial as string[])[0] ?? "";
 
-      if (Array.isArray(value))
-        return (value as string[]).reduce(
-          (acc, k) => ({ ...acc, [k]: true }),
-          {} as Record<string, boolean>
-        );
+			if (typeof initial === "object" && initial !== null) {
+				const obj = initial as Record<string, boolean>;
+				const k = Object.keys(obj).find((kk) => obj[kk]);
+				return k ?? "";
+			}
+		}
 
-      if (typeof value === "object" && value !== null && !Array.isArray(value))
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return value as any;
+		if (typeof value === "string") return value as string;
+		if (Array.isArray(value)) return (value as string[])[0] ?? "";
 
-      if (typeof value === "string") return { [value]: true };
+		if (typeof value === "object" && value !== null) {
+			const obj = value as Record<string, boolean>;
+			const k = Object.keys(obj).find((kk) => obj[kk]);
+			return k ?? "";
+		}
 
-      return {};
-    }
-    if (initial !== undefined) {
-      if (typeof initial === "string") return initial as string;
+		return "";
+	}, [initial, multi, value]);
 
-      if (Array.isArray(initial)) return (initial as string[])[0] ?? "";
+	const [local, setLocal] = React.useState<string | { [key: string]: boolean }>(normalizeInitial);
 
-      if (typeof initial === "object" && initial !== null) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const k = Object.keys(initial as any).find(
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (kk) => (initial as any)[kk]
-        );
-        return k ?? "";
-      }
-    }
+	React.useEffect(() => {
+		setLocal(normalizeInitial());
+	}, [normalizeInitial]);
 
-    if (typeof value === "string") return value as string;
+	const selected = local;
+	const updateSelected = React.useCallback(
+		(newVal: string | { [key: string]: boolean }) => {
+			setLocal(newVal);
+			if (stateKey) setExternalSelected(newVal);
+		},
+		[setExternalSelected, stateKey]
+	);
 
-    if (Array.isArray(value)) return (value as string[])[0] ?? "";
+	const [searchQuery, setSearchQuery] = React.useState("");
+	const filteredOptions = React.useMemo(() => {
+		if (!searchable || !searchQuery.trim()) return options;
 
-    if (typeof value === "object" && value !== null) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const k = Object.keys(value as any).find((kk) => (value as any)[kk]);
-      return k ?? "";
-    }
+		const q = searchQuery.toLowerCase();
+		return options.filter((opt) => opt.toLowerCase().includes(q));
+	}, [options, searchable, searchQuery]);
 
-    return "";
-  }, [initial, multi, value]);
+	React.useEffect(() => {
+		if (!isOpen) {
+			setScrollTop(0);
+			setSearchQuery("");
+		}
+	}, [isOpen]);
 
-  const [local, setLocal] = React.useState<string | { [key: string]: boolean }>(
-    normalizeInitial
-  );
+	const { visibleOptions, startIndex, topSpacer, bottomSpacer } = React.useMemo(() => {
+		const visibleCount = Math.ceil(MAX_PANEL_HEIGHT / ITEM_HEIGHT) + OVERSCAN;
+		const startIdx = Math.max(0, Math.floor(scrollTop / ITEM_HEIGHT) - Math.floor(OVERSCAN / 2));
+		const endIdx = Math.min(filteredOptions.length, startIdx + visibleCount);
+		return {
+			visibleOptions: filteredOptions.slice(startIdx, endIdx),
+			startIndex: startIdx,
+			topSpacer: startIdx * ITEM_HEIGHT,
+			bottomSpacer: (filteredOptions.length - endIdx) * ITEM_HEIGHT
+		};
+	}, [scrollTop, filteredOptions]);
 
-  React.useEffect(() => {
-    if (stateKey && externalSelected !== undefined) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      setLocal(externalSelected as any);
-    }
-  }, [externalSelected, stateKey]);
+	useClickOutside(clickOutsideRefs, closeDropdown);
 
-  const selected = local;
-  const updateSelected = React.useCallback(
-    (newVal: string | { [key: string]: boolean }) => {
-      setLocal(newVal);
-      if (stateKey) {
-        setExternalSelected(newVal);
-      }
-    },
-    [setExternalSelected, stateKey]
-  );
+	const displayText = React.useMemo(() => {
+		if (multi) {
+			if (selected && typeof selected === "object" && !Array.isArray(selected)) {
+				const keys = Object.keys(selected).filter((k) => (selected as Record<string, boolean>)[k]);
+				return keys.length ? keys.join(", ") : "---";
+			}
 
-  const [searchQuery, setSearchQuery] = React.useState("");
+			return "---";
+		}
 
-  const filteredOptions = React.useMemo(() => {
-    if (!searchable || !searchQuery.trim()) return options;
-    const q = searchQuery.toLowerCase();
-    return options.filter((opt) => opt.toLowerCase().includes(q));
-  }, [options, searchable, searchQuery]);
+		const s = typeof selected === "string" && selected.trim().length ? selected : "---";
+		return s;
+	}, [multi, selected]);
 
-  const ITEM_HEIGHT = 24;
-  const MAX_PANEL_HEIGHT = 168;
-  const OVERSCAN = 6;
+	const onScroll = React.useCallback((Event: React.UIEvent<HTMLDivElement>) => {
+		const ScrollTopValue = (Event.currentTarget as HTMLDivElement).scrollTop;
+		setScrollTop(ScrollTopValue);
+	}, []);
 
-  const [scrollTop, setScrollTop] = React.useState(0);
-  const { visibleOptions, startIndex, topSpacer, bottomSpacer } =
-    React.useMemo(() => {
-      const visibleCount = Math.ceil(MAX_PANEL_HEIGHT / ITEM_HEIGHT) + OVERSCAN;
-      const startIdx = Math.max(
-        0,
-        Math.floor(scrollTop / ITEM_HEIGHT) - Math.floor(OVERSCAN / 2)
-      );
-      const endIdx = Math.min(filteredOptions.length, startIdx + visibleCount);
-      return {
-        visibleOptions: filteredOptions.slice(startIdx, endIdx),
-        startIndex: startIdx,
-        topSpacer: startIdx * ITEM_HEIGHT,
-        bottomSpacer: (filteredOptions.length - endIdx) * ITEM_HEIGHT,
-      };
-    }, [scrollTop, filteredOptions]);
+	const onSelectOption = React.useCallback(
+		(option: string) => {
+			if (disabledValues.includes(option)) return;
+			if (multi) {
+				const selMap: Record<string, boolean> = typeof selected === "object" && !Array.isArray(selected) ? (selected as Record<string, boolean>) : {};
+				const isSelected = !!selMap[option];
+				updateSelected({ ...selMap, [option]: !isSelected });
+			} else {
+				updateSelected(option);
+				setIsOpen(false);
+			}
+		},
+		[disabledValues, multi, selected, updateSelected]
+	);
 
-  useClickOutside(anchorRef, () => {
-    setIsOpen(false);
-  });
+	return (
+		<div className="flex flex-col gap-1">
+			<Label className="text-white opacity-100">{text}</Label>
 
-  const displayText = React.useMemo(() => {
-    if (multi) {
-      if (
-        selected &&
-        typeof selected === "object" &&
-        !Array.isArray(selected)
-      ) {
-        const keys = Object.keys(selected).filter(
-          (k) => (selected as Record<string, boolean>)[k]
-        );
-        return keys.length ? keys.join(", ") : "---";
-      }
-      return "---";
-    }
-    const s =
-      typeof selected === "string" && selected.trim().length ? selected : "---";
-    return s;
-  }, [multi, selected]);
+			<div className="relative" ref={anchorRef}>
+				<ButtonBase
+					text={displayText}
+					className="absolute w-[calc(100%-35px)] text-left text-white opacity-100 text-xs"
+					containerClassName="justify-start flex relative"
+					onClick={(Event) => {
+						Event.stopPropagation();
+						setIsOpen((PrevIsOpen) => !PrevIsOpen);
+					}}
+					aria-haspopup="listbox"
+					aria-expanded={isOpen}
+					aria-controls={listboxId}
+					style={
+						isOpen ? {
+							borderBottomLeftRadius: 0,
+							borderBottomRightRadius: 0
+						} : undefined
+					}
+				>
+					<div className="absolute right-0 top-0 h-full opacity-50">
+						<ChevronUp
+							className={cn("w-[20px] mr-1", {
+								"-rotate-180": isOpen
+							})}
+						/>
+					</div>
+				</ButtonBase>
 
-  const onScroll = React.useCallback((e: React.UIEvent<HTMLDivElement>) => {
-    const t = (e.currentTarget as HTMLDivElement).scrollTop;
-    setScrollTop(t);
-  }, []);
+				{isOpen && (
+					<div
+						ref={listboxRef}
+						onPointerDown={(Event) => Event.stopPropagation()}
+						onMouseDown={(Event) => Event.stopPropagation()}
+						role="listbox"
+						id={listboxId}
+						aria-multiselectable={!!multi}
+						className={cn(
+							NoAnimationClassName,
+							"absolute left-0 top-full z-[9999] max-h-[168px] w-full border",
+							"overflow-scroll",
+							"no-scrollbar",
+							"text-white"
+						)}
+						style={{
+							backgroundColor: "var(--background-color)",
+							borderColor: "var(--outline-color)",
+							borderTopLeftRadius: 0,
+							borderTopRightRadius: 0,
+							borderBottomLeftRadius: br,
+							borderBottomRightRadius: br
+						}}
+						onScroll={onScroll}
+					>
+						{searchable && (
+							<div
+								className="sticky top-0 z-10 border-b px-1"
+								style={{
+									backgroundColor: "var(--background-color)",
+									borderBottomColor: "var(--outline-color)"
+								}}
+							>
+								<input
+									type="text"
+									placeholder="Search..."
+									value={searchQuery}
+									onChange={(Event) => {
+										setSearchQuery(Event.target.value);
+										setScrollTop(0);
+										if (listboxRef.current) listboxRef.current.scrollTop = 0;
+									}}
+									className="w-full bg-transparent text-white text-xs py-1 outline-none placeholder-[rgb(100,100,100)]"
+									autoFocus
+									onClick={(Event) => Event.stopPropagation()}
+								/>
+							</div>
+						)}
+						{topSpacer > 0 && <div style={{ height: `${topSpacer}px` }} />}
+						{visibleOptions.map((OptionItem, Index) => {
+							const IsSelected = multi ? 
+								typeof selected === "object" && 
+								selected !== null && 
+								!Array.isArray(selected) && 
+								(selected as Record<string, boolean>)[OptionItem] === true 
+							: selected === OptionItem;
+							return (
+								<div
+									key={startIndex + Index}
+									className={cn(
+										"py-0 gap-1 px-1 flex items-center cursor-pointer",
+										IsSelected && "bg-[var(--outline-color)]",
+										disabledValues.includes(OptionItem) && "bg-black opacity-40 cursor-not-allowed",
+										IBMMono.className,
+									)}
+									role="option"
+									aria-selected={IsSelected}
+									onPointerDown={(Event) => {
+										Event.preventDefault();
+										Event.stopPropagation();
+										onSelectOption(OptionItem);
+									}}
+									onClick={(Event) => {
+										Event.preventDefault();
+										Event.stopPropagation();
+									}}
+									style={{ height: `${ITEM_HEIGHT}px` }}
+								>
+									<div className="px-0 py-0.75 text-xs">{OptionItem}</div>
+								</div>
+							);
+						})}
 
-  const onSelectOption = React.useCallback(
-    (option: string) => {
-      if (disabledValues.includes(option)) return;
-      if (multi) {
-        const selMap: Record<string, boolean> =
-          typeof selected === "object" && !Array.isArray(selected)
-            ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            (selected as any)
-            : {};
-        const isSelected = !!selMap[option];
-        updateSelected({ ...selMap, [option]: !isSelected });
-      } else {
-        updateSelected(option);
-        setIsOpen(false);
-      }
-    },
-    [disabledValues, multi, selected, updateSelected]
-  );
-
-  const listboxId = React.useId();
-
-  return (
-    <div className="flex flex-col gap-1">
-      <Label className="text-white opacity-100">{text}</Label>
-
-      <div className="relative" ref={anchorRef}>
-        <ButtonBase
-          text={displayText}
-          className="absolute w-[calc(100%-35px)] text-left text-white opacity-100 text-xs"
-          containerClassName="justify-start flex relative"
-          onClick={(e) => {
-            e.stopPropagation();
-            setIsOpen((v) => !v);
-          }}
-          aria-haspopup="listbox"
-          aria-expanded={isOpen}
-          aria-controls={listboxId}
-        >
-          <div className="absolute right-0 top-0 h-full opacity-50">
-            <ChevronUp
-              className={cn("w-[20px] mr-1", { "-rotate-180": isOpen })}
-            />
-          </div>
-        </ButtonBase>
-
-        {isOpen &&
-          createPortal(
-            <div
-              ref={portalRef}
-              onMouseDown={(e) => e.stopPropagation()}
-              role="listbox"
-              id={listboxId}
-              aria-multiselectable={!!multi}
-              className={cn(
-                NoAnimationClassName,
-                "fixed z-[9999] max-h-[168px]",
-                "rounded-[1px] bg-[rgb(15,15,15)] border-[rgb(40,40,40)] border",
-                "overflow-scroll",
-                "no-scrollbar",
-                "text-white"
-              )}
-              style={{
-                top: position.top,
-                left: position.left,
-                width: position.width,
-                position: "absolute"
-              }}
-              onScroll={onScroll}
-            >
-              {searchable && (
-                <div className="sticky top-0 z-10 bg-[rgb(15,15,15)] border-b border-b-[rgb(40,40,40)] px-1">
-                  <input
-                    type="text"
-                    placeholder="Search..."
-                    value={searchQuery}
-                    onChange={(e) => {
-                      setSearchQuery(e.target.value);
-                      setScrollTop(0);
-                    }}
-                    className="w-full bg-transparent text-white text-xs py-1 outline-none placeholder-[rgb(100,100,100)]"
-                    autoFocus
-                    onClick={(e) => e.stopPropagation()}
-                  />
-                </div>
-              )}
-              {topSpacer > 0 && <div style={{ height: `${topSpacer}px` }} />}
-              {visibleOptions.map((option, i) => (
-                <div
-                  key={startIndex + i}
-                  className={cn(
-                    "py-0 gap-1 px-1 flex items-center cursor-pointer",
-                    (() => {
-                      const isSelected = multi
-                        ? typeof selected === "object" &&
-                        selected !== null &&
-                        !Array.isArray(selected) &&
-                        (selected as Record<string, boolean>)[option] === true
-                        : selected === option;
-                      return isSelected && "bg-[rgb(40,40,40)]";
-                    })(),
-                    disabledValues.includes(option) &&
-                    "bg-[rgb(0,0,0)] opacity-40 cursor-not-allowed",
-                    IBMMono.className
-                  )}
-                  role="option"
-                  aria-selected={
-                    multi
-                      ? !!(
-                        typeof selected === "object" &&
-                        selected &&
-                        !Array.isArray(selected) &&
-                        (selected as Record<string, boolean>)[option]
-                      )
-                      : selected === option
-                  }
-                  onClick={() => onSelectOption(option)}
-                  style={{ height: `${ITEM_HEIGHT}px` }}
-                >
-                  <div className="px-0 py-0.75 text-xs">{option}</div>
-                </div>
-              ))}
-
-              {bottomSpacer > 0 && (
-                <div style={{ height: `${bottomSpacer}px` }} />
-              )}
-            </div>,
-            document.body
-          )}
-      </div>
-    </div>
-  );
+						{bottomSpacer > 0 && <div style={{ height: `${bottomSpacer}px` }} />}
+					</div>
+				)}
+			</div>
+		</div>
+	);
 }

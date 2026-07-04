@@ -3,76 +3,79 @@
 import { useMemo } from "react";
 import Tabbox from "../obsidian/elements/TabBox";
 import { UIStateProvider } from "../obsidian/providers/UIStateProvider";
+import { ObsidianDataProvider } from "../obsidian/providers/ObsidianDataProvider";
 
 export default function DemoTabbox() {
   const memoizedComponent = useMemo(
     () => (
       <UIStateProvider>
-        <Tabbox
-          tabs={{
-            ["Auto Farm"]: {
-              type: "Tab",
-              name: "Auto Farm",
-              order: 0,
-              elements: [
-                {
-                  type: "Toggle",
-                  text: "Enable Auto Farm",
-                  value: false,
-                  index: 0,
-                  visible: true,
-                  disabled: false,
-                  properties: {
-                    risky: false,
-                    addons: undefined,
+        <ObsidianDataProvider scheme={{}}>
+          <Tabbox
+            tabs={{
+              ["Auto Farm"]: {
+                type: "Tab",
+                name: "Auto Farm",
+                order: 0,
+                elements: [
+                  {
+                    type: "Toggle",
+                    text: "Enable Auto Farm",
+                    value: false,
+                    index: 0,
+                    visible: true,
+                    disabled: false,
+                    properties: {
+                      risky: false,
+                      addons: undefined,
+                    },
                   },
-                },
-              ],
-            },
-            Settings: {
-              type: "Tab",
-              name: "Settings",
-              order: 1,
-              elements: [
-                {
-                  type: "Dropdown",
-                  text: "Mode",
-                  value: "Blatant",
-                  index: 0,
-                  visible: true,
-                  disabled: false,
-                  properties: {
-                    values: ["Blatant", "Legit"],
-                    disabledValues: [],
-                    multi: false,
-                    searchable: false,
+                ],
+              },
+              Settings: {
+                type: "Tab",
+                name: "Settings",
+                order: 1,
+                elements: [
+                  {
+                    type: "Dropdown",
+                    text: "Mode",
+                    value: "Blatant",
+                    index: 0,
+                    visible: true,
+                    disabled: false,
+                    properties: {
+                      values: ["Blatant", "Legit"],
+                      disabledValues: [],
+                      multi: false,
+                      searchable: false,
+                    },
                   },
-                },
 
-                {
-                  type: "Divider",
-                  text: "",
-                  index: 1,
-                  visible: true,
-                  disabled: false,
-                  properties: {},
-                },
+                  {
+                    type: "Divider",
+                    text: "",
+                    index: 1,
+                    visible: true,
+                    disabled: false,
+                    properties: {},
+                  },
 
-                {
-                  type: "Button",
-                  text: "Reset to Default",
-                  index: 2,
-                  visible: true,
-                  disabled: false,
-                  properties: {
-                    risky: false
-                  }
-                },
-              ],
-            },
-          }}
-          scope={`demo:tab`}
-        />
+                  {
+                    type: "Button",
+                    text: "Reset to Default",
+                    index: 2,
+                    visible: true,
+                    disabled: false,
+                    properties: {
+                      risky: false
+                    }
+                  },
+                ],
+              },
+            }}
+            scope={`demo:tab`}
+          />
+        </ObsidianDataProvider>
       </UIStateProvider>
     ),
     []

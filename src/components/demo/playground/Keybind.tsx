@@ -1,9 +1,8 @@
 "use client";
 
 import Toggle from "@/components/obsidian/elements/Toggle";
-import KeyPicker from "@/components/obsidian/elements/addons/KeyPicker";
-import AddonContainer from "@/components/obsidian/elements/addons/AddonContainer";
 import { UIStateProvider } from "@/components/obsidian/providers/UIStateProvider";
+import { ObsidianDataProvider } from "@/components/obsidian/providers/ObsidianDataProvider";
 import { Input } from "@/components/ui/input";
 import { Label as LabelPrimitive } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -83,9 +82,11 @@ export default function KeybindPlayground() {
   const memoizedPreview = useMemo(
     () => (
       <UIStateProvider>
-        <div className="flex w-full flex-col items-center gap-6 md:flex-row md:items-start md:justify-center">
-          <KeybindControl toggleText={toggleText} defaultKey={defaultKey} />
-        </div>
+        <ObsidianDataProvider scheme={{}}>
+          <div className="flex w-full flex-col items-center gap-6 md:flex-row md:items-start md:justify-center">
+            <KeybindControl toggleText={toggleText} defaultKey={defaultKey} />
+          </div>
+        </ObsidianDataProvider>
       </UIStateProvider>
     ),
     [defaultKey, toggleText]

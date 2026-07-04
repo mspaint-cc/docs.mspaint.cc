@@ -4,6 +4,7 @@ import Divider from "@/components/obsidian/elements/Divider";
 import { CopyPseudoComponent } from "./shared/CopyComponent";
 import Button from "@/components/obsidian/elements/Button";
 import { UIStateProvider } from "@/components/obsidian/providers/UIStateProvider";
+import { ObsidianDataProvider } from "@/components/obsidian/providers/ObsidianDataProvider";
 import Toggle from "@/components/obsidian/elements/Toggle";
 
 import { Input } from "@/components/ui/input";
@@ -45,10 +46,14 @@ export default function DividerPlayground() {
       <div className="flex items-center justify-center min-h-[150px] relative">
         <div className="w-[50%] max-sm:w-[90%] max-md:w-[80%] max-lg:w-[60%] flex flex-col gap-2 mx-auto">
           <UIStateProvider>
-            <Toggle text="Create Logs" checked={false} risky={false} />
-            <Divider text={text} marginTop={activeMarginTop} marginBottom={activeMarginBottom} />
-            <Button text="Join Discord" subButton={{ text: "Copy Link", properties: { risky: false } }} />
-            <Button text="Unload" />
+            <ObsidianDataProvider scheme={{}}>
+              <div className="flex flex-col gap-[8px]">
+                <Toggle text="Create Logs" checked={false} risky={false} />
+                <Divider text={text} marginTop={activeMarginTop} marginBottom={activeMarginBottom} />
+                <Button text="Join Discord" subButton={{ text: "Copy Link", properties: { risky: false } }} />
+                <Button text="Unload" />
+              </div>
+            </ObsidianDataProvider>
           </UIStateProvider>
         </div>
       </div>

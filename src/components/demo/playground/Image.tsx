@@ -3,6 +3,8 @@
 import ObsidianImage from "@/components/obsidian/elements/Image";
 import { Input } from "@/components/ui/input";
 import { Label as LabelPrimitive } from "@/components/ui/label";
+import { UIStateProvider } from "@/components/obsidian/providers/UIStateProvider";
+import { ObsidianDataProvider } from "@/components/obsidian/providers/ObsidianDataProvider";
 
 import { useMemo, useState } from "react";
 import { CopyPseudoComponent } from "./shared/CopyComponent";
@@ -102,12 +104,10 @@ export default function ImagePlayground() {
 
   const safeGeneratePseudoCode = () => pseudoCode;
 
-  return (
-    <div className="flex flex-col gap-4 border rounded-lg p-4 min-h-[360px] relative">
-      <CopyPseudoComponent codegenfunc={safeGeneratePseudoCode} />
-
-      <div className="flex items-center justify-center min-h-[200px] relative w-full">
-        <div className="max-w-[200px] w-[200px] mb-5">
+  const memoizedImage = useMemo(
+    () => (
+      <UIStateProvider>
+        <ObsidianDataProvider scheme={{}}>
           <ObsidianImage
             image={imageUrl}
             transparency={transparency}
@@ -117,6 +117,19 @@ export default function ImagePlayground() {
             height={height}
             rectSize={parsedSize}
           />
+        </ObsidianDataProvider>
+      </UIStateProvider>
+    ),
+    [imageUrl, transparency, scaleType, r, g, b, parsedOffset, height, parsedSize]
+  );
+
+  return (
+    <div className="flex flex-col gap-4 border rounded-lg p-4 min-h-[360px] relative">
+      <CopyPseudoComponent codegenfunc={safeGeneratePseudoCode} />
+
+      <div className="flex items-center justify-center min-h-[200px] relative w-full">
+        <div className="max-w-[200px] w-[200px] mb-5">
+          {memoizedImage}
         </div>
       </div>
 

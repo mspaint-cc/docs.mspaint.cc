@@ -6,6 +6,8 @@ import { Label as LabelPrimitive } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useMemo, useState } from "react";
 import { CopyPseudoComponent } from "./shared/CopyComponent";
+import { UIStateProvider } from "@/components/obsidian/providers/UIStateProvider";
+import { ObsidianDataProvider } from "@/components/obsidian/providers/ObsidianDataProvider";
 
 const DEFAULT_HEIGHT = 24;
 
@@ -36,15 +38,24 @@ export default function UIPassthroughPlayground() {
 
   const safeGeneratePseudoCode = () => pseudoCode;
 
+  const memoizedUIPassthrough = useMemo(
+    () => (
+      <UIStateProvider>
+        <ObsidianDataProvider scheme={{}}>
+          <ObsidianUIPassthrough height={height} />
+        </ObsidianDataProvider>
+      </UIStateProvider>
+    ),
+    [height]
+  );
+
   return (
     <div className="flex flex-col gap-4 border rounded-lg p-4 min-h-[360px] relative">
       <CopyPseudoComponent codegenfunc={safeGeneratePseudoCode} />
 
       <div className="flex items-center justify-center min-h-[200px] relative w-full">
         <div className="max-w-[200px] w-[200px] mb-5">
-          <ObsidianUIPassthrough
-            height={height}
-          />
+          {memoizedUIPassthrough}
         </div>
       </div>
 

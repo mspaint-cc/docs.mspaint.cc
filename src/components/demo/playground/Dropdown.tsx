@@ -8,6 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { useMemo, useState } from "react";
 import { CopyPseudoComponent } from "./shared/CopyComponent";
 import { UIStateProvider } from "@/components/obsidian/providers/UIStateProvider";
+import { ObsidianDataProvider } from "@/components/obsidian/providers/ObsidianDataProvider";
 
 function splitList(value: string) {
   return value
@@ -139,13 +140,15 @@ export default function DropdownPlayground() {
   const memoizedDropdown = useMemo(
     () => (
       <UIStateProvider>
-        <DropdownElement
-          text={text}
-          value={dropdownValue}
-          options={values}
-          multi={multi}
-          disabledValues={disabledValues}
-        />
+        <ObsidianDataProvider scheme={{}}>
+          <DropdownElement
+            text={text}
+            value={dropdownValue}
+            options={values}
+            multi={multi}
+            disabledValues={disabledValues}
+          />
+        </ObsidianDataProvider>
       </UIStateProvider>
     ),
     [disabledValues, dropdownValue, multi, text, values]

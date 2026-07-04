@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { CopyPseudoComponent } from "./shared/CopyComponent";
+import { UIStateProvider } from "@/components/obsidian/providers/UIStateProvider";
+import { ObsidianDataProvider, useCornerRadius } from "@/components/obsidian/providers/ObsidianDataProvider";
 
 const TARGET = [0, -0.4, 0] as const;
 const DEFAULT_ORBIT = {
@@ -114,6 +116,49 @@ function ViewportControls({
   return null;
 }
 
+function ViewportPreview({
+  height,
+  focusTick,
+  interactive,
+  autoFocus,
+}: {
+  height: number;
+  focusTick: number;
+  interactive: boolean;
+  autoFocus: boolean;
+}) {
+  const br = useCornerRadius();
+
+  return (
+    <div
+      className={
+        "w-full bg-[rgb(25,25,25)] border-[rgb(40,40,40)] border flex items-center justify-center max-w-[200px] overflow-hidden"
+      }
+      style={{ height: `${height}px`, borderRadius: br }}
+    >
+      <Canvas
+        key={focusTick}
+        camera={{ position: [3.5, 3.5, 3.5], fov: 70 }}
+        style={{ height, cursor: interactive ? "grab" : "default" }}
+      >
+        <hemisphereLight
+          intensity={0.65}
+          color="#e6ecff"
+          groundColor="#1b212e"
+        />
+        <directionalLight position={[6, 8, 6]} intensity={1.15} />
+        <Suspense fallback={null}>
+          <DemoPart />
+        </Suspense>
+        <ViewportControls
+          interactive={interactive}
+          focusSignal={focusTick + (autoFocus ? 1 : 0)}
+        />
+      </Canvas>
+    </div>
+  );
+}
+
 export default function ViewportPlayground() {
   const [interactive, setInteractive] = useState(true);
   const [autoFocus, setAutoFocus] = useState(true);
@@ -142,37 +187,28 @@ export default function ViewportPlayground() {
 
   const safeGeneratePseudoCode = () => pseudoCode;
 
+  const memoizedViewport = useMemo(
+    () => (
+      <UIStateProvider>
+        <ObsidianDataProvider scheme={{}}>
+          <ViewportPreview
+            height={height}
+            focusTick={focusTick}
+            interactive={interactive}
+            autoFocus={autoFocus}
+          />
+        </ObsidianDataProvider>
+      </UIStateProvider>
+    ),
+    [height, focusTick, interactive, autoFocus]
+  );
+
   return (
     <div className="flex flex-col gap-4 border rounded-lg p-4 min-h-[360px] relative">
       <CopyPseudoComponent codegenfunc={safeGeneratePseudoCode} />
 
       <div className="flex items-center justify-center min-h-[200px] relative w-full mb-5">
-        <div
-          className={
-            "w-full rounded-[1px] bg-[rgb(25,25,25)] border-[rgb(40,40,40)] border flex items-center justify-center max-w-[200px]"
-          }
-          style={{ height: `${height}px` }}
-        >
-          <Canvas
-            key={focusTick}
-            camera={{ position: [3.5, 3.5, 3.5], fov: 70 }}
-            style={{ height, cursor: interactive ? "grab" : "default" }}
-          >
-            <hemisphereLight
-              intensity={0.65}
-              color="#e6ecff"
-              groundColor="#1b212e"
-            />
-            <directionalLight position={[6, 8, 6]} intensity={1.15} />
-            <Suspense fallback={null}>
-              <DemoPart />
-            </Suspense>
-            <ViewportControls
-              interactive={interactive}
-              focusSignal={focusTick + (autoFocus ? 1 : 0)}
-            />
-          </Canvas>
-        </div>
+        {memoizedViewport}
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">

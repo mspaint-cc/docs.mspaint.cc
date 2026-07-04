@@ -5,6 +5,7 @@ import { Groupbox } from "../obsidian/elements/GroupBox";
 import Toggle from "../obsidian/elements/Toggle";
 import { UIStateProvider, useUIValue } from "../obsidian/providers/UIStateProvider";
 import Slider from "../obsidian/elements/Slider";
+import { ObsidianDataProvider } from "../obsidian/providers/ObsidianDataProvider";
 
 function ObsidianComponent() {
   const [externalChecked] = useUIValue<boolean | undefined>(
@@ -34,7 +35,9 @@ export default function DemoDependencyBox() {
   const memoizedComponent = useMemo(
     () => (
       <UIStateProvider>
-        <ObsidianComponent />
+        <ObsidianDataProvider scheme={{}}>
+          <ObsidianComponent />
+        </ObsidianDataProvider>
       </UIStateProvider>
     ),
     []

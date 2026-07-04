@@ -8,6 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { useEffect, useMemo, useState } from "react";
 import { CopyPseudoComponent } from "./shared/CopyComponent";
 import { UIStateProvider } from "@/components/obsidian/providers/UIStateProvider";
+import { ObsidianDataProvider } from "@/components/obsidian/providers/ObsidianDataProvider";
 
 function parseNumber(value: string, fallback: number) {
   const next = Number(value);
@@ -16,13 +17,13 @@ function parseNumber(value: string, fallback: number) {
 
 export default function SliderPlayground() {
   const [text, setText] = useState("Slider");
-  const [value, setValue] = useState(25);
-  const [min, setMin] = useState(0);
-  const [max, setMax] = useState(100);
+  const [min, setMin] = useState(16);
+  const [max, setMax] = useState(250);
   const [rounding, setRounding] = useState(0);
   const [prefix, setPrefix] = useState("");
   const [suffix, setSuffix] = useState("");
   const [compact, setCompact] = useState(false);
+  const [value, setValue] = useState(16);
 
   useEffect(() => {
     setValue((current) => {
@@ -34,17 +35,19 @@ export default function SliderPlayground() {
   const memoizedSlider = useMemo(
     () => (
       <UIStateProvider>
-        <SliderElement
-          text={text}
-          value={value}
-          min={min}
-          max={max}
-          rounding={rounding >= 0 ? rounding : undefined}
-          prefix={prefix}
-          suffix={suffix}
-          compact={compact}
-          onValueChange={(next) => setValue(next)}
-        />
+        <ObsidianDataProvider scheme={{}}>
+          <SliderElement
+            text={text}
+            value={value}
+            min={min}
+            max={max}
+            rounding={rounding >= 0 ? rounding : undefined}
+            prefix={prefix}
+            suffix={suffix}
+            compact={compact}
+            onValueChange={(next) => setValue(next)}
+          />
+        </ObsidianDataProvider>
       </UIStateProvider>
     ),
     [compact, max, min, prefix, rounding, suffix, text, value]

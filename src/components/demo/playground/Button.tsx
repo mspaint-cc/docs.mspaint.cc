@@ -4,6 +4,8 @@ import Button from "@/components/obsidian/elements/Button";
 import { Input } from "@/components/ui/input";
 import { Label as LabelPrimitive } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { UIStateProvider } from "@/components/obsidian/providers/UIStateProvider";
+import { ObsidianDataProvider } from "@/components/obsidian/providers/ObsidianDataProvider";
 
 import { useMemo, useState } from "react";
 import { CopyPseudoComponent } from "./shared/CopyComponent";
@@ -15,10 +17,14 @@ export default function ButtonPlayground() {
 
   const memoizedComponent = useMemo(
     () => (
-      <Button
-        text={text}
-        subButton={hasSubButton ? { text: subButtonText, properties: { risky: false } } : undefined}
-      />
+      <UIStateProvider>
+        <ObsidianDataProvider scheme={{}}>
+          <Button
+            text={text}
+            subButton={hasSubButton ? { text: subButtonText, properties: { risky: false } } : undefined}
+          />
+        </ObsidianDataProvider>
+      </UIStateProvider>
     ),
     [text, hasSubButton, subButtonText]
   );

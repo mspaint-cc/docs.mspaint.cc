@@ -13,41 +13,49 @@ export const ButtonBase = React.forwardRef<
 		replacedText?: boolean;
 		centeredText?: boolean;
 	} & React.ButtonHTMLAttributes<HTMLButtonElement>
->(({
-	text,
-	containerClassName,
-	className,
-	children,
-	replacedText = false,
-	centeredText = false,
-	...props
-}, ref) => {
+>(({ text, containerClassName, className, children, replacedText = false, centeredText = false, style, ...props }, ref) => {
 	const br = useCornerRadius();
 
-	return (<div className={cn("flex w-full min-w-0 h-[24px] justify-center items-center", containerClassName)}>
-		<button
-			ref={ref}
-			type="button"
-			className={cn(
-				"flex items-center w-full h-full cursor-pointer border bg-[rgb(25,25,25)] hover:bg-[rgb(35,35,35)] border-[rgb(40,40,40)] overflow-hidden",
-				!replacedText && (centeredText ? "justify-center" : "justify-start px-2")
-			)}
-			style={{ borderRadius: br }}
-			{...props}
-		>
-			{!replacedText ? (
-				<span className={cn(
-					"flex items-center w-full min-w-0 h-full text-white text-[12px] opacity-50 truncate",
-					centeredText ? "justify-center text-center" : "justify-start text-left",
-					className
-				)}>
-					{text}
-				</span>
-			) : (text)}
+	return (
+		<div className={cn("flex w-full min-w-0 h-[24px] justify-center items-center", containerClassName)}>
+			<button
+				ref={ref}
+				type="button"
+				className={cn(
+					"flex items-center w-full h-full cursor-pointer border hover:brightness-125 overflow-hidden",
+					!replacedText && (centeredText ? "justify-center" : "justify-start px-2"),
+					props.disabled && "pointer-events-none opacity-50"
+				)}
+				style={{
+					borderTopLeftRadius: br,
+					borderTopRightRadius: br,
+					borderBottomLeftRadius: br,
+					borderBottomRightRadius: br,
+					backgroundColor: props.disabled ? "var(--background-color)" : "var(--main-color)",
+					borderColor: "var(--outline-color)",
+					...style
+				}}
+				{...props}
+			>
+				{!replacedText ? (
+					<span
+						className={cn(
+							"flex items-center w-full min-w-0 h-full text-white text-[12px] opacity-50 truncate",
+							centeredText ? "justify-center text-center" : "justify-start text-left",
+							props.disabled && "opacity-20",
+							className
+						)}
+					>
+						{text}
+					</span>
+				) : (
+					text
+				)}
 
-			{children}
-		</button>
-	</div>);
+				{children}
+			</button>
+		</div>
+	);
 });
 
 ButtonBase.displayName = "ButtonBase";
@@ -56,6 +64,7 @@ export default function Button({
 	text,
 	risky,
 	subButton,
+	disabled
 }: {
 	text: string;
 	risky?: boolean;
@@ -66,6 +75,7 @@ export default function Button({
 			doubleClick?: boolean;
 		};
 	};
+	disabled?: boolean;
 }) {
 	if (subButton != undefined) {
 		return (
@@ -75,6 +85,7 @@ export default function Button({
 					containerClassName="flex-1"
 					centeredText={true}
 					className={risky ? "text-red-500 opacity-80" : undefined}
+					disabled={disabled}
 				/>
 
 				<ButtonBase
@@ -82,6 +93,7 @@ export default function Button({
 					containerClassName="flex-1"
 					centeredText={true}
 					className={subButton.properties.risky ? "text-red-500 opacity-80" : undefined}
+					disabled={disabled}
 				/>
 			</div>
 		);
@@ -89,11 +101,7 @@ export default function Button({
 
 	return (
 		<div className="flex flex-row items-center w-full">
-			<ButtonBase
-				text={text}
-				centeredText={true}
-				className={risky ? "text-red-500 opacity-80" : undefined}
-			/>
+			<ButtonBase text={text} centeredText={true} className={risky ? "text-red-500 opacity-80" : undefined} disabled={disabled} />
 		</div>
 	);
 }
