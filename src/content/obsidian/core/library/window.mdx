@@ -158,7 +158,6 @@ local Window = Library:CreateWindow({
       default: 'true',
       required: false
     },
-
     EnableSidebarResize: {
       description: 'Show a draggable handle so players can resize the sidebar',
       type: 'boolean',
@@ -213,10 +212,34 @@ local Window = Library:CreateWindow({
       type: 'number',
       default: '128',
       required: false
-    }
+    },
+
+    Animations: {
+      description: 'Configuration table to enable animations',
+      type: 'table',
+      default: '{ ToggleWindow = false, TabSwitch = false, Dropdown = false }',
+      required: false
+    },
+    TabTransitionTime: {
+      description: 'Duration of the tab swipe transition in seconds',
+      type: 'number',
+      default: '0.22',
+      required: false
+    },
+    TabSwipeOffset: {
+      description: 'Distance (in pixels) the tab slides during the switch animation',
+      type: 'number',
+      default: '26',
+      required: false
+    },
+    TabSwipeFrom: {
+      description: 'Direction the tab swipes in from ("left", "right", "top", "bottom")',
+      type: 'string',
+      default: '"bottom"',
+      required: false
+    },
   }}
 />
-
 
 #### ChangeTitle
 Changes the title of the window.
@@ -352,3 +375,58 @@ Window:SetCompact(true)
 | Arg Idx | Argument Description | Type | Default |
 | --- | --- | --- | --- |
 | 1 | Whether the sidebar should stay compacted | boolean | — |
+
+
+### Animations
+
+Obsidian has customizable, opt-in animations. You can enable them directly when creating the window:
+
+```lua
+local Window = Library:CreateWindow({
+    Title = "mspaint",
+    
+    -- Enable animations
+    Animations = {
+        ToggleWindow = true,
+        TabSwitch = true,
+        Dropdown = true
+    },
+    
+    -- Customise Tab switching animation
+    TabTransitionTime = 0.22,
+    TabSwipeOffset = 26,
+    TabSwipeFrom = "bottom"
+})
+```
+
+#### Preview
+
+<Tabs items={['ToggleWindow', 'TabSwitch', 'Dropdown']}>
+  <Tab value="ToggleWindow">
+    Animation when opening or closing the UI window.
+    ![ToggleWindow Preview](/images/obsidian/animations/toggle-window.gif)
+  </Tab>
+  <Tab value="TabSwitch">
+    Transition effect when switching between different tabs (from bottom).
+    ![TabSwitch Preview](/images/obsidian/animations/tab-switch.gif)
+  </Tab>
+  <Tab value="Dropdown">
+    Animation when expanding or collapsing Dropdowns.
+    ![Dropdown Preview](/images/obsidian/animations/dropdown.gif)
+  </Tab>
+</Tabs>
+
+
+#### SetAnimations
+Updates animation configuration.
+
+```lua
+Window:SetAnimations({ ToggleWindow = true, TabSwitch = true, Dropdown = true }, 0.22, 26, "bottom")
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | The animations configuration table | table? | `nil` |
+| 2 | Tab transition duration (seconds) | number? | `nil` |
+| 3 | Tab swipe transition offset (pixels) | number? | `nil` |
+| 4 | Tab swipe direction (`"left" \| "right" \| "top" \| "bottom"`) | string? | `nil` |
