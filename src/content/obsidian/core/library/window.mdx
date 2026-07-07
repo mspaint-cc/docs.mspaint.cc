@@ -217,7 +217,7 @@ local Window = Library:CreateWindow({
     Animations: {
       description: 'Configuration table to enable animations',
       type: 'table',
-      default: '{ ToggleWindow = false, TabSwitch = false, Dropdown = false }',
+      default: '{ ToggleWindow = false, TabSwitch = false, Groupbox = false, Dropdown = false, KeyPicker = false }',
       required: false
     },
     TabTransitionTime: {
@@ -389,7 +389,9 @@ local Window = Library:CreateWindow({
     Animations = {
         ToggleWindow = true,
         TabSwitch = true,
-        Dropdown = true
+        Groupbox = true,
+        Dropdown = true,
+        KeyPicker = true
     },
     
     -- Customise Tab switching animation
@@ -401,7 +403,7 @@ local Window = Library:CreateWindow({
 
 #### Preview
 
-<Tabs items={['ToggleWindow', 'TabSwitch', 'Dropdown']}>
+<Tabs items={['ToggleWindow', 'TabSwitch', 'Groupbox', 'Dropdown', 'KeyPicker']}>
   <Tab value="ToggleWindow">
     Animation when opening or closing the UI window.
     ![ToggleWindow Preview](/images/obsidian/animations/toggle-window.gif)
@@ -414,6 +416,14 @@ local Window = Library:CreateWindow({
     Animation when expanding or collapsing Dropdowns.
     ![Dropdown Preview](/images/obsidian/animations/dropdown.gif)
   </Tab>
+  <Tab value="Groupbox">
+    Animation when expanding or collapsing Groupboxes.
+    ![Groupbox Preview](/images/obsidian/animations/groupbox.gif)
+  </Tab>
+  <Tab value="KeyPicker">
+    Animation when interacting with KeyPickers.
+    ![KeyPicker Preview](/images/obsidian/animations/keypicker.gif)
+  </Tab>
 </Tabs>
 
 
@@ -421,7 +431,7 @@ local Window = Library:CreateWindow({
 Updates animation configuration.
 
 ```lua
-Window:SetAnimations({ ToggleWindow = true, TabSwitch = true, Dropdown = true }, 0.22, 26, "bottom")
+Window:SetAnimations({ ToggleWindow = true, TabSwitch = true, Groupbox = true, Dropdown = true, KeyPicker = true }, 0.22, 26, "bottom")
 ```
 
 | Arg Idx | Argument Description | Type | Default |

@@ -58,6 +58,12 @@ local Dropdown = Groupbox:AddDropdown("MyDropdown", {
       default: 'false',
       required: false
     },
+    DragSelect: {
+      description: 'Enables dragging to select multiple items (only works on non-touch devices and Multi dropdowns)',
+      type: 'boolean',
+      default: 'false',
+      required: false
+    },
     AllowNull: {
       description: 'Whether no selection is allowed',
       type: 'boolean',
@@ -264,6 +270,17 @@ Dropdown:SetVisible(boolean)
 | Arg Idx | Argument Description | Type | Default |
 | --- | --- | --- | --- |
 | 1 | Whether to show the dropdown | boolean | nil |
+
+#### SetDragSelect
+Enables or disables dragging to select multiple items.
+
+```lua
+Dropdown:SetDragSelect(boolean)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Whether to enable drag select | boolean | nil |
 
 #### GetActiveValues
 Returns the currently selected values.
