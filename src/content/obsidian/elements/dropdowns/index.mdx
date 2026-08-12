@@ -41,13 +41,13 @@ local Dropdown = Groupbox:AddDropdown("MyDropdown", {
       required: true
     },
     Values: {
-      description: 'List of selectable values',
+      description: 'Selectable entries. Array: each entry is the selection identity and display text. Dictionary: key = selection identity, value = display label. Sparse numeric tables are treated as arrays (value identity), not dictionaries.',
       type: 'table',
       default: '{}',
       required: true
     },
     Default: {
-      description: 'Default selected value or values (index, string, or table)',
+      description: 'Default selection: array index, identity string, or table of identities. For dictionary Values, use a key (or table of keys), not the display label.',
       type: 'any',
       default: 'nil',
       required: false
@@ -71,13 +71,13 @@ local Dropdown = Groupbox:AddDropdown("MyDropdown", {
       required: false
     },
     Searchable: {
-      description: 'Enables searching through the dropdown values',
+      description: 'Enables searching through list labels.',
       type: 'boolean',
       default: 'false',
       required: false
     },
     MaxVisibleDropdownItems: {
-      description: 'Maximum number of visible items in the dropdown menu',
+      description: 'Maximum number of visible rows in the dropdown menu (caps height). Large lists are virtualized with a fixed row pool so instance count stays roughly constant.',
       type: 'number',
       default: '8',
       required: false
@@ -107,19 +107,19 @@ local Dropdown = Groupbox:AddDropdown("MyDropdown", {
       required: false
     },
     FormatListValue: {
-      description: 'Function to format values inside the context menu list (Randomized formatting will not be preserved as the function is called every time the context menu is rebuilt)',
+      description: 'Function to format values inside the context menu list. Receives the raw Values entry (array value, or dictionary label). Randomized formatting will not be preserved as the function is called whenever the list is rebuilt.',
       type: 'function',
       default: 'nil',
       required: false
     },
     DisabledValues: {
-      description: 'Values that cannot be selected',
+      description: 'Identities that cannot be selected. For dictionary Values, entries may be keys or display labels.',
       type: 'table',
       default: '{}',
       required: false
     },
     ValueImages: {
-      description: 'A table mapping to add images to values',
+      description: 'Maps selection identities (or dictionary labels) to images',
       type: 'table',
       default: '{}',
       required: false
@@ -157,12 +157,40 @@ local Dropdown = Groupbox:AddDropdown("MyDropdown", {
   }}
 />
 
+## Values
+
+`Values` can be a normal list or a dictionary.
+
+### List
+
+Each entry is both what you select and what the user sees:
+
+```lua
+Values = { "Sword", "Shield" }
+-- selecting Sword -> Value is "Sword"
+```
+
+### Dictionary
+
+The key is what your script gets back; the label is what the user sees:
+
+```lua
+Values = { item01 = "Excalibur", item05 = "Aegis Shield" }
+-- selecting Excalibur -> Value is "item01" (not "Excalibur")
+```
+
+Use a dictionary when the UI needs friendly names but your code needs stable IDs (or other data). Look up the label or metadata with `Values[selectedKey]`.
+
+For multi dropdowns, `Value` is always a map of selected keys to `true` (for example `{ item01 = true }`).
+
+`Default`, `SetValue`, and `OnChanged` use the **key** for dictionaries, not the label. See the [Example](#example) below.
+
 ## Methods
 
 You can use the following methods to interact with the dropdown:
 
 #### SetValue
-Sets the selected value or values.
+Sets the selected value or values. For dictionary dropdowns, pass keys (or `{ [key] = true }` for multi), not display labels.
 
 ```lua
 Dropdown:SetValue(value)
@@ -173,7 +201,7 @@ Dropdown:SetValue(value)
 | 1 | Value to select (string, number, or table) | any | nil |
 
 #### SetValues
-Replaces all dropdown values.
+Replaces all dropdown values (array or dictionary). Selections that are no longer present are pruned; if anything was removed, `Callback` may fire.
 
 ```lua
 Dropdown:SetValues(table)
@@ -181,10 +209,13 @@ Dropdown:SetValues(table)
 
 | Arg Idx | Argument Description | Type | Default |
 | --- | --- | --- | --- |
-| 1 | New values list | table | nil |
+| 1 | New values list or dictionary map | table | nil |
 
 #### AddValues
 Adds new values to the dropdown.
+
+- **Array** `Values`: appends entries (`table.insert`).
+- **Dictionary** `Values`: merges maps (`{ key = label }`). Array-style tables become key=label pairs (`{ "X" }` → `Values.X = "X"`).
 
 ```lua
 Dropdown:AddValues(value)
@@ -192,10 +223,10 @@ Dropdown:AddValues(value)
 
 | Arg Idx | Argument Description | Type | Default |
 | --- | --- | --- | --- |
-| 1 | Value or table of values to add | any | nil |
+| 1 | Value, array of values, or dictionary map to merge | any | nil |
 
 #### SetDisabledValues
-Sets which values are disabled.
+Sets which values are disabled. For dictionary dropdowns, entries may be keys or labels.
 
 ```lua
 Dropdown:SetDisabledValues(table)
@@ -217,7 +248,7 @@ Dropdown:AddDisabledValues(value)
 | 1 | Value or table of values to disable | any | nil |
 
 #### SetValueImages
-Replaces value to image mapping.
+Replaces value to image mapping. For dictionary dropdowns, keys may be selection identities or labels.
 
 ```lua
 Dropdown:SetValueImages(table)
@@ -283,7 +314,7 @@ Dropdown:SetDragSelect(boolean)
 | 1 | Whether to enable drag select | boolean | nil |
 
 #### GetActiveValues
-Returns the currently selected values.
+Returns the currently selected values (selection values or keys).
 
 ```lua
 local values = Dropdown:GetActiveValues()
@@ -328,4 +359,21 @@ Options.MyDropdown:OnChanged(function()
 end)
 
 Options.MyDropdown:SetValue("This")
+
+-- Dictionary Values: key = identity, value = label
+Groupbox:AddDropdown("MyDictionaryDropdown", {
+    Values = {
+        item01 = "Excalibur",
+        item05 = "Aegis Shield",
+    },
+    Default = "item01",
+    Multi = true,
+    Text = "A dictionary dropdown",
+})
+
+Options.MyDictionaryDropdown:OnChanged(function(Value)
+    for Key in Value do
+        print(Key, "->", Options.MyDictionaryDropdown.Values[Key])
+    end
+end)
 ```
