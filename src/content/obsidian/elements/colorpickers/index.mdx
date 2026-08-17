@@ -25,6 +25,7 @@ local Toggle = Groupbox:AddToggle("MyToggle", {
 local ColorPicker = Toggle:AddColorPicker("ColorPicker1", {
     Default = Color3.new(1, 0, 0),
     Title = "Some color",
+    Resizable = true,
 })
 ```
 
@@ -53,6 +54,12 @@ local ColorPicker = Toggle:AddColorPicker("ColorPicker1", {
       description: 'Default transparency (0-1) and enables transparency editing',
       type: 'number',
       default: '0',
+      required: false
+    },
+    Resizable: {
+      description: 'Whether the color picker menu can be resized',
+      type: 'boolean',
+      default: 'true',
       required: false
     },
     Callback: {
@@ -130,6 +137,7 @@ local ColorPicker = Toggle:AddColorPicker("ColorPicker1", {
     Default = Color3.new(1, 0, 0),
     Title = "Some color",
     Transparency = 0,
+    Resizable = true,
 })
 
 Options.ColorPicker1:OnChanged(function()
