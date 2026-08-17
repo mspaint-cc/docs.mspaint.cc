@@ -86,6 +86,12 @@ local Window = Library:CreateWindow({
       default: 'true',
       required: false
     },
+    AlwaysOnTop: {
+      description: 'Whether the window ScreenGui stays above Roblox core blur (executor only).',
+      type: 'boolean',
+      default: 'false',
+      required: false
+    },
     Font: {
       description: 'The font to use for text',
       type: 'Enum.Font',
@@ -262,6 +268,17 @@ Window:SetFooter("New Footer")
 | Arg Idx | Argument Description | Type | Default |
 | --- | --- | --- | --- |
 | 1 | The new footer of the window | string | nil |
+
+#### SetAlwaysOnTop
+Keeps the window ScreenGui above Roblox core blur (executor only).
+
+```lua
+Window:SetAlwaysOnTop(true)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Whether Always On Top is enabled | boolean | false |
 
 #### SetBackgroundImage
 Changes the background image of the window.
