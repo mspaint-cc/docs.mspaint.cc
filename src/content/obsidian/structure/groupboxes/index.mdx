@@ -4,6 +4,9 @@ description: 'Groupboxes are used to group ui elements together in a tab.'
 ---
 
 import DemoGroupbox from "@/components/demo/Groupbox";
+import { TypeTable } from '@/components/type-table';
+import { Callout } from "fumadocs-ui/components/callout";
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 
 [Groupboxes](/obsidian/structure/groupboxes) and [Tabboxes](/obsidian/structure/tabboxes) are the basic building block of each tab, you need it to group together UI elements. Any groupbox you create can be either a left or right groupbox.
 
@@ -11,22 +14,71 @@ import DemoGroupbox from "@/components/demo/Groupbox";
 
 ## Usage
 
-You can create a Groupbox by calling the `AddLeftGroupbox` or `AddRightGroupbox` method on a Tab.
-
-### Arguments
+You can create a Groupbox by calling the `AddGroupbox` method on a Tab.
 
 ```lua
-local LeftGroupBox = Tab:AddLeftGroupbox("Left Groupbox", "wrench")
-local RightGroupBox = Tab:AddRightGroupbox("Right Groupbox")
+local LeftGroupBox = Tab:AddGroupbox({
+    Side = "Left", -- case-insensitive
+    Name = "Groupbox",
+    Description = "Optional subtitle under the title",
+    IconName = "boxes",
+    -- Visible = true,
+    -- Collapsed = false,
+    -- DisableCollapsing = false,
+})
+
+local RightGroupBox = Tab:AddGroupbox({
+    Side = "Right",
+    Name = "Dropdowns",
+})
 ```
 
-| Arg Idx | Argument Description | Type | Default |
-| --- | --- | --- | --- |
-| 1 | Title of the groupbox | string | nil |
-| 2 | Custom Icon or Icon name from lucide.dev | string | nil |
-| 3 | Whether the groupbox should be initially visible | boolean | true |
-| 4 | Whether the groupbox should be initially collapsed | boolean | false |
-| 5 | Whether collapsing the groupbox should be disabled | boolean | false |
+<TypeTable
+  type={{
+    Side: {
+      description: 'Which column to place the groupbox in. Accepts "Left", "Right" (case-insensitive) or 1, 2.',
+      type: '"Left" | "Right" | 1 | 2',
+      default: 'nil',
+      required: true
+    },
+    Name: {
+      description: 'Title of the groupbox',
+      type: 'string',
+      default: 'nil',
+      required: true
+    },
+    Description: {
+      description: 'Optional subtitle shown under the title',
+      type: 'string',
+      default: 'nil',
+      required: false
+    },
+    IconName: {
+      description: 'Custom Icon or Icon name from lucide.dev',
+      type: 'string',
+      default: 'nil',
+      required: false
+    },
+    Visible: {
+      description: 'Whether the groupbox should be initially visible',
+      type: 'boolean',
+      default: 'true',
+      required: false
+    },
+    Collapsed: {
+      description: 'Whether the groupbox should be initially collapsed',
+      type: 'boolean',
+      default: 'false',
+      required: false
+    },
+    DisableCollapsing: {
+      description: 'Whether collapsing the groupbox should be disabled',
+      type: 'boolean',
+      default: 'false',
+      required: false
+    }
+  }}
+/>
 
 ## Methods
 
@@ -58,6 +110,19 @@ Hides the groupbox. This is an alias for `SetVisible(false)`.
 Groupbox:Hide()
 ```
 
+### SetDescription
+
+Sets or clears the groupbox description shown under the title.
+
+```lua
+Groupbox:SetDescription("New description")
+Groupbox:SetDescription(nil) -- hide the description
+```
+
+| Argument | Type | Description |
+| --- | --- | --- |
+| Description | string \| nil | Text to show under the title, or `nil` to hide it |
+
 ### AddTabbox
 
 Creates a Tabbox inside this groupbox, allowing you to nest tabs.
@@ -65,3 +130,32 @@ Creates a Tabbox inside this groupbox, allowing you to nest tabs.
 ```lua
 local MyTabbox = Groupbox:AddTabbox()
 ```
+
+---
+
+<Accordions type="single">
+
+<Accordion title="Deprecated Documentation">
+
+## AddLeftGroupbox, AddRightGroupbox
+
+<Callout type="warn">
+  `AddLeftGroupbox` and `AddRightGroupbox` are deprecated. Please use `Tab:AddGroupbox` with a `Side` argument instead.
+</Callout>
+
+```lua
+local LeftGroupBox = Tab:AddLeftGroupbox("Left Groupbox", "wrench")
+local RightGroupBox = Tab:AddRightGroupbox("Right Groupbox")
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Title of the groupbox | string | nil |
+| 2 | Custom Icon or Icon name from lucide.dev | string | nil |
+| 3 | Whether the groupbox should be initially visible | boolean | true |
+| 4 | Whether the groupbox should be initially collapsed | boolean | false |
+| 5 | Whether collapsing the groupbox should be disabled | boolean | false |
+
+</Accordion>
+
+</Accordions>

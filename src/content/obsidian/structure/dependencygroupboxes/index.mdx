@@ -17,7 +17,11 @@ You can create a Dependency Groupbox by calling the `AddDependencyGroupbox` meth
 
 ```lua
 local Toggles = Library.Toggles
-local LeftGroupbox = MainTab:AddLeftGroupbox("Settings", "wrench")
+local LeftGroupbox = MainTab:AddGroupbox({
+    Side = "Left",
+    Name = "Settings",
+    IconName = "wrench",
+})
 
 LeftGroupbox:AddToggle("EnableAudio", {
     Text = "Enable Audio",
