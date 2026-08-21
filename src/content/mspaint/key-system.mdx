@@ -16,7 +16,7 @@ import { StepImage } from '@/components/keysystem/StepImage'
 </Callout>
 <Callout type="warn">
     Before starting, any type of **VPN/ad-blocker/bypasser** must be **disabled** to continue. You will **receive a temporary blacklist** from Luarmor for **any bypass attempt**!<br />
-    You are also required to **login with your Discord Account**.<br /><br />
+    To use bug reports and suggestions on the website, sign in to the <a href="https://www.mspaint.cc/subscription-dashboard">Subscription Dashboard</a> with Discord and link your Luarmor key there.<br /><br />
     Make sure your executor **supports the Luarmor loader** and **mspaint**. We list all of the tested and supported executors in our [Discord server](https://discord.gg/mspaint) in [#supported-utilities](https://discord.com/channels/1282361102935658777/1363957140334841986).<br />
 </Callout>
 <Callout type="info">
@@ -30,7 +30,7 @@ import { StepImage } from '@/components/keysystem/StepImage'
 ## Available Key Providers
 
 - **Linkvertise**: 3 checkpoints (without 1 hour wait) → **24-hour key**
-- ~~[DISABLED] **Work.ink**: 2 checkpoints → **12-hour key**~~
+{/*- ~~[DISABLED] **Work.ink**: 2 checkpoints → **12-hour key**~~*/}
 
 ## Choosing a link shortener provider
 
@@ -63,9 +63,9 @@ import { StepImage } from '@/components/keysystem/StepImage'
 />
 
 <Step number={4} title="Complete Required Tasks">
-    <Callout type="info">
+    {/*<Callout type="info">
         If you receive a **one-hour wait time**, you can switch to the <a href="#through-work-ink">work.ink</a> provider instead.
-    </Callout>
+    </Callout>*/}
 
     Complete all required tasks, then click **Continue**.
 </Step>
@@ -80,7 +80,7 @@ import { StepImage } from '@/components/keysystem/StepImage'
     After completing all required task, <a href="#final-steps">click here</a> to continue.
 </Step>
 
----
+{/*---
 
 ### Through work.ink
 
@@ -138,14 +138,20 @@ import { StepImage } from '@/components/keysystem/StepImage'
     You can now <a href="#final-steps">click here</a> to continue.
 </Step>
 
----
+---*/}
 
 ## Final steps
+
+<Callout type="warn">
+    **Save your key.** Luarmor Ad Reward pages store keys in a browser/IP session. Switching browsers or devices can make the page forget your key. Always copy it somewhere safe after generating or renewing.
+</Callout>
 
 <Step number={1} title="Generate or Renew Your Key">
     After being redirected back to **Luarmor**, click **Get a New Key**.
 
-    If you already have a key, click **Renew** instead and skip to **Step 5**.
+    <Callout type="info">
+        If you **already have a key**, click **Renew** instead of creating a new one and skip to **[Get the Script](#get-the-script)** step.
+    </Callout>
 </Step>
 
 <div className="flex flex-col md:flex-row gap-2 justify-center items-center">
@@ -165,7 +171,7 @@ import { StepImage } from '@/components/keysystem/StepImage'
 </div>
 
 <Step number={2} title="Copy the Generated Key">
-    Once the key is generated, copy it to your clipboard.
+    Once the key is generated *(or renewed)*, copy it to your clipboard **and keep a backup**.
 </Step>
 
 <StepImage
@@ -174,17 +180,43 @@ import { StepImage } from '@/components/keysystem/StepImage'
     width={500}
 />
 
-<Step number={3} title="Redeem the Key in Discord">
-    Open Discord and go to the [#get-script](https://discord.com/channels/1282361102935658777/1282373591652110417) channel in our [Discord Server](https://discord.gg/mspaint).
+<Step number={3} title="Link the Key in the Subscription Dashboard">
+    Sign in to the <a href="https://www.mspaint.cc/subscription-dashboard">Subscription Dashboard</a> with the same Discord account you want to use for mspaint.
 
-    <Callout type="warn">
-        If you can't find the channel, enable **Show All Channels** option in the server settings.
+    Click **Link Key System Luarmor key**, paste your key, and submit.
 
-        <img width="200" height="200" src="/images/mspaint/keytutorial/finish/allchannels.png" />
+    If your linked free key later **expires** and Renew gives you a different key string, use **Update Key System key** in the Subscription Dashboard (only available while expired).
+
+    <Callout type="info">
+        The dashboard links the key to your Discord account automatically. You do **not** need to Redeem the key in the Discord Luarmor panel.
     </Callout>
 
-    Click the **Redeem Key** button in the script panel.
+    <Callout type="warn">
+        Ensure there are **no extra spaces** before or after the key.
+    </Callout>
 </Step>
+
+### Redeem Key in Discord (optional)
+
+Follow this if you want the **Whitelisted** Discord role and script panel features in the server.
+
+Open Discord and go to the [#get-script](https://discord.com/channels/1282361102935658777/1282373591652110417) channel in our [Discord Server](https://discord.gg/mspaint).
+
+<Callout type="warn">
+    If you can't find the channel, enable **Show All Channels** option in the server settings.
+
+    <img width="200" height="200" src="/images/mspaint/keytutorial/finish/allchannels.png" />
+</Callout>
+
+Click the **Redeem Key** button in the script panel, then paste your key and submit.
+
+<Callout type="info">
+    **Redeem Key** is not required if you already linked your key in the **Subscription Dashboard**.
+</Callout>
+
+<Callout type="warn">
+    Ensure there are **no extra spaces** before or after the key.
+</Callout>
 
 <StepImage
     src="/images/mspaint/keytutorial/finish/3.png"
@@ -192,28 +224,9 @@ import { StepImage } from '@/components/keysystem/StepImage'
     width={600}
 />
 
-<Step number={4} title="Submit the Key">
-    Paste the copied key into the input field and click **Submit**.
+### Get the Whitelisted Role
 
-    <Callout type="warn">
-        Ensure there are **no extra spaces** before or after the key, or you will receive the error:<br />
-        **Something went wrong. Try again.**
-
-        <img width="450" height="450" src="/images/mspaint/keytutorial/finish/keycheck.png" />
-    </Callout>
-</Step>
-
-<StepImage
-    src="/images/mspaint/keytutorial/finish/4.png"
-    alt="Submit key"
-    width={500}
-/>
-
-<Step number={5} title="Get the Whitelisted Role">
-    To unlock be able to **make suggestions, report bugs and access more channels**, you need to get the **Whitelisted** role.<br />
-
-    Click the **Get Role** button in the script panel.
-</Step>
+After redeeming (or if your key is already linked to your Discord account), click **Get Role** in the script panel to receive the **Whitelisted** role.
 
 <StepImage
     src="/images/mspaint/keytutorial/finish/5.png"
@@ -221,9 +234,9 @@ import { StepImage } from '@/components/keysystem/StepImage'
     width={500}
 />
 
-<Step number={6} title="Get the Script">
-    Click **Get Script**, scroll down and then copy and paste the provided script into your executor.
-</Step>
+### Get the Script
+
+You can get the script from the <a href="https://www.mspaint.cc/subscription-dashboard">Subscription Dashboard</a> after linking, or from the Discord panel: click **Get Script**, scroll down, and paste the script into your executor.
 
 <StepImage
     src="/images/mspaint/keytutorial/finish/6.png"
