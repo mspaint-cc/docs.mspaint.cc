@@ -9,6 +9,9 @@
     "lint": "next lint",
     "postinstall": "fumadocs-mdx"
   },
+  "engines": {
+    "node": ">=20.9.0 <21"
+  },
   "dependencies": {
     "@radix-ui/react-collapsible": "1.1.12",
     "@radix-ui/react-label": "2.1.8",
