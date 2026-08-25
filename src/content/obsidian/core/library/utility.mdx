@@ -49,6 +49,22 @@ Library:SetIconModule(Icons)
 
 The direct lucide module can be found [here](https://raw.githubusercontent.com/mstudio45/lucide-roblox-direct/refs/heads/main/source.lua). (Our automation updates the icon spritesheet each month)
 
+### ApplyLucideIcon
+
+Applies a Lucide icon table to an `ImageLabel` or `ImageButton`.
+
+```lua
+local Icon = Library:GetIcon("settings")
+Library:ApplyLucideIcon(ImageLabel, Icon)
+Library:ApplyLucideIcon(ImageButton, Icon, 180) -- optional rotation
+```
+
+| Argument | Type | Description |
+| --- | --- | --- |
+| ImageGui | ImageLabel \| ImageButton | Target image instance |
+| Icon | Icon | Icon table from `GetIcon` or `GetCustomIcon` |
+| Rotation | number? | Optional rotation in degrees |
+
 ### Custom Icon Registry
 
 If you'd like to make your own custom Icon Module, make sure it follows these types:

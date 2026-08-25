@@ -4,6 +4,9 @@ description: 'Tabboxes can condense multiple groupboxes into a single groupbox.'
 ---
 
 import DemoTabbox from "@/components/demo/Tabbox";
+import { TypeTable } from '@/components/type-table';
+import { Callout } from "fumadocs-ui/components/callout";
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 
 [Groupboxes](/obsidian/structure/groupboxes) and [Tabboxes](/obsidian/structure/tabboxes) are the basic building block of each tab, you need it to group together UI elements. Any tabbox you create can be either a left or right tabbox.
 
@@ -11,9 +14,101 @@ import DemoTabbox from "@/components/demo/Tabbox";
 
 ## Usage
 
-You can create a Tabbox by calling the `AddLeftTabbox` or `AddRightTabbox` method on a Tab.
+You can create a Tabbox by calling the `AddTabbox` method on a Tab.
 
-### Arguments
+```lua
+local LeftTabBox = Tab:AddTabbox({
+    Side = "Left", -- case-insensitive
+    Name = "Left Tabbox",
+    -- PopOut = true,
+})
+
+local RightTabBox = Tab:AddTabbox({
+    Side = "Right",
+    Name = "Right Tabbox",
+})
+```
+
+<TypeTable
+  type={{
+    Side: {
+      description: 'Which column to place the tabbox in. Accepts "Left", "Right" (case-insensitive) or 1, 2.',
+      type: '"Left" | "Right" | 1 | 2',
+      default: 'nil',
+      required: true
+    },
+    Name: {
+      description: 'Optional name used for SaveManager pop-out persistence',
+      type: 'string',
+      default: 'nil',
+      required: false
+    },
+    PopOut: {
+      description: 'Allow hold-dragging the tab strip to undock the tabbox into a floating panel. Drop into the main window to dock again.',
+      type: 'boolean',
+      default: 'true',
+      required: false
+    }
+  }}
+/>
+
+## Methods
+
+### AddTab
+
+Creates a tab inside the tabbox (acts like a nested groupbox for elements).
+
+```lua
+local Tab = Tabbox:AddTab("Tab Name", "home")
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Title of the tab in the tabbox | string | nil |
+| 2 | Custom Icon or Icon name from lucide.dev | string | nil |
+
+### SetPoppedOut
+
+Undocks or docks the tabbox. When undocked, the tab strip stays fixed and a tall body scrolls without a visible scrollbar (height is clamped to the screen with a bottom gap).
+
+```lua
+Tabbox:SetPoppedOut(true)
+Tabbox:SetPoppedOut(true, UDim2.fromOffset(100, 100)) -- optional float position
+Tabbox:SetPoppedOut(false) -- dock
+```
+
+| Argument | Type | Description |
+| --- | --- | --- |
+| Value | boolean | Whether the tabbox should be popped out |
+| FloatPosition | UDim2? | Optional screen position for the floating panel |
+
+### TogglePoppedOut
+
+Toggles the popped-out state.
+
+```lua
+Tabbox:TogglePoppedOut()
+```
+
+### Resize
+
+Resizes the active tab (and therefore the tabbox height). Called automatically when content changes; useful after programmatic updates while popped out.
+
+```lua
+Tabbox:Resize()
+```
+
+---
+
+<Accordions type="single">
+
+<Accordion title="Deprecated Documentation">
+
+## AddLeftTabbox, AddRightTabbox
+
+<Callout type="warn">
+  `AddLeftTabbox` and `AddRightTabbox` are deprecated. Please use `Tab:AddTabbox` with a `Side` argument instead.
+</Callout>
 
 ```lua
 local LeftTabBox = Tab:AddLeftTabbox("Left Tabbox")
@@ -24,15 +119,6 @@ local RightTabBox = Tab:AddRightTabbox("Right Tabbox")
 | --- | --- | --- | --- |
 | 1 | Title of the tabbox | string | nil |
 
-## Methods
+</Accordion>
 
-You can use the following method to create a "groupbox" inside a tabbox:
-
-```lua
-local Tab = Tabbox:AddTab("Tab Name", "home")
-```
-
-| Arg Idx | Argument Description | Type | Default |
-| --- | --- | --- | --- |
-| 1 | Title of the tab in the tabbox | string | nil |
-| 2 | Custom Icon or Icon name from lucide.dev | string | nil |
+</Accordions>

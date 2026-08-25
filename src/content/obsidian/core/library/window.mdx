@@ -220,6 +220,31 @@ local Window = Library:CreateWindow({
       required: false
     },
 
+    Snapping: {
+      description: 'Snap the window to screen edges and center while dragging',
+      type: 'boolean',
+      default: 'false',
+      required: false
+    },
+    SnapDistance: {
+      description: 'How close (in pixels) the window must be to a snap target before it snaps',
+      type: 'number',
+      default: '28',
+      required: false
+    },
+    SnapMargin: {
+      description: 'Padding (in pixels) from the screen edge when snapped',
+      type: 'number',
+      default: '8',
+      required: false
+    },
+    SnapAvoidCoreGui: {
+      description: 'Keep snap targets inside the safe area (outside Roblox core GUI insets)',
+      type: 'boolean',
+      default: 'true',
+      required: false
+    },
+
     Animations: {
       description: 'Configuration table to enable animations',
       type: 'table',
@@ -301,6 +326,21 @@ Window:SetCornerRadius(10)
 | Arg Idx | Argument Description | Type | Default |
 | --- | --- | --- | --- |
 | 1 | The new corner radius | number | nil |
+
+#### SetSnapping
+Enables or updates window edge/center snapping while dragging.
+
+```lua
+Window:SetSnapping(true)
+Window:SetSnapping(true, 28, 8, true)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Whether snapping is enabled | boolean | nil |
+| 2 | Snap distance in pixels | number? | current |
+| 3 | Snap margin in pixels | number? | current |
+| 4 | Avoid Roblox core GUI insets when choosing snap targets | boolean? | current |
 
 #### Toggle
 

@@ -25,6 +25,7 @@ local LeftGroupBox = Tab:AddGroupbox({
     -- Visible = true,
     -- Collapsed = false,
     -- DisableCollapsing = false,
+    -- PopOut = true,
 })
 
 local RightGroupBox = Tab:AddGroupbox({
@@ -76,6 +77,12 @@ local RightGroupBox = Tab:AddGroupbox({
       type: 'boolean',
       default: 'false',
       required: false
+    },
+    PopOut: {
+      description: 'Allow hold-dragging the header to undock the groupbox into a floating panel. Drop into the main window to dock again.',
+      type: 'boolean',
+      default: 'true',
+      required: false
     }
   }}
 />
@@ -122,6 +129,29 @@ Groupbox:SetDescription(nil) -- hide the description
 | Argument | Type | Description |
 | --- | --- | --- |
 | Description | string \| nil | Text to show under the title, or `nil` to hide it |
+
+### SetPoppedOut
+
+Undocks or docks the groupbox. When undocked, the header stays fixed and a tall body scrolls without a visible scrollbar (height is clamped to the screen with a bottom gap).
+
+```lua
+Groupbox:SetPoppedOut(true)
+Groupbox:SetPoppedOut(true, UDim2.fromOffset(100, 100)) -- optional float position
+Groupbox:SetPoppedOut(false) -- dock
+```
+
+| Argument | Type | Description |
+| --- | --- | --- |
+| Value | boolean | Whether the groupbox should be popped out |
+| FloatPosition | UDim2? | Optional screen position for the floating panel |
+
+### TogglePoppedOut
+
+Toggles the popped-out state.
+
+```lua
+Groupbox:TogglePoppedOut()
+```
 
 ### AddTabbox
 
