@@ -46,7 +46,8 @@ local Tab = Window:AddTab("Main", "user")
 local Tab = Window:AddTab({
     Name = "Main",
     Description = "Main features",
-    Icon = "home"
+    Icon = "home",
+    Tooltip = "Main features for the game",
 })
 ```
 
@@ -66,6 +67,12 @@ local Tab = Window:AddTab({
     },
     Icon: {
       description: 'Custom Icon or Icon name from lucide.dev',
+      type: 'string',
+      default: 'nil',
+      required: false
+    },
+    Tooltip: {
+      description: 'Tooltip shown when hovering the tab button',
       type: 'string',
       default: 'nil',
       required: false
@@ -149,6 +156,17 @@ Tab:SetOrder(number)
 | Arg Idx | Argument Description | Type | Default |
 | --- | --- | --- | --- |
 | 1 | New order of the tab | number | nil |
+
+#### SetTooltip
+Sets or clears the tooltip shown when hovering the tab button.
+
+```lua
+Tab:SetTooltip(tooltip)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Tooltip text, or nil to remove | string? | nil |
 
 #### SetName
 Updates the name of the tab.
