@@ -5,6 +5,7 @@ description: 'Utility methods and extra library features.'
 
 import { InlineTOC } from 'fumadocs-ui/components/inline-toc';
 import { Callout } from "fumadocs-ui/components/callout";
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 import { TypeTable } from '@/components/type-table';
 
 <InlineTOC items={toc} />
@@ -21,17 +22,122 @@ Enable the custom cursor to render the Obsidian-styled pointer at your mouse pos
 Library.ShowCustomCursor = true
 ```
 
-These functions allow you to set your own image instead of the default custom cursor.
+The custom cursor has two layers: a crosshair and an optional icon. Use `Library.Cursor` to customize either layer.
 
 ```lua
-Library:ChangeCursorIcon(ImageId: string)
+-- Crosshair color
+Library.Cursor:ChangeCrossColor(Color3.fromRGB(255, 80, 80))
+Library.Cursor:ResetCross()
 
--- If you need to change the cursor icon size:
-Library:ChangeCursorIconSize(Size: UDim2)
+-- Custom icon (hides the crosshair while active)
+Library.Cursor:ChangeIcon("crosshair")
+Library.Cursor:ChangeIconColor(Color3.fromRGB(80, 255, 120))
+Library.Cursor:ChangeIconSize(UDim2.fromOffset(32, 32))
+Library.Cursor:ResetIcon()
 
--- To reset it back, use this function:
+-- Reset both crosshair and icon
+Library.Cursor:ResetCursor()
+```
+
+<Callout type="info">
+  `ChangeIcon` accepts a Lucide icon name, Roblox asset ID, or URL. Passing an empty string calls `ResetIcon`.
+</Callout>
+
+### ChangeCrossColor
+
+Changes the inner crosshair color.
+
+```lua
+Library.Cursor:ChangeCrossColor(Color3.fromRGB(255, 80, 80))
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Crosshair color | Color3 | nil |
+
+### ResetCross
+
+Resets the inner crosshair color back to the default white.
+
+```lua
+Library.Cursor:ResetCross()
+```
+
+### ChangeIcon
+
+Replaces the crosshair with a custom icon.
+
+```lua
+Library.Cursor:ChangeIcon("crosshair")
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Lucide icon name, Roblox asset ID, or URL | string | nil |
+
+### ChangeIconColor
+
+Changes the tint of the custom cursor icon.
+
+```lua
+Library.Cursor:ChangeIconColor(Color3.fromRGB(80, 255, 120))
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Icon tint color | Color3 | nil |
+
+### ChangeIconSize
+
+Changes the size of the custom cursor icon.
+
+```lua
+Library.Cursor:ChangeIconSize(UDim2.fromOffset(32, 32))
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Icon size | UDim2 | nil |
+
+### ResetIcon
+
+Hides the custom icon, restores the crosshair, and resets icon color and size.
+
+```lua
+Library.Cursor:ResetIcon()
+```
+
+### ResetCursor
+
+Resets both the crosshair and the custom icon.
+
+```lua
+Library.Cursor:ResetCursor()
+```
+
+<Accordions type="single">
+
+<Accordion title="Deprecated Documentation">
+
+### Deprecated Cursor Documentation 
+
+<Callout type="warn">
+  `Library:ChangeCursorIcon`, `ChangeCursorIconSize`, `ResetCursorIcon`, `ChangeCursorCrossColor`, `ResetCursorCross`, and `ChangeCursorIconColor` are deprecated. Please use `Library.Cursor` instead.
+</Callout>
+
+```lua
+Library:ChangeCursorCrossColor(Color3.fromRGB(255, 80, 80))
+Library:ResetCursorCross()
+
+Library:ChangeCursorIcon("crosshair")
+Library:ChangeCursorIconColor(Color3.fromRGB(80, 255, 120))
+Library:ChangeCursorIconSize(UDim2.fromOffset(32, 32))
 Library:ResetCursorIcon()
 ```
+
+</Accordion>
+
+</Accordions>
 
 ---
 

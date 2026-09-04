@@ -269,6 +269,12 @@ local Window = Library:CreateWindow({
       default: '"bottom"',
       required: false
     },
+    TabButtonsStyle: {
+      description: 'Styling options for sidebar tab buttons',
+      type: 'table',
+      default: '{ Gap = 0, Padding = 0, CornerRadius = 0, Indicator = false, IndicatorWidth = 2, IndicatorHeight = 20 }',
+      required: false
+    },
   }}
 />
 
@@ -497,3 +503,63 @@ Window:SetAnimations({ ToggleWindow = true, TabSwitch = true, Groupbox = true, D
 | 2 | Tab transition duration (seconds) | number? | `nil` |
 | 3 | Tab swipe transition offset (pixels) | number? | `nil` |
 | 4 | Tab swipe direction (`"left" \| "right" \| "top" \| "bottom"`) | string? | `nil` |
+
+
+### Tab Buttons Style
+
+Customize the appearance of sidebar tab buttons when creating the window:
+
+```lua
+local Window = Library:CreateWindow({
+    Title = "mspaint",
+    TabButtonsStyle = {
+        Gap = 4,
+        Padding = 8,
+        CornerRadius = 6,
+        Indicator = true,
+        IndicatorWidth = 2,
+        IndicatorHeight = 20,
+    },
+})
+```
+
+<TypeTable
+  type={{
+    Gap: {
+      description: 'Vertical spacing between tab buttons',
+      type: 'number',
+      default: '0',
+      required: false
+    },
+    Padding: {
+      description: 'Padding around the tab button list. Also affects minimum sidebar widths.',
+      type: 'number',
+      default: '0',
+      required: false
+    },
+    CornerRadius: {
+      description: 'Corner radius applied to each tab button',
+      type: 'number',
+      default: '0',
+      required: false
+    },
+    Indicator: {
+      description: 'Whether to show an accent-colored indicator bar on the active tab',
+      type: 'boolean',
+      default: 'false',
+      required: false
+    },
+    IndicatorWidth: {
+      description: 'Width of the active tab indicator in pixels',
+      type: 'number',
+      default: '2',
+      required: false
+    },
+    IndicatorHeight: {
+      description: 'Height of the active tab indicator in pixels',
+      type: 'number',
+      default: '20',
+      required: false
+    },
+  }}
+/>
