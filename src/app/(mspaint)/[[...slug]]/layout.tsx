@@ -37,6 +37,7 @@ const docsTree: Root = {
         { type: "page", name: "YESU", url: "/purchase/YESU" },
         { type: "page", name: "bennnyr", url: "/purchase/bennnyr" },
         { type: "page", name: "lunor.wtf", url: "/purchase/lunor" },
+        { type: "page", name: "Gefesha", url: "/purchase/gefesha" }
       ],
     },
     
