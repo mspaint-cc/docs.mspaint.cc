@@ -37,6 +37,7 @@ export default function DropdownPlayground() {
   const [multi, setMulti] = useState(false);
   const [allowNull, setAllowNull] = useState(false);
   const [searchable, setSearchable] = useState(false);
+  const [keepDisabledValuePosition, setKeepDisabledValuePosition] = useState(false);
   const [maxVisibleEnabled, setMaxVisibleEnabled] = useState(false);
   const [maxVisibleItems, setMaxVisibleItems] = useState(8);
   const [specialType, setSpecialType] = useState<"none" | "Player" | "Team">(
@@ -50,6 +51,14 @@ export default function DropdownPlayground() {
     () => splitList(disabledValuesInput).filter((value) => value.length > 0),
     [disabledValuesInput]
   );
+
+  const displayOptions = useMemo(() => {
+    if (keepDisabledValuePosition || disabledValues.length === 0) return values;
+
+    const enabled = values.filter((value) => !disabledValues.includes(value));
+    const disabled = values.filter((value) => disabledValues.includes(value));
+    return [...enabled, ...disabled];
+  }, [disabledValues, keepDisabledValuePosition, values]);
 
   const { dropdownValue, luaDefault } = useMemo(() => {
     const trimmed = defaultValueInput.trim();
@@ -144,14 +153,15 @@ export default function DropdownPlayground() {
           <DropdownElement
             text={text}
             value={dropdownValue}
-            options={values}
+            options={displayOptions}
             multi={multi}
+            searchable={searchable}
             disabledValues={disabledValues}
           />
         </ObsidianDataProvider>
       </UIStateProvider>
     ),
-    [disabledValues, dropdownValue, multi, text, values]
+    [disabledValues, displayOptions, dropdownValue, multi, searchable, text]
   );
 
   function generatePseudoCode() {
@@ -168,6 +178,10 @@ export default function DropdownPlayground() {
 
     if (searchable) {
       lines.push(`    Searchable = true,`);
+    }
+
+    if (keepDisabledValuePosition) {
+      lines.push(`    KeepDisabledValuePosition = true,`);
     }
 
     if (maxVisibleEnabled) {
@@ -337,6 +351,22 @@ export default function DropdownPlayground() {
               />
               <span className="text-sm text-muted-foreground">
                 Enable searching through values
+              </span>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <LabelPrimitive htmlFor="dropdown-keep-disabled">
+              Keep disabled position
+            </LabelPrimitive>
+            <div className="flex items-center gap-2">
+              <Switch
+                id="dropdown-keep-disabled"
+                checked={keepDisabledValuePosition}
+                onCheckedChange={setKeepDisabledValuePosition}
+              />
+              <span className="text-sm text-muted-foreground">
+                Leave disabled values in their original order
               </span>
             </div>
           </div>

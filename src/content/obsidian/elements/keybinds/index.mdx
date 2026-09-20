@@ -169,6 +169,17 @@ Keybind:SetText(text)
 | --- | --- | --- | --- |
 | 1 | New keybind text | string | nil |
 
+#### SetMenuVisibility
+Shows or hides this keybind in the [Keybind Menu](/obsidian/core/library/keybind-menu).
+
+```lua
+Keybind:SetMenuVisibility(false)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Whether this keybind should appear in the keybind menu | boolean | nil |
+
 #### Update
 Refreshes the keybind display.
 

@@ -113,9 +113,15 @@ local Dropdown = Groupbox:AddDropdown("MyDropdown", {
       required: false
     },
     DisabledValues: {
-      description: 'Identities that cannot be selected. For dictionary Values, entries may be keys or display labels.',
+      description: 'Identities that cannot be selected. For dictionary Values, entries may be keys or display labels. By default these are listed after enabled values.',
       type: 'table',
       default: '{}',
+      required: false
+    },
+    KeepDisabledValuePosition: {
+      description: 'When true, DisabledValues stay in their original Values order instead of being moved to the end of the list.',
+      type: 'boolean',
+      default: 'false',
       required: false
     },
     ValueImages: {

@@ -26,6 +26,7 @@ local LeftGroupBox = Tab:AddGroupbox({
     -- Collapsed = false,
     -- DisableCollapsing = false,
     -- PopOut = true,
+    -- MaxPopOutHeight = 200,
 })
 
 local RightGroupBox = Tab:AddGroupbox({
@@ -83,6 +84,12 @@ local RightGroupBox = Tab:AddGroupbox({
       type: 'boolean',
       default: 'true',
       required: false
+    },
+    MaxPopOutHeight: {
+      description: 'Optional max height (in layout pixels) for the groupbox body when popped out. Still also clamped to the screen.',
+      type: 'number',
+      default: 'nil',
+      required: false
     }
   }}
 />
@@ -132,7 +139,7 @@ Groupbox:SetDescription(nil) -- hide the description
 
 ### SetPoppedOut
 
-Undocks or docks the groupbox. When undocked, the header stays fixed and a tall body scrolls without a visible scrollbar (height is clamped to the screen with a bottom gap).
+Undocks or docks the groupbox. When undocked, the header stays fixed and a tall body scrolls without a visible scrollbar (height is clamped to the screen with a bottom gap, and to `MaxPopOutHeight` if set).
 
 ```lua
 Groupbox:SetPoppedOut(true)
@@ -152,6 +159,19 @@ Toggles the popped-out state.
 ```lua
 Groupbox:TogglePoppedOut()
 ```
+
+### SetMaxPopOutHeight
+
+Sets a custom max height for the groupbox body while popped out. Pass `nil` to clear it. The body is still also clamped to fit on screen.
+
+```lua
+Groupbox:SetMaxPopOutHeight(200)
+Groupbox:SetMaxPopOutHeight(nil) -- clear
+```
+
+| Argument | Type | Description |
+| --- | --- | --- |
+| Height | number, nil | Max body height in layout pixels, or `nil` to remove the limit |
 
 ### AddTabbox
 
