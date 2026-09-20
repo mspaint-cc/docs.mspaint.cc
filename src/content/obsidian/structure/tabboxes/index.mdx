@@ -22,6 +22,7 @@ local LeftTabBox = Tab:AddTabbox({
     Name = "Left Tabbox",
     -- PopOut = true,
     -- MaxPopOutHeight = 200,
+    -- PopOutWidth = 280,
 })
 
 local RightTabBox = Tab:AddTabbox({
@@ -52,6 +53,12 @@ local RightTabBox = Tab:AddTabbox({
     },
     MaxPopOutHeight: {
       description: 'Optional max height (in layout pixels) for the tabbox body when popped out. Still also clamped to the screen.',
+      type: 'number',
+      default: 'nil',
+      required: false
+    },
+    PopOutWidth: {
+      description: 'Optional fixed width (in layout pixels) for the floating panel when popped out. Defaults to the docked tabbox width.',
       type: 'number',
       default: 'nil',
       required: false
@@ -109,6 +116,19 @@ Tabbox:SetMaxPopOutHeight(nil) -- clear
 | Argument | Type | Description |
 | --- | --- | --- |
 | Height | number \| nil | Max body height in layout pixels, or `nil` to remove the limit |
+
+### SetPopOutWidth
+
+Sets a fixed width for the floating panel while popped out. Pass `nil` to use the docked tabbox width again.
+
+```lua
+Tabbox:SetPopOutWidth(280)
+Tabbox:SetPopOutWidth(nil) -- clear
+```
+
+| Argument | Type | Description |
+| --- | --- | --- |
+| Width | number, nil | Float width in layout pixels, or `nil` to clear |
 
 ### Resize
 

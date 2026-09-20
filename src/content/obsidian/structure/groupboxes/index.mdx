@@ -27,6 +27,7 @@ local LeftGroupBox = Tab:AddGroupbox({
     -- DisableCollapsing = false,
     -- PopOut = true,
     -- MaxPopOutHeight = 200,
+    -- PopOutWidth = 280,
 })
 
 local RightGroupBox = Tab:AddGroupbox({
@@ -87,6 +88,12 @@ local RightGroupBox = Tab:AddGroupbox({
     },
     MaxPopOutHeight: {
       description: 'Optional max height (in layout pixels) for the groupbox body when popped out. Still also clamped to the screen.',
+      type: 'number',
+      default: 'nil',
+      required: false
+    },
+    PopOutWidth: {
+      description: 'Optional fixed width (in layout pixels) for the floating panel when popped out. Defaults to the docked groupbox width.',
       type: 'number',
       default: 'nil',
       required: false
@@ -172,6 +179,19 @@ Groupbox:SetMaxPopOutHeight(nil) -- clear
 | Argument | Type | Description |
 | --- | --- | --- |
 | Height | number, nil | Max body height in layout pixels, or `nil` to remove the limit |
+
+### SetPopOutWidth
+
+Sets a fixed width for the floating panel while popped out. Pass `nil` to use the docked groupbox width again.
+
+```lua
+Groupbox:SetPopOutWidth(280)
+Groupbox:SetPopOutWidth(nil) -- clear
+```
+
+| Argument | Type | Description |
+| --- | --- | --- |
+| Width | number, nil | Float width in layout pixels, or `nil` to clear |
 
 ### AddTabbox
 
