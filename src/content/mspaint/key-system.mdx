@@ -150,7 +150,7 @@ import { StepImage } from '@/components/keysystem/StepImage'
     After being redirected back to **Luarmor**, click **Get a New Key**.
 
     <Callout type="info">
-        If you **already have a key**, click **Renew** instead of creating a new one and skip to **[Get the Script](#get-the-script)** step.
+        If you **already have a key**, click **Renew** instead of creating a new one. After renewing, go back to the Subscription Dashboard and click **Refresh status** (or **Redeem or link key** if the key changed), then continue to **[Get the Script](#get-the-script)**.
     </Callout>
 </Step>
 
@@ -180,79 +180,59 @@ import { StepImage } from '@/components/keysystem/StepImage'
     width={500}
 />
 
-<Step number={3} title="Link the Key in the Subscription Dashboard">
+<Step number={3} title="Open the Subscription Dashboard">
     Sign in to the <a href="https://www.mspaint.cc/subscription-dashboard">Subscription Dashboard</a> with the same Discord account you want to use for mspaint.
+</Step>
 
-    Click **Link Key System Luarmor key**, paste your key, and submit.
+<StepImage
+    src="/images/mspaint/keytutorial/finish/dashboard-overview.png"
+    alt="Subscription Dashboard overview"
+    width={750}
+/>
 
-    If your linked free key later **expires** and Renew gives you a different key string, use **Update Key System key** in the Subscription Dashboard (only available while expired).
+<Step number={4} title="Link Your Key">
+    On the Subscription card, click **Redeem or link key**.
+
+    Paste your freemium Key System key into the input, then click **Submit**.
 
     <Callout type="info">
-        The dashboard links the key to your Discord account automatically. You do **not** need to Redeem the key in the Discord Luarmor panel.
-    </Callout>
-
-    <Callout type="warn">
-        Ensure there are **no extra spaces** before or after the key.
+        If your linked free key later **expires**, prefer **Renew** on the Luarmor Ad page. Then click **Refresh status** in the dashboard. Only use **Redeem or link key** again if Renew gave you a different key.
     </Callout>
 </Step>
 
-### Redeem Key in Discord (optional)
-
-Follow this if you want the **Whitelisted** Discord role and script panel features in the server.
-
-Open Discord and go to the [#get-script](https://discord.com/channels/1282361102935658777/1282373591652110417) channel in our [Discord Server](https://discord.gg/mspaint).
-
-<Callout type="warn">
-    If you can't find the channel, enable **Show All Channels** option in the server settings.
-
-    <img width="200" height="200" src="/images/mspaint/keytutorial/finish/allchannels.png" />
-</Callout>
-
-Click the **Redeem Key** button in the script panel, then paste your key and submit.
-
-<Callout type="info">
-    **Redeem Key** is not required if you already linked your key in the **Subscription Dashboard**.
-</Callout>
-
-<Callout type="warn">
-    Ensure there are **no extra spaces** before or after the key.
-</Callout>
-
 <StepImage
-    src="/images/mspaint/keytutorial/finish/3.png"
-    alt="Redeem key button"
-    width={600}
-/>
-
-### Get the Whitelisted Role
-
-After redeeming (or if your key is already linked to your Discord account), click **Get Role** in the script panel to receive the **Whitelisted** role.
-
-<StepImage
-    src="/images/mspaint/keytutorial/finish/5.png"
-    alt="Get Whitelisted Role"
-    width={500}
-/>
-
-### Get the Script
-
-You can get the script from the <a href="https://www.mspaint.cc/subscription-dashboard">Subscription Dashboard</a> after linking, or from the Discord panel: click **Get Script**, scroll down, and paste the script into your executor.
-
-<StepImage
-    src="/images/mspaint/keytutorial/finish/6.png"
-    alt="Get script"
-    width={500}
-/>
-
-<StepImage
-    src="/images/mspaint/keytutorial/finish/6b.png"
-    alt="Copy script"
+    src="/images/mspaint/keytutorial/finish/dashboard-redeem-or-link.png"
+    alt="Redeem or link key button"
     width={750}
 />
 
 <StepImage
-    src="/images/mspaint/keytutorial/finish/7.png"
-    alt="Validate script"
+    src="/images/mspaint/keytutorial/finish/dashboard-paste-key.png"
+    alt="Paste key and submit"
+    width={600}
+/>
+
+### Get the Script
+
+<Step number={5} title="Open Get Script">
+    After your key is linked and active, open the **Script** card and click **Get Script**.
+
+    On first use, accept the [Terms of Service](https://www.mspaint.cc/tos) dialog, then the script dialog will open.
+</Step>
+
+<StepImage
+    src="/images/mspaint/keytutorial/finish/dashboard-get-script.png"
+    alt="Get Script button"
+    width={750}
+/>
+
+<Step number={6} title="Copy and Execute the Script">
+    Click the copy button in the script dialog, then paste the full script into your executor.
+</Step>
+
+<StepImage
+    src="/images/mspaint/keytutorial/finish/dashboard-copy-script.png"
+    alt="Copy script from dashboard"
     width={750}
 />
 
@@ -262,4 +242,4 @@ You can get the script from the <a href="https://www.mspaint.cc/subscription-das
 
 If you want to skip ads and unlock all features, purchase a **Premium Key** here:
 
-👉 [Buy a Premium Key](/purchase/getting_started)
+[Buy a Premium Key](/purchase/getting_started)

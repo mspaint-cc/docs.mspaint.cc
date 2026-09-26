@@ -18,10 +18,8 @@ const docsTree: Root = {
     { type: "separator", name: "Guides" },
     { type: "page", name: "Introduction", url: "/" },
 
-    { type: "separator", name: "Addons" },
-    { type: "page", name: "Getting Started", url: "/addons/getting_started" },
-    { type: "page", name: "Migration Guide", url: "/addons/migrate" },
-    { type: "page", name: "API", url: "/addons/api" },
+    { type: "separator", name: "Key System" },
+    { type: "page", name: "Step By Step Guide", url: "/key-system" },
 
     { type: "separator", name: "Purchase" },
     { type: "page", name: "Getting Started", url: "/purchase/getting_started" },
@@ -40,9 +38,11 @@ const docsTree: Root = {
         { type: "page", name: "Gefesha", url: "/purchase/gefesha" }
       ],
     },
-    
-    { type: "separator", name: "Key System" },
-    { type: "page", name: "Step By Step Guide", url: "/key-system" },
+
+    { type: "separator", name: "Addons" },
+    { type: "page", name: "Getting Started", url: "/addons/getting_started" },
+    { type: "page", name: "Migration Guide", url: "/addons/migrate" },
+    { type: "page", name: "API", url: "/addons/api" },
   ],
 };
 
