@@ -1,12 +1,23 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import Label from "../Label";
 import { useEffect, useState, useMemo } from "react";
 import { useUIState } from "../../providers/UIStateProvider";
 import { useCornerRadius } from "../../providers/ObsidianDataProvider";
 
-export default function KeyPicker({ defaultValue, className, stateKey }: { defaultValue: string; className?: string; stateKey?: string }) {
+export default function KeyPicker({
+	defaultValue,
+	className,
+	stateKey,
+	mode,
+	modifiers
+}: {
+	defaultValue: string;
+	className?: string;
+	stateKey?: string;
+	mode?: string;
+	modifiers?: string[];
+}) {
 	const { state, setState } = useUIState();
 	const br = useCornerRadius();
 
@@ -35,31 +46,36 @@ export default function KeyPicker({ defaultValue, className, stateKey }: { defau
 		};
 	}, [isListening, stateKey, setState]);
 
-	// Sync with UI state when stored value changes //
 	useEffect(() => {
 		if (stateKey && storedValue !== undefined && storedValue !== value) {
 			setValue(storedValue);
 		}
 	}, [stateKey, storedValue, value]);
 
+	const display = modifiers && modifiers.length > 0 ? `${modifiers.join(" + ")} + ${value}` : value;
+
 	return (
 		<div
 			className={cn(
-				"flex justify-center items-center h-[22px] border hover:brightness-125 cursor-pointer",
+				"inline-flex justify-center items-center border cursor-pointer select-none",
+				"text-[12px] leading-none whitespace-nowrap",
+				"opacity-40 hover:opacity-100 hover:brightness-125",
+				isListening ? "w-[29px] h-[18px]" : "h-[18px] min-w-[18px] px-[4.5px]",
 				className
 			)}
 			style={{
-				borderRadius: br,
+				borderRadius: `calc(${br} / 2)`,
 				backgroundColor: "var(--main-color)",
-				borderColor: "var(--outline-color)"
+				borderColor: "var(--outline-color)",
+				color: "var(--font-color)"
 			}}
 			onClick={(e) => {
 				e.preventDefault();
 				setIsListening(true);
 			}}
-			title={isListening ? "Press a key..." : undefined}
+			title={isListening ? "Press a key..." : mode ? `Mode: ${mode}` : undefined}
 		>
-			<Label className="m-1 text-[12px] text-white">{isListening ? "..." : value}</Label>
+			{isListening ? "..." : display}
 		</div>
 	);
 }

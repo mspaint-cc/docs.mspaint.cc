@@ -326,16 +326,16 @@ export default function ColorPicker({
 				type="button"
 				ref={anchorRef}
 				className={cn(
-					"relative flex justify-center items-center w-[21px] h-[20px] border cursor-pointer",
+					"relative flex justify-center items-center size-[18px] border cursor-pointer",
 					className
 				)}
 				style={{
 					backgroundColor: `rgb(${rgbString})`,
 					borderColor: "var(--outline-color)",
-					borderTopLeftRadius: br,
-					borderTopRightRadius: br,
-					borderBottomLeftRadius: isActive ? 0 : br,
-					borderBottomRightRadius: isActive ? 0 : br
+					borderTopLeftRadius: `calc(${br} / 2)`,
+					borderTopRightRadius: `calc(${br} / 2)`,
+					borderBottomLeftRadius: isActive ? 0 : `calc(${br} / 2)`,
+					borderBottomRightRadius: isActive ? 0 : `calc(${br} / 2)`
 				}}
 				aria-label="Open color picker"
 				aria-haspopup="dialog"

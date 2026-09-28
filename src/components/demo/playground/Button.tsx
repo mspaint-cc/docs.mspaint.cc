@@ -12,8 +12,10 @@ import { CopyPseudoComponent } from "./shared/CopyComponent";
 
 export default function ButtonPlayground() {
   const [text, setText] = useState("Button");
+  const [icon, setIcon] = useState("mouse-pointer-click");
   const [hasSubButton, setHasSubButton] = useState(false);
   const [subButtonText, setSubButtonText] = useState("Sub button");
+  const [subButtonIcon, setSubButtonIcon] = useState("plus");
 
   const memoizedComponent = useMemo(
     () => (
@@ -21,25 +23,40 @@ export default function ButtonPlayground() {
         <ObsidianDataProvider scheme={{}}>
           <Button
             text={text}
-            subButton={hasSubButton ? { text: subButtonText, properties: { risky: false } } : undefined}
+            icon={icon || undefined}
+            subButton={
+              hasSubButton
+                ? {
+                    text: subButtonText,
+                    icon: subButtonIcon || undefined,
+                    properties: { risky: false },
+                  }
+                : undefined
+            }
           />
         </ObsidianDataProvider>
       </UIStateProvider>
     ),
-    [text, hasSubButton, subButtonText]
+    [text, icon, hasSubButton, subButtonText, subButtonIcon]
   );
 
   function generatePseudoCode() {
+    const iconLine = icon.trim()
+      ? `\n    Icon = "${icon.replaceAll('"', '\\"')}",`
+      : "";
     let code = `Groupbox:AddButton({
-    Text = "${text.replaceAll('"', '\\"')}",
+    Text = "${text.replaceAll('"', '\\"')}",${iconLine}
     Func = function()
         print("Button clicked!")
     end
 })`;
 
     if (hasSubButton) {
+      const subIconLine = subButtonIcon.trim()
+        ? `\n    Icon = "${subButtonIcon.replaceAll('"', '\\"')}",`
+        : "";
       code += `:AddButton({
-    Text = "${subButtonText.replaceAll('"', '\\"')}",
+    Text = "${subButtonText.replaceAll('"', '\\"')}",${subIconLine}
     Func = function()
         print("Sub button clicked!")
     end
@@ -70,6 +87,15 @@ export default function ButtonPlayground() {
             </div>
 
             <div className="flex flex-1 flex-col gap-2">
+              <LabelPrimitive htmlFor="button-icon">Button icon</LabelPrimitive>
+              <Input
+                id="button-icon"
+                value={icon}
+                onChange={(event) => setIcon(event.target.value)}
+              />
+            </div>
+
+            <div className="flex flex-1 flex-col gap-2">
               <LabelPrimitive htmlFor="subbutton-text">
                 Sub button text
               </LabelPrimitive>
@@ -77,6 +103,18 @@ export default function ButtonPlayground() {
                 id="subbutton-text"
                 value={subButtonText}
                 onChange={(event) => setSubButtonText(event.target.value)}
+                disabled={!hasSubButton}
+              />
+            </div>
+
+            <div className="flex flex-1 flex-col gap-2">
+              <LabelPrimitive htmlFor="subbutton-icon">
+                Sub button icon
+              </LabelPrimitive>
+              <Input
+                id="subbutton-icon"
+                value={subButtonIcon}
+                onChange={(event) => setSubButtonIcon(event.target.value)}
                 disabled={!hasSubButton}
               />
             </div>

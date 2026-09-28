@@ -54,6 +54,12 @@ Groupbox:AddButton({
       default: 'nil',
       required: true
     },
+    Icon: {
+      description: 'Lucide icon name, Roblox asset, or image URL shown next to the text',
+      type: 'string',
+      default: 'nil',
+      required: false
+    },
     DoubleClick: {
       description: 'Whether the button needs double-click',
       type: 'boolean',
@@ -96,6 +102,14 @@ Groupbox:AddButton({
 ## Methods
 
 You can use the following methods to interact with the button:
+
+#### SetIcon
+Sets or clears the button icon.
+
+```lua
+MainButton:SetIcon("mouse-pointer-click")
+MainButton:SetIcon(nil)
+```
 
 #### Destroy
 Destroys the button and removes it from the UI.

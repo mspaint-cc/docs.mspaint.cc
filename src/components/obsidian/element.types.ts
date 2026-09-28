@@ -1,3 +1,4 @@
+// Data Structures //
 export interface Color3 {
 	r: number;
 	g: number;
@@ -12,28 +13,54 @@ export interface Vector2 {
 // Addon Types //
 export interface KeyPickerAddon {
 	type: "KeyPicker";
-	mode: "Toggle" | "Hold" | "Always" | "Press";
+	mode?: "Toggle" | "Hold" | "Always" | "Press";
+	modes?: string[];
 	value: string;
-	text: string;
+	text?: string;
+	displayValue?: string;
+	modifiers?: string[];
+	defaultModifiers?: string[];
+	blacklisted?: string[];
+	blacklistedModifiers?: string[];
+	whitelisted?: string[];
+	whitelistedModifiers?: string[];
+	syncToggleState?: boolean;
+	toggled?: boolean;
+	noUI?: boolean;
+	index?: string | number;
 }
 
 export interface ColorPickerAddon {
 	type: "ColorPicker";
 	value: string | Color3;
-	title: string;
+	title?: string;
+	transparency?: number;
+	hue?: number;
+	sat?: number;
+	vib?: number;
+	resizable?: boolean;
+	index?: string | number;
 }
 
 export type Addons = KeyPickerAddon | ColorPickerAddon;
 
+export interface DependencyRef {
+	index?: string | number | null;
+	type?: string | null;
+	text?: string | null;
+	value?: unknown;
+}
+
 // Element Types //
 interface BaseElement {
-	index: number;
+	index: string | number;
 	visible: boolean;
 	type: string;
 	text: string;
 	disabled: boolean;
 	tooltip?: string;
 	disabledTooltip?: string;
+	layoutOrder?: number;
 }
 
 export interface ToggleElement extends BaseElement {
@@ -50,6 +77,7 @@ export interface LabelElement extends BaseElement {
 	type: "Label";
 	properties: {
 		doesWrap: boolean;
+		size?: number;
 		addons?: Addons[] | undefined;
 	};
 }
@@ -57,15 +85,23 @@ export interface LabelElement extends BaseElement {
 export interface ButtonElement extends BaseElement {
 	text: string;
 	type: "Button";
+	icon?: string;
 	properties: {
 		risky?: boolean;
 		doubleClick?: boolean;
+		tooltip?: string;
+		disabledTooltip?: string;
+		icon?: string;
+		addons?: Addons[] | undefined;
 	};
 	subButton?: {
 		text: string;
-		properties: {
+		icon?: string;
+		index?: string | number;
+		properties?: {
 			risky?: boolean;
 			doubleClick?: boolean;
+			icon?: string;
 		};
 	};
 }
@@ -74,10 +110,17 @@ export interface DropdownElement extends BaseElement {
 	type: "Dropdown";
 	value: string | { [key: string]: boolean };
 	properties: {
-		values: string[];
-		disabledValues: string[] | undefined;
-		multi: boolean | undefined;
-		searchable: boolean | undefined;
+		values: string[] | { [key: string]: string };
+		disabledValues?: string[] | { [key: string]: unknown };
+		valueImages?: { [key: string]: string };
+		multi?: boolean;
+		searchable?: boolean;
+		allowNull?: boolean;
+		maxVisibleDropdownItems?: number;
+		specialType?: "Player" | "Team" | string;
+		excludeLocalPlayer?: boolean;
+		enablePlayerImages?: boolean;
+		addons?: Addons[] | undefined;
 	};
 }
 
@@ -87,11 +130,13 @@ export interface SliderElement extends BaseElement {
 	properties: {
 		min: number;
 		max: number;
-		compact: boolean | undefined;
-		rounding: number | undefined;
-		hideMax: boolean | undefined;
-		prefix: string;
-		suffix: string;
+		compact?: boolean;
+		rounding?: number;
+		hideMax?: boolean;
+		prefix?: string;
+		suffix?: string;
+		allowRightClickInput?: boolean;
+		addons?: Addons[] | undefined;
 	};
 }
 
@@ -100,11 +145,14 @@ export interface InputElement extends BaseElement {
 	value: string;
 	properties: {
 		placeholder: string;
-		finished: boolean;
-		emptyReset: string;
-		numeric: boolean;
-		clearTextOnFocus: boolean;
-		allowEmpty: boolean;
+		finished?: boolean;
+		emptyReset?: string;
+		numeric?: boolean;
+		clearTextOnFocus?: boolean;
+		clearTextOnBlur?: boolean;
+		allowEmpty?: boolean;
+		maxLength?: number;
+		addons?: Addons[] | undefined;
 	};
 }
 
@@ -128,6 +176,7 @@ export interface ImageElement extends BaseElement {
 		height: number;
 		scaleType: string;
 		transparency: number;
+		backgroundTransparency?: number;
 	};
 }
 
@@ -148,6 +197,9 @@ export interface ViewportElement extends BaseElement {
 		height: number;
 		interactive: boolean;
 		autoFocus: boolean;
+		clone?: boolean;
+		objectClass?: string;
+		objectName?: string;
 	};
 }
 
@@ -155,6 +207,16 @@ export interface UIPassthroughElement extends BaseElement {
 	type: "UIPassthrough";
 	properties: {
 		height: number;
+		instanceClass?: string;
+		instanceName?: string;
+	};
+}
+
+export interface KeyBoxElement extends BaseElement {
+	type: "KeyBox";
+	value?: string;
+	properties: {
+		placeholder?: string;
 	};
 }
 
@@ -169,28 +231,36 @@ export type UIElement =
 	| ImageElement
 	| VideoElement
 	| ViewportElement
-	| UIPassthroughElement;
+	| UIPassthroughElement
+	| KeyBoxElement;
 
 // JSON File Types //
 export interface GroupboxData {
 	type: "Groupbox" | "DependencyBox" | "DependencyGroupbox";
 	name: string;
 	order: number;
-	side: "Left" | "Right" | "Unknown";
+	side?: "Left" | "Right" | "Unknown";
 	elements: UIElement[];
 	collapsed?: boolean;
 	disableCollapsing?: boolean;
+	description?: string;
 	icon?: string;
 	visible?: boolean;
+	layoutOrder?: number;
+	tabboxes?: TabboxData[];
 	dependencyBoxes?: { [key: string]: GroupboxData };
+	dependencyGroupboxes?: GroupboxData[];
+	dependencies?: DependencyRef[];
 }
 
 export interface TabboxTab {
 	type: "Tab";
 	name: string;
 	order: number;
+	icon?: string;
 	elements: UIElement[];
 	visible?: boolean;
+	tabboxes?: TabboxData[];
 	dependencyBoxes?: { [key: string]: GroupboxData };
 }
 
@@ -198,7 +268,8 @@ export interface TabboxData {
 	type: "Tabbox";
 	name: string;
 	order: number;
-	side: "Left" | "Right" | "Unknown";
+	layoutOrder?: number;
+	side?: "Left" | "Right" | "Unknown";
 	tabs: {
 		[key: string]: TabboxTab;
 	};
@@ -211,9 +282,11 @@ export interface TabData {
 	type: string;
 	icon: string;
 	description?: string;
+	tooltip?: string;
 	order: number;
 	visible?: boolean;
 	isKeyTab?: boolean;
+	elements?: UIElement[];
 	tabboxes: {
 		Left: TabboxData[];
 		Right: TabboxData[];
@@ -238,6 +311,7 @@ export interface UIData {
 	tabs: {
 		[key: string]: TabData;
 	};
+	elements?: { [key: string]: UIElement };
 	metadata?: {
 		cornerRadius?: number;
 		forceCheckbox?: boolean;
@@ -251,6 +325,7 @@ export interface UIData {
 			destructiveColor?: string;
 			darkColor?: string;
 			whiteColor?: string;
+			backgroundImage?: string;
 		};
 	};
 }

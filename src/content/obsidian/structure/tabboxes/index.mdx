@@ -3,7 +3,7 @@ title: 'Tabboxes'
 description: 'Tabboxes can condense multiple groupboxes into a single groupbox.'
 ---
 
-import DemoTabbox from "@/components/demo/Tabbox";
+import DemoTabbox, { DemoNestedTabbox } from "@/components/demo/Tabbox";
 import { TypeTable } from '@/components/type-table';
 import { Callout } from "fumadocs-ui/components/callout";
 import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
@@ -80,6 +80,18 @@ local Tab = Tabbox:AddTab("Tab Name", "home")
 | --- | --- | --- | --- |
 | 1 | Title of the tab in the tabbox | string | nil |
 | 2 | Custom Icon or Icon name from lucide.dev | string | nil |
+
+### Nested Tabboxes
+
+Tabs inside a tabbox can hold their own tabbox, allowing you to nest tabs. Leave the name empty to show only the icon.
+
+```lua
+local SettingsTab = Tabbox:AddTab("Settings")
+local NestedTabbox = SettingsTab:AddTabbox()
+
+local GeneralTab = NestedTabbox:AddTab(nil, "settings")
+local AdvancedTab = NestedTabbox:AddTab(nil, "wrench")
+```
 
 ### SetPoppedOut
 

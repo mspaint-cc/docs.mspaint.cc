@@ -15,24 +15,56 @@ const ITEM_HEIGHT = 24;
 const MAX_PANEL_HEIGHT = 168;
 const OVERSCAN = 6;
 
+type DropdownOptions = string[] | { [key: string]: string };
+type DisabledValues = string[] | { [key: string]: unknown } | undefined;
+
+const normalizeOptions = (options: DropdownOptions): { key: string; label: string }[] => {
+	if (Array.isArray(options)) {
+		return options.map((option) => ({ key: String(option), label: String(option) }));
+	}
+
+	return Object.entries(options || {}).map(([key, label]) => ({ key, label: String(label) }));
+};
+
+const isDisabledValue = (disabledValues: DisabledValues, key: string, label: string) => {
+	if (!disabledValues) return false;
+	if (Array.isArray(disabledValues)) return disabledValues.includes(key) || disabledValues.includes(label);
+	return disabledValues[key] !== undefined || disabledValues[label] !== undefined;
+};
+
+const playerThumb = (name: string) => `https://www.roblox.com/headshot-thumbnail/image?userId=1&width=48&height=48&format=png#${encodeURIComponent(name)}`;
 export default function Dropdown({
 	text,
 	value,
 	options,
 	multi,
 	searchable,
-	disabledValues = [],
+	disabledValues,
+	valueImages,
+	allowNull,
+	specialType,
+	enablePlayerImages,
 	stateKey
 }: {
 	text: string;
 	value: string | string[] | { [key: string]: boolean };
-	options: string[];
+	options: DropdownOptions;
 	multi: boolean | undefined;
 	searchable?: boolean;
-	disabledValues?: string[];
+	disabledValues?: DisabledValues;
+	valueImages?: { [key: string]: string };
+	allowNull?: boolean;
+	specialType?: string;
+	enablePlayerImages?: boolean;
 	stateKey?: string;
 }) {
 	const br = useCornerRadius();
+	const optionItems = React.useMemo(() => normalizeOptions(options), [options]);
+	const labelByKey = React.useMemo(() => {
+		const map: Record<string, string> = {};
+		for (const item of optionItems) map[item.key] = item.label;
+		return map;
+	}, [optionItems]);
 
 	const [scrollTop, setScrollTop] = React.useState(0);
 	const listboxRef = React.useRef<HTMLDivElement>(null);
@@ -100,11 +132,11 @@ export default function Dropdown({
 
 	const [searchQuery, setSearchQuery] = React.useState("");
 	const filteredOptions = React.useMemo(() => {
-		if (!searchable || !searchQuery.trim()) return options;
+		if (!searchable || !searchQuery.trim()) return optionItems;
 
 		const q = searchQuery.toLowerCase();
-		return options.filter((opt) => opt.toLowerCase().includes(q));
-	}, [options, searchable, searchQuery]);
+		return optionItems.filter((opt) => opt.label.toLowerCase().includes(q) || opt.key.toLowerCase().includes(q));
+	}, [optionItems, searchable, searchQuery]);
 
 	React.useEffect(() => {
 		if (!isOpen) {
@@ -131,15 +163,15 @@ export default function Dropdown({
 		if (multi) {
 			if (selected && typeof selected === "object" && !Array.isArray(selected)) {
 				const keys = Object.keys(selected).filter((k) => (selected as Record<string, boolean>)[k]);
-				return keys.length ? keys.join(", ") : "---";
+				return keys.length ? keys.map((k) => labelByKey[k] ?? k).join(", ") : "---";
 			}
 
 			return "---";
 		}
 
-		const s = typeof selected === "string" && selected.trim().length ? selected : "---";
-		return s;
-	}, [multi, selected]);
+		if (typeof selected === "string" && selected.trim().length) return labelByKey[selected] ?? selected;
+		return "---";
+	}, [multi, selected, labelByKey]);
 
 	const onScroll = React.useCallback((Event: React.UIEvent<HTMLDivElement>) => {
 		const ScrollTopValue = (Event.currentTarget as HTMLDivElement).scrollTop;
@@ -147,23 +179,28 @@ export default function Dropdown({
 	}, []);
 
 	const onSelectOption = React.useCallback(
-		(option: string) => {
-			if (disabledValues.includes(option)) return;
+		(optionKey: string, optionLabel: string) => {
+			if (isDisabledValue(disabledValues, optionKey, optionLabel)) return;
 			if (multi) {
 				const selMap: Record<string, boolean> = typeof selected === "object" && !Array.isArray(selected) ? (selected as Record<string, boolean>) : {};
-				const isSelected = !!selMap[option];
-				updateSelected({ ...selMap, [option]: !isSelected });
+				const isSelected = !!selMap[optionKey];
+				updateSelected({ ...selMap, [optionKey]: !isSelected });
+			} else if (allowNull && selected === optionKey) {
+				updateSelected("");
+				setIsOpen(false);
 			} else {
-				updateSelected(option);
+				updateSelected(optionKey);
 				setIsOpen(false);
 			}
 		},
-		[disabledValues, multi, selected, updateSelected]
+		[disabledValues, multi, selected, updateSelected, allowNull]
 	);
+
+	const showPlayerImages = specialType === "Player" && enablePlayerImages === true;
 
 	return (
 		<div className="flex flex-col gap-1">
-			<Label className="text-white opacity-100">{text}</Label>
+			{text ? <Label className="text-white opacity-100">{text}</Label> : null}
 
 			<div className="relative" ref={anchorRef}>
 				<ButtonBase
@@ -177,12 +214,7 @@ export default function Dropdown({
 					aria-haspopup="listbox"
 					aria-expanded={isOpen}
 					aria-controls={listboxId}
-					style={
-						isOpen ? {
-							borderBottomLeftRadius: 0,
-							borderBottomRightRadius: 0
-						} : undefined
-					}
+					style={isOpen ? { borderBottomLeftRadius: 0, borderBottomRightRadius: 0 } : undefined}
 				>
 					<div className="absolute right-0 top-0 h-full opacity-50">
 						<ChevronUp
@@ -243,27 +275,26 @@ export default function Dropdown({
 						)}
 						{topSpacer > 0 && <div style={{ height: `${topSpacer}px` }} />}
 						{visibleOptions.map((OptionItem, Index) => {
-							const IsSelected = multi ? 
-								typeof selected === "object" && 
-								selected !== null && 
-								!Array.isArray(selected) && 
-								(selected as Record<string, boolean>)[OptionItem] === true 
-							: selected === OptionItem;
+							const IsSelected = multi
+								? typeof selected === "object" && selected !== null && !Array.isArray(selected) && (selected as Record<string, boolean>)[OptionItem.key] === true
+								: selected === OptionItem.key;
+							const imageSrc = valueImages?.[OptionItem.key] || valueImages?.[OptionItem.label] || (showPlayerImages ? playerThumb(OptionItem.label) : undefined);
+
 							return (
 								<div
 									key={startIndex + Index}
 									className={cn(
 										"py-0 gap-1 px-1 flex items-center cursor-pointer",
 										IsSelected && "bg-[var(--outline-color)]",
-										disabledValues.includes(OptionItem) && "bg-black opacity-40 cursor-not-allowed",
-										IBMMono.className,
+										isDisabledValue(disabledValues, OptionItem.key, OptionItem.label) && "bg-black opacity-40 cursor-not-allowed",
+										IBMMono.className
 									)}
 									role="option"
 									aria-selected={IsSelected}
 									onPointerDown={(Event) => {
 										Event.preventDefault();
 										Event.stopPropagation();
-										onSelectOption(OptionItem);
+										onSelectOption(OptionItem.key, OptionItem.label);
 									}}
 									onClick={(Event) => {
 										Event.preventDefault();
@@ -271,7 +302,11 @@ export default function Dropdown({
 									}}
 									style={{ height: `${ITEM_HEIGHT}px` }}
 								>
-									<div className="px-0 py-0.75 text-xs">{OptionItem}</div>
+									{imageSrc && (
+										// eslint-disable-next-line @next/next/no-img-element
+										<img src={imageSrc} alt="" className="size-[16px] rounded-sm object-cover shrink-0" />
+									)}
+									<div className="px-0 py-0.75 text-xs truncate">{OptionItem.label}</div>
 								</div>
 							);
 						})}

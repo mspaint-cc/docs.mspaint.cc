@@ -1,190 +1,83 @@
 import { memo, useMemo, FC } from "react";
 
-import { TabData, UIElement, Addons, TabboxData, GroupboxData } from "../element.types";
+import { TabData, TabboxData, GroupboxData } from "../element.types";
 import { Groupbox } from "../elements/GroupBox";
 import { TabContainer, TabLeft, TabRight } from "../elements/Tab";
-import Divider from "../elements/Divider";
-import Toggle from "../elements/Toggle";
-import Button from "../elements/Button";
-import ObsidianImage from "../elements/Image";
-import ObsidianVideo from "../elements/Video";
-import ObsidianViewport from "../elements/Viewport";
-import ObsidianUIPassthrough from "../elements/UIPassthrough";
-import Label from "../elements/Label";
 import Tabbox from "../elements/TabBox";
-import Dropdown from "../elements/Dropdown";
-import Input from "../elements/Input";
-import Slider from "../elements/Slider";
-import KeyPicker from "../elements/addons/KeyPicker";
-import AddonContainer from "../elements/addons/AddonContainer";
-import ColorPicker from "../elements/addons/ColorPicker";
 import ObsidianWarningBox from "../elements/WarningBox";
+import { ElementParser } from "./ElementParser";
+import { OrderedBoxContent } from "./DependencyBox";
+import { collectOptionDefaults, dependenciesMet, type OptionDefault } from "../utils/dependencies";
+import { useUIState } from "../providers/UIStateProvider";
+import { useCornerRadius } from "../providers/ObsidianDataProvider";
 
-// Parsers //
-export const renderAddons = (element: UIElement, addons?: Addons[], stateKeyPrefix?: string, node?: React.ReactNode) => {
-	if (!addons || addons.length === 0) return null;
+const GroupboxRenderer: FC<{
+	groupbox: GroupboxData;
+	scope: string;
+	optionDefaults: Map<string, OptionDefault>;
+}> = ({ groupbox, scope, optionDefaults }) => {
+	if (groupbox.visible === false) return null;
 
-	const scope = stateKeyPrefix || "global";
 	return (
-		<AddonContainer>
-			{addons.map((addon, idx) => {
-				const addonKey = `${scope}:addon:${addon.type}:${element.index}:${idx}`;
+		<>
+			<Groupbox
+				title={groupbox.name}
+				description={groupbox.description}
+				collapsed={groupbox.collapsed}
+				disableCollapsing={groupbox.disableCollapsing}
+				icon={groupbox.icon}
+			>
+				<OrderedBoxContent
+					elements={groupbox.elements}
+					tabboxes={groupbox.tabboxes}
+					dependencyBoxes={groupbox.dependencyBoxes}
+					scope={scope}
+					optionDefaults={optionDefaults}
+				/>
+			</Groupbox>
 
-				switch (addon.type) {
-					case "KeyPicker":
-						return <KeyPicker key={idx} defaultValue={addon.value} className="pointer-events-auto" stateKey={addonKey} />;
-
-					case "ColorPicker":
-						return (
-							<ColorPicker
-								key={idx}
-								title={addon.title}
-								defaultValue={addon.value}
-								className="pointer-events-auto"
-								stateKey={addonKey}
-							/>
-						);
-
-					default:
-						return null;
-				}
-			})}
-			{node}
-		</AddonContainer>
+			{[...(groupbox.dependencyGroupboxes || [])]
+				.sort((depA, depB) => (depA.layoutOrder ?? 0) - (depB.layoutOrder ?? 0))
+				.map((depGroupbox) => (
+					<DependencyGroupboxRenderer
+						key={`depgroup-${depGroupbox.name}`}
+						depGroupbox={depGroupbox}
+						scope={`${scope}:depgroup:${depGroupbox.name}`}
+						optionDefaults={optionDefaults}
+					/>
+				))}
+		</>
 	);
 };
 
-export const ElementParser: FC<{
-	element: UIElement;
-	stateKeyPrefix?: string;
-}> = ({ element, stateKeyPrefix }) => {
-	if ("visible" in element && !element.visible) return null;
-
-	const scope = stateKeyPrefix || "global";
-	const addons = (element as unknown as { properties?: { addons?: Addons[] } }).properties?.addons;
-	let customHandlerForAddons = false;
-
-	const core = (() => {
-		switch (element.type) {
-			case "Toggle":
-				customHandlerForAddons = element.properties.variant === undefined || element.properties.variant === "Switch";
-				return (
-					<Toggle
-						text={element.text}
-						risky={element.properties.risky}
-						checked={element.value}
-						variant={element.properties.variant}
-						stateKey={`${scope}:el:Toggle:${element.index}`}
-						addonData={[element, addons, stateKeyPrefix]}
-					/>
-				);
-
-			case "Label":
-				return <Label doesWrap={element.properties.doesWrap}>{element.text}</Label>;
-
-			case "Button":
-				return (
-					<Button
-						text={element.text}
-						subButton={element.subButton}
-						risky={element.properties?.risky}
-						disabled={element.disabled}
-					/>
-				);
-
-			case "Dropdown":
-				return (
-					<Dropdown
-						text={element.text}
-						value={element.value}
-						options={element.properties.values}
-						multi={element.properties.multi === true}
-						searchable={element.properties.searchable === true}
-						disabledValues={element.properties.disabledValues || []}
-						stateKey={`${scope}:el:Dropdown:${element.index}`}
-					/>
-				);
-
-			case "Slider":
-				return (
-					<Slider
-						text={element.text}
-						value={element.value}
-						min={element.properties.min}
-						max={element.properties.max}
-						compact={element.properties.compact}
-						hideMax={element.properties.hideMax}
-						rounding={element.properties.rounding}
-						prefix={element.properties.prefix}
-						suffix={element.properties.suffix}
-						stateKey={`${scope}:el:Slider:${element.index}`}
-					/>
-				);
-
-			case "Input":
-				return (
-					<Input
-						text={element.text}
-						value={element.value}
-						placeholder={element.properties.placeholder}
-						stateKey={`${scope}:el:Input:${element.index}`}
-					/>
-				);
-
-			case "Divider":
-				return (
-					<Divider
-						text={element.properties?.text}
-						marginTop={element.properties?.marginTop}
-						marginBottom={element.properties?.marginBottom}
-					/>
-				);
-
-			case "Image":
-				return (
-					<ObsidianImage
-						image={element.properties.image}
-						transparency={element.properties.transparency}
-						scaleType={element.properties.scaleType}
-						color={element.properties.color}
-						rectOffset={element.properties.rectOffset}
-						height={element.properties.height}
-						rectSize={element.properties.rectSize}
-					/>
-				);
-
-			case "Video":
-				return <ObsidianVideo height={element.properties.height} />;
-
-			case "Viewport":
-				return (
-					<ObsidianViewport
-						height={element.properties.height}
-						interactive={element.properties.interactive}
-						autoFocus={element.properties.autoFocus}
-					/>
-				);
-
-			case "UIPassthrough":
-				return <ObsidianUIPassthrough height={element.properties.height} />;
-
-			default:
-				return (
-					<div className="text-red-400 text-left">Unknown element type: {(element as { type: string }).type || "Unknown"}</div>
-				);
-		}
-	})();
+const DependencyGroupboxRenderer: FC<{
+	depGroupbox: GroupboxData;
+	scope: string;
+	optionDefaults: Map<string, OptionDefault>;
+}> = ({ depGroupbox, scope, optionDefaults }) => {
+	const { state } = useUIState();
+	const br = useCornerRadius();
+	if (!dependenciesMet(depGroupbox.dependencies, state, optionDefaults)) return null;
 
 	return (
-		<div className="relative">
-			{core}
-			{customHandlerForAddons == false && renderAddons(element, addons, stateKeyPrefix)}
+		<div
+			className="-mt-[6px] ml-2 mb-3 flex flex-col p-[7px] gap-[8px] bg-[var(--background-color)] border border-[var(--outline-color)] font-normal"
+			style={{ borderRadius: br }}
+		>
+			<OrderedBoxContent
+				elements={depGroupbox.elements}
+				tabboxes={depGroupbox.tabboxes}
+				dependencyBoxes={depGroupbox.dependencyBoxes}
+				scope={scope}
+				optionDefaults={optionDefaults}
+			/>
 		</div>
 	);
 };
 
 const TabParserComponent: FC<{ tabData: TabData | null }> = ({ tabData }) => {
-	const { groupboxes, tabboxes, warningBox } = tabData || {};
+	const { groupboxes, tabboxes, warningBox, isKeyTab, elements, dependencyGroupboxes } = tabData || {};
+	const optionDefaults = useMemo(() => collectOptionDefaults(tabData), [tabData]);
 
 	const LeftBoxes = useMemo(() => {
 		const GroupboxesList = groupboxes?.Left ? Object.values(groupboxes.Left) : [];
@@ -199,6 +92,18 @@ const TabParserComponent: FC<{ tabData: TabData | null }> = ({ tabData }) => {
 	}, [groupboxes?.Right, tabboxes?.Right]);
 
 	if (!tabData) return null;
+
+	if (isKeyTab) {
+		return (
+			<div className="flex flex-col items-center justify-center gap-[8px] w-full h-full px-4 py-6 overflow-y-auto">
+				{(elements || []).map((element) => (
+					<div key={`keytab-${element.index}`} className="w-full max-w-[420px]">
+						<ElementParser element={element} stateKeyPrefix={`keytab:${tabData.name}`} />
+					</div>
+				))}
+			</div>
+		);
+	}
 
 	return (
 		<>
@@ -217,28 +122,35 @@ const TabParserComponent: FC<{ tabData: TabData | null }> = ({ tabData }) => {
 					{LeftBoxes.map((Box) => {
 						if (Box.type === "Tabbox") {
 							const TabboxInstance = Box as TabboxData;
-							return <Tabbox key={TabboxInstance.name} tabs={TabboxInstance.tabs} scope={`tab:${tabData.name}:left:tabbox:${TabboxInstance.name}`} />;
-						} else {
-							const GroupboxInstance = Box as GroupboxData;
 							return (
-								<Groupbox
-									key={GroupboxInstance.name}
-									title={GroupboxInstance.name}
-									collapsed={GroupboxInstance.collapsed}
-									disableCollapsing={GroupboxInstance.disableCollapsing}
-									icon={GroupboxInstance.icon}
-								>
-									{GroupboxInstance.elements.map((ElementInstance) => (
-										<ElementParser
-											key={`left-gb-${GroupboxInstance.name}-${ElementInstance.index}`}
-											element={ElementInstance}
-											stateKeyPrefix={`gb:${tabData.name}:left:groupbox:${GroupboxInstance.name}`}
-										/>
-									))}
-								</Groupbox>
+								<Tabbox
+									key={TabboxInstance.name}
+									tabs={TabboxInstance.tabs}
+									scope={`tab:${tabData.name}:left:tabbox:${TabboxInstance.name}`}
+									optionDefaults={optionDefaults}
+								/>
 							);
 						}
+
+						const GroupboxInstance = Box as GroupboxData;
+						return (
+							<GroupboxRenderer
+								key={GroupboxInstance.name}
+								groupbox={GroupboxInstance}
+								scope={`gb:${tabData.name}:left:groupbox:${GroupboxInstance.name}`}
+								optionDefaults={optionDefaults}
+							/>
+						);
 					})}
+
+					{Object.entries(dependencyGroupboxes || {}).map(([depName, depGroupbox]) => (
+						<DependencyGroupboxRenderer
+							key={`dep-gb-left-${depName}`}
+							depGroupbox={depGroupbox}
+							scope={`gb:${tabData.name}:depgroup:${depName}`}
+							optionDefaults={optionDefaults}
+						/>
+					))}
 				</TabLeft>
 
 				<TabRight>
@@ -246,28 +158,24 @@ const TabParserComponent: FC<{ tabData: TabData | null }> = ({ tabData }) => {
 						if (Box.type === "Tabbox") {
 							const TabboxInstance = Box as TabboxData;
 							return (
-								<Tabbox key={TabboxInstance.name} tabs={TabboxInstance.tabs} scope={`tab:${tabData.name}:right:tabbox:${TabboxInstance.name}`} />
-							);
-						} else {
-							const GroupboxInstance = Box as GroupboxData;
-							return (
-								<Groupbox
-									key={GroupboxInstance.name}
-									title={GroupboxInstance.name}
-									collapsed={GroupboxInstance.collapsed}
-									disableCollapsing={GroupboxInstance.disableCollapsing}
-									icon={GroupboxInstance.icon}
-								>
-									{GroupboxInstance.elements.map((ElementInstance) => (
-										<ElementParser
-											key={`right-gb-${GroupboxInstance.name}-${ElementInstance.index}`}
-											element={ElementInstance}
-											stateKeyPrefix={`gb:${tabData.name}:right:groupbox:${GroupboxInstance.name}`}
-										/>
-									))}
-								</Groupbox>
+								<Tabbox
+									key={TabboxInstance.name}
+									tabs={TabboxInstance.tabs}
+									scope={`tab:${tabData.name}:right:tabbox:${TabboxInstance.name}`}
+									optionDefaults={optionDefaults}
+								/>
 							);
 						}
+
+						const GroupboxInstance = Box as GroupboxData;
+						return (
+							<GroupboxRenderer
+								key={GroupboxInstance.name}
+								groupbox={GroupboxInstance}
+								scope={`gb:${tabData.name}:right:groupbox:${GroupboxInstance.name}`}
+								optionDefaults={optionDefaults}
+							/>
+						);
 					})}
 				</TabRight>
 			</TabContainer>

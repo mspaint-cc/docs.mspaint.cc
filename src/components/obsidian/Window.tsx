@@ -155,6 +155,7 @@ function ObsidianWindowInner({ title, icon, footer, uiData, width, height }: Obs
 							<TabsTrigger
 								value={tabName}
 								key={index}
+								title={tab.tooltip || undefined}
 								className="flex flex-row items-center justify-start w-full max-h-[40px] min-h-[40px] rounded-none py-[11px] px-[12px] data-[state=active]:bg-[var(--main-color)] text-white text-opacity-75 data-[state=active]:text-white"
 							>
 								{IconTab ? (

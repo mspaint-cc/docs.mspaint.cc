@@ -12,7 +12,9 @@ export default function Input({
 	className,
 	containerClassName,
 	inputClassName,
-	onChanged
+	onChanged,
+	maxLength,
+	clearTextOnFocus
 }: {
 	text: string;
 	value: string;
@@ -22,6 +24,8 @@ export default function Input({
 	containerClassName?: string;
 	inputClassName?: string;
 	onChanged?: React.ChangeEventHandler<HTMLInputElement>;
+	maxLength?: number;
+	clearTextOnFocus?: boolean;
 }) {
 	const { state, setState } = useUIState();
 	const [local, setLocal] = React.useState<string>((stateKey ? (state[stateKey] as string | undefined) : undefined) ?? value);
@@ -32,7 +36,6 @@ export default function Input({
 		if (typeof v === "string") setLocal(v);
 	}, [state, stateKey]);
 
-	// sync with external value when uncontrolled //
 	React.useEffect(() => {
 		if (stateKey) return;
 		setLocal(value);
@@ -40,7 +43,7 @@ export default function Input({
 
 	return (
 		<div className="flex flex-col gap-1">
-			<Label className="text-white opacity-100">{text}</Label>
+			{text ? <Label className="text-white opacity-100">{text}</Label> : null}
 
 			<ButtonBase
 				text={
@@ -50,8 +53,19 @@ export default function Input({
 						className={cn("w-full h-full text-white opacity-100 text-xs bg-transparent outline-none px-1", inputClassName)}
 						value={local}
 						placeholder={placeholder}
+						maxLength={maxLength}
+						onFocus={(e) => {
+							if (clearTextOnFocus) {
+								setLocal("");
+								if (stateKey) setState(stateKey, "");
+							}
+							e.currentTarget.select?.();
+						}}
 						onChange={(e) => {
-							const next = e.target.value;
+							let next = e.target.value;
+							if (typeof maxLength === "number" && next.length > maxLength) {
+								next = next.slice(0, maxLength);
+							}
 							setLocal(next);
 							if (stateKey) setState(stateKey, next);
 							if (onChanged) onChanged(e);

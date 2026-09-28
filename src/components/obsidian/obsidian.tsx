@@ -24,6 +24,8 @@ export type ObsidianTabProps = {
 	order?: number;
 	icon?: string;
 	description?: string;
+	tooltip?: string;
+	isKeyTab?: boolean;
 	children?: ReactNode;
 };
 
@@ -32,6 +34,10 @@ export type ObsidianSideProps = { children?: ReactNode };
 export type ObsidianGroupboxProps = {
 	name: string;
 	order?: number;
+	icon?: string;
+	description?: string;
+	collapsed?: boolean;
+	disableCollapsing?: boolean;
 	children?: ReactNode;
 };
 
@@ -53,20 +59,26 @@ export type OLabelProps = {
 
 export type OButtonProps = {
 	text: string;
+	icon?: string;
 	risky?: boolean;
 	visible?: boolean;
 	disabled?: boolean;
 	subButtonText?: string;
+	subButtonIcon?: string;
 	subButtonRisky?: boolean;
 };
 
 export type ODropdownProps = {
 	text: string;
 	value?: string | { [key: string]: boolean };
-	options: string[];
+	options: string[] | { [key: string]: string };
 	disabledValues?: string[];
+	valueImages?: { [key: string]: string };
 	multi?: boolean;
 	searchable?: boolean;
+	allowNull?: boolean;
+	specialType?: string;
+	enablePlayerImages?: boolean;
 	visible?: boolean;
 	disabled?: boolean;
 };
@@ -89,6 +101,8 @@ export type OInputProps = {
 	text: string;
 	value?: string;
 	placeholder?: string;
+	maxLength?: number;
+	clearTextOnFocus?: boolean;
 	visible?: boolean;
 	disabled?: boolean;
 };
@@ -115,6 +129,13 @@ export type OViewportProps = {
 
 export type OUIPassthroughProps = {
 	height?: number;
+	visible?: boolean;
+	disabled?: boolean;
+};
+
+export type OKeyBoxProps = {
+	placeholder?: string;
+	value?: string;
 	visible?: boolean;
 	disabled?: boolean;
 };
@@ -157,6 +178,7 @@ const TAGS = {
 	Video: "obsidian-video",
 	Viewport: "obsidian-viewport",
 	UIPassthrough: "obsidian-uipassthrough",
+	KeyBox: "obsidian-keybox",
 	TabWarning: "obsidian-tabwarning"
 } as const;
 
@@ -183,6 +205,7 @@ export const OImage = makeMarker<OImageProps>("OImage");
 export const OVideo = makeMarker<OVideoProps>("OVideo");
 export const OViewport = makeMarker<OViewportProps>("OViewport");
 export const OUIPassthrough = makeMarker<OUIPassthroughProps>("OUIPassthrough");
+export const OKeyBox = makeMarker<OKeyBoxProps>("OKeyBox");
 export const TabWarning = makeMarker<TabWarningProps>("TabWarning");
 
 // Long-form aliases for convenience in pages
@@ -197,6 +220,7 @@ export { OImage as ObsidianImage };
 export { OVideo as ObsidianVideo };
 export { OViewport as ObsidianViewport };
 export { OUIPassthrough as ObsidianUIPassthrough };
+export { OKeyBox as ObsidianKeyBox };
 export { TabWarning as ObsidianTabWarning };
 
 // Parsing helpers
@@ -286,9 +310,16 @@ function parseElements(children: ReactNode, startIndex = 0): { elements: UIEleme
 				visible: p.visible ?? true,
 				type: "Button",
 				text: p.text,
+				icon: p.icon,
 				disabled: p.disabled ?? false,
-				properties: { risky: p.risky ?? false, doubleClick: false },
-				subButton: p.subButtonText ? { text: p.subButtonText, risky: p.subButtonRisky } : undefined
+				properties: { risky: p.risky ?? false, doubleClick: false, icon: p.icon },
+				subButton: p.subButtonText
+					? {
+							text: p.subButtonText,
+							icon: p.subButtonIcon,
+							properties: { risky: p.subButtonRisky, icon: p.subButtonIcon },
+						}
+					: undefined
 			} as unknown as UIElement);
 			return;
 		}
@@ -300,12 +331,16 @@ function parseElements(children: ReactNode, startIndex = 0): { elements: UIEleme
 				type: "Dropdown",
 				text: p.text,
 				disabled: p.disabled ?? false,
-				value: p.value ?? (p.multi ? {} : (p.options?.[0] ?? "")),
+				value: p.value ?? (p.multi ? {} : Array.isArray(p.options) ? (p.options?.[0] ?? "") : Object.keys(p.options || {})[0] ?? ""),
 				properties: {
 					values: p.options ?? [],
 					disabledValues: p.disabledValues ?? [],
+					valueImages: p.valueImages,
 					multi: p.multi ?? false,
-					searchable: p.searchable ?? false
+					searchable: p.searchable ?? false,
+					allowNull: p.allowNull,
+					specialType: p.specialType,
+					enablePlayerImages: p.enablePlayerImages
 				}
 			} as unknown as UIElement);
 			return;
@@ -347,8 +382,9 @@ function parseElements(children: ReactNode, startIndex = 0): { elements: UIEleme
 					finished: false,
 					emptyReset: "",
 					numeric: false,
-					clearTextOnFocus: false,
-					allowEmpty: true
+					clearTextOnFocus: p.clearTextOnFocus ?? false,
+					allowEmpty: true,
+					maxLength: p.maxLength
 				}
 			} as unknown as UIElement);
 			return;
@@ -437,6 +473,21 @@ function parseElements(children: ReactNode, startIndex = 0): { elements: UIEleme
 			} as unknown as UIElement);
 			return;
 		}
+		if (isElementOfType(child, OKeyBox) || isMarker(child, "KeyBox") || isTag(child, TAGS.KeyBox)) {
+			const p = child.props as OKeyBoxProps;
+			elements.push({
+				index: idx++,
+				visible: p.visible ?? true,
+				type: "KeyBox",
+				text: p.placeholder ?? "Key",
+				disabled: p.disabled ?? false,
+				value: p.value ?? "",
+				properties: {
+					placeholder: p.placeholder ?? "Key"
+				}
+			} as unknown as UIElement);
+			return;
+		}
 	});
 
 	return { elements, lastIndex: idx };
@@ -458,6 +509,10 @@ function parseGroupboxes(children: ReactNode): {
 			name: p.name,
 			order: p.order ?? 0,
 			side: "Unknown",
+			icon: p.icon,
+			description: p.description,
+			collapsed: p.collapsed,
+			disableCollapsing: p.disableCollapsing,
 			elements: elements.map((el) => ({
 				...el,
 				index: globalIndex++
@@ -494,7 +549,10 @@ function parseTabs(children: ReactNode): UIData {
 			type: "Tab",
 			icon: p.icon ?? "",
 			description: p.description,
+			tooltip: p.tooltip,
+			isKeyTab: p.isKeyTab,
 			order: p.order ?? 0,
+			elements: p.isKeyTab ? parseElements(p.children, 0).elements : [],
 			tabboxes: { Left: [], Right: [], Unknown: [] },
 			groupboxes: {
 				Left: left.byName,
@@ -538,6 +596,9 @@ function normalizeUIData(data: unknown): UIData | undefined {
 			type?: string;
 			icon?: string;
 			description?: string;
+			tooltip?: string;
+			isKeyTab?: boolean;
+			elements?: unknown;
 			order?: unknown;
 			tabboxes?: {
 				Left?: unknown;
@@ -549,6 +610,7 @@ function normalizeUIData(data: unknown): UIData | undefined {
 				Right?: unknown;
 				Unknown?: unknown;
 			};
+			dependencyGroupboxes?: unknown;
 			warningBox?: {
 				Visible?: unknown;
 				Title?: unknown;
@@ -596,6 +658,9 @@ function normalizeUIData(data: unknown): UIData | undefined {
 			type: (rawTab.type ?? "Tab") as string,
 			icon: (rawTab.icon ?? "") as string,
 			description: rawTab.description,
+			tooltip: rawTab.tooltip,
+			isKeyTab: Boolean(rawTab.isKeyTab),
+			elements: Array.isArray(rawTab.elements) ? (rawTab.elements as TabData["elements"]) : [],
 			order: Number(rawTab.order ?? 0),
 			tabboxes: {
 				Left: normalizeTabSide(tabboxes.Left),
@@ -607,6 +672,10 @@ function normalizeUIData(data: unknown): UIData | undefined {
 				Right: normalizeGroupSide(groupboxes.Right),
 				Unknown: normalizeGroupSide(groupboxes.Unknown)
 			},
+			dependencyGroupboxes:
+				rawTab.dependencyGroupboxes && typeof rawTab.dependencyGroupboxes === "object"
+					? (rawTab.dependencyGroupboxes as TabData["dependencyGroupboxes"])
+					: {},
 			warningBox: {
 				Visible: Boolean(rawTab.warningBox?.Visible ?? false),
 				Title: String(rawTab.warningBox?.Title ?? ""),

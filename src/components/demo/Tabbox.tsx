@@ -74,6 +74,7 @@ export default function DemoTabbox() {
               },
             }}
             scope={`demo:tab`}
+            optionDefaults={new Map()}
           />
         </ObsidianDataProvider>
       </UIStateProvider>

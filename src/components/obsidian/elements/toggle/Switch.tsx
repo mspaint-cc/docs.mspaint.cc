@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useUIValue } from "../../providers/UIStateProvider";
 import Label from "../Label";
 import { Addons, UIElement } from "../../element.types";
-import { renderAddons } from "../../ui/DynamicTab";
+import { renderAddons } from "../../ui/renderAddons";
 
 function Switch({ isChecked, onClick }: { isChecked: boolean; onClick: (e: React.MouseEvent) => void }) {
 	return (

@@ -126,7 +126,7 @@ export default function Slider({
 		const sliderText = `${text}: ${prefix || ""}${formatValue(displayValue as number)}${suffix || ""}`;
 
 		return (
-			<ButtonBase text="" replacedText={true} containerClassName={cn(className, "h-[20px]")}>
+			<ButtonBase text="" replacedText={true} containerClassName={cn(className, "h-[17px]")}>
 				<div className="relative w-full h-full flex items-center justify-center">
 					<div
 						ref={trackRef}
@@ -160,9 +160,9 @@ export default function Slider({
 	}
 
 	return (
-		<div className={cn("flex flex-col gap-1", className)}>
+		<div className={cn("flex flex-col gap-[4px]", className)}>
 			<Label className="text-white opacity-100">{text}</Label>
-			<div className="relative w-full h-[20px] bg-[var(--main-color)] border-[var(--outline-color)] border" style={{ borderRadius: br }}>
+			<div className="relative box-border w-full h-[17px] bg-[var(--main-color)] border-[var(--outline-color)] border" style={{ borderRadius: br }}>
 				<div
 					ref={trackRef}
 					role="slider"
