@@ -13,6 +13,8 @@ import { Callout } from "fumadocs-ui/components/callout";
 
 The Keybind Menu is a floating overlay that shows every registered [KeyPicker](../../elements/keybinds) alongside its current state. When a keybind is configured in `Toggle` mode the menu also renders tap-friendly buttons, giving mobile players parity with keyboard users.
 
+Control of the menu (collapse, visibility settings) lives on `Library.KeybindMenu`, which is created together with `Library.KeybindFrame` when you call `Library:CreateWindow()`.
+
 ### Enabling the Keybind Menu
 
 The Keybind Menu is **hidden by default**. To show it, set the frame's `Visible` property to `true`:
@@ -22,7 +24,7 @@ Library.KeybindFrame.Visible = true
 ```
 
 <Callout type="info">
-    `Library.KeybindFrame` is only created after `Library:CreateWindow()` has been called. Make sure to enable it after the window is set up.
+    `Library.KeybindFrame` and `Library.KeybindMenu` are only created after `Library:CreateWindow()` has been called. Make sure to use them after the window is set up.
 </Callout>
 
 ### Configuration
@@ -39,3 +41,81 @@ Library.ShowToggleFrameInKeybinds = true
 | --- | --- |
 | `true` | Show toggle checkboxes in the keybind menu (default) |
 | `false` | Hide the toggle checkboxes; only show the keybind name and key |
+
+### Collapse
+
+The Keybind Menu title bar has a collapse arrow. Collapsing hides the keybind list and shrinks the frame to the title bar height.
+
+#### SetCollapsed
+
+```lua
+Library.KeybindMenu:SetCollapsed(true)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Whether the keybind list is collapsed | boolean | nil |
+
+#### ToggleCollapsed
+
+```lua
+Library.KeybindMenu:ToggleCollapsed()
+```
+
+### Visibility Settings
+
+Keybinds with `NoUI = true` never appear in the Keybind Menu or the visibility settings panel. For other keybinds, users can hide individual entries from the menu without deleting them.
+
+Visibility control is **off by default**. Enable it to show the settings icon on the Keybind Menu title bar. When enabled, the settings icon opens a second floating panel ("Visible Keybinds") with a checkbox per keybind. Toggling a checkbox calls [KeyPicker:SetMenuVisibility](../../elements/keybinds#setmenuvisibility).
+
+#### SetVisibilityControl
+
+```lua
+Library.KeybindMenu:SetVisibilityControl(true)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Whether the settings icon and panel are available | boolean | false |
+
+#### SetSettingsOpen
+
+```lua
+Library.KeybindMenu:SetSettingsOpen(true)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Whether the Visible Keybinds panel is open | boolean | nil |
+
+#### ToggleSettings
+
+```lua
+Library.KeybindMenu:ToggleSettings()
+```
+
+#### RefreshSettings
+
+```lua
+Library.KeybindMenu:RefreshSettings()
+```
+
+### Example
+
+```lua
+MenuGroup:AddToggle("KeybindMenuOpen", {
+    Default = Library.KeybindFrame.Visible,
+    Text = "Open Keybind Menu",
+    Callback = function(Value)
+        Library.KeybindFrame.Visible = Value
+    end,
+})
+
+MenuGroup:AddToggle("KeybindMenuVisibilityControl", {
+    Default = false,
+    Text = "Keybind Menu Visibility",
+    Callback = function(Value)
+        Library.KeybindMenu:SetVisibilityControl(Value)
+    end,
+})
+```
