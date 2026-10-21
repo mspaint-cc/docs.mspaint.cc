@@ -61,10 +61,10 @@ This is the table that contains the information about the addon. It is required 
     Description: {
       description: 'A description of the addon, can be empty.',
       type: 'string',
-      required: false
+      required: true
     },
     Game: {
-      description: 'A string or number (place id) or table of strings or numbers (place id) that represent the game(s) where the addon will be loaded. If you want the addon to be loaded in all games, use `*`.',
+      description: 'A place id, game id (universe id), script loader path (like `"Doors/Doors"`) or a table of them, that represent the game(s) where the addon will be loaded. If you want the addon to be loaded in all games, use `"*"`.',
       type: 'string | number | table',
       required: true
     }
