@@ -5,3 +5,16 @@ allowBuilds:
   esbuild: true
   sharp: true
   unrs-resolver: true
+
+overrides:
+  "minimatch@<3.1.5": "3.1.5"
+  "minimatch@>=9.0.0 <9.0.9": "9.0.9"
+  "brace-expansion@<1.1.21": "1.1.21"
+  "brace-expansion@>=2.0.0 <2.1.7": "2.1.7"
+  "ajv@<6.14.0": "6.15.0"
+  "flatted@<3.4.2": "3.4.4"
+  "picomatch@<2.3.2": "2.3.2"
+  "esbuild@>=0.27.3 <0.28.1": "0.28.2"
+  "js-yaml@>=4.0.0 <4.3.2": "4.3.2"
+  "baseline-browser-mapping@<2.11.0": "2.11.30"
+  "source-map-js@>=1.0.0 <1.2.2": "1.2.2"
