@@ -106,6 +106,90 @@ Viewport:SetCamera(camera)
 | --- | --- | --- | --- |
 | 1 | Camera instance | Instance (Camera) | nil |
 
+#### SetCameraCFrame
+Sets the CFrame of the viewport camera.
+
+```lua
+Viewport:SetCameraCFrame(CFrame.new(0, 5, 10))
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | New camera CFrame | CFrame | nil |
+
+#### GetCameraCFrame
+Returns the current CFrame of the viewport camera.
+
+```lua
+local CameraCFrame = Viewport:GetCameraCFrame()
+```
+
+#### Rotate
+Orbits the camera around the object pivot. Pitch is limited so the camera can't flip over the top.
+
+```lua
+Viewport:Rotate(45) -- 45 degrees to the side
+Viewport:Rotate(0, 15) -- 15 degrees up
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Yaw in degrees | number | 0 |
+| 2 | Pitch in degrees | number? | 0 |
+
+#### Zoom
+Moves the camera forwards (positive) or backwards (negative) along its look direction.
+
+```lua
+Viewport:Zoom(2)
+Viewport:Zoom(-2)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Amount of studs to move | number | nil |
+
+#### LookAt
+Points the camera at a position without moving it. Defaults to the object pivot.
+
+```lua
+Viewport:LookAt()
+Viewport:LookAt(Vector3.new(0, 2, 0))
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Position to look at | Vector3? | Object pivot |
+
+#### SetDistance
+Moves the camera to a specific distance from the object pivot, keeping its current direction.
+
+```lua
+Viewport:SetDistance(10)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Distance in studs (must be higher than 0) | number | nil |
+
+#### GetDistance
+Returns the distance between the camera and the object pivot. Returns `0` if there is no object.
+
+```lua
+local Distance = Viewport:GetDistance()
+```
+
+#### SetFieldOfView
+Sets the field of view of the viewport camera. The value is clamped between 1 and 120.
+
+```lua
+Viewport:SetFieldOfView(50)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Field of view in degrees | number | nil |
+
 #### SetInteractive
 Toggles user interaction.
 
@@ -173,4 +257,9 @@ local Viewport = Groupbox:AddViewport("DemoViewport", {
 Viewport:SetInteractive(true)
 Viewport:SetHeight(260)
 Viewport:Focus()
+
+Viewport:SetFieldOfView(50)
+Viewport:SetDistance(8)
+Viewport:Rotate(45, 15)
+Viewport:LookAt()
 ```

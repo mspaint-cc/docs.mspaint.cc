@@ -1,0 +1,129 @@
+---
+title: 'Settings'
+description: 'Settings add a gear button to an element that opens a box with extra elements.'
+---
+
+import { TypeTable } from '@/components/type-table';
+import { Callout } from "fumadocs-ui/components/callout";
+
+## Usage
+
+You can add Settings to an element by calling the `AddSettings` method on it. This adds a gear button next to the element which opens a floating box. The returned Settings object works like a [Groupbox](/obsidian/structure/groupboxes), so you can add any UI element to it.
+
+Settings are supported on the following elements:
+  - [Toggles](/obsidian/elements/toggles)
+  - [Checkboxes](/obsidian/elements/checkboxes)
+  - [Labels](/obsidian/elements/labels) (only when `DoesWrap` is `false`)
+  - [Buttons](/obsidian/elements/buttons) and Sub Buttons
+  - [Inputs](/obsidian/elements/inputs)
+  - [Dropdowns](/obsidian/elements/dropdowns)
+
+<Callout type="info">
+    Each element can only have one Settings box. Calling `AddSettings` again returns the existing one.
+</Callout>
+
+### Arguments
+
+```lua
+local Toggle = Groupbox:AddToggle("AimbotEnabled", {
+    Text = "Aimbot",
+    Default = false,
+})
+
+local Settings = Toggle:AddSettings({
+    Width = 220,
+})
+
+Settings:AddSlider("AimbotFOV", {
+    Text = "FOV",
+    Default = 90,
+    Min = 10,
+    Max = 360,
+    Rounding = 0,
+})
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Settings configuration table | table? | nil |
+
+### Configuration Table
+
+<TypeTable
+  type={{
+    Width: {
+      description: 'Fixed width (in layout pixels) of the settings box. Defaults to the width of a groupbox column.',
+      type: 'number',
+      default: 'nil',
+      required: false
+    }
+  }}
+/>
+
+## Methods
+
+Settings inherit all element methods from [Groupboxes](/obsidian/structure/groupboxes) (`AddToggle`, `AddSlider`, `AddDropdown`, `AddDependencyBox`, etc.).
+
+#### Open
+Opens the settings box. Does nothing while the parent element is disabled.
+
+```lua
+Settings:Open()
+```
+
+#### Close
+Closes the settings box.
+
+```lua
+Settings:Close()
+```
+
+#### Toggle
+Opens or closes the settings box.
+
+```lua
+Settings:Toggle()
+```
+
+#### SetWidth
+Sets the width of the settings box. Pass `nil` to use the default width again.
+
+```lua
+Settings:SetWidth(260)
+Settings:SetWidth(nil)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Width in layout pixels | number? | nil |
+
+#### Destroy
+Destroys the settings box, all of its elements and the gear button.
+
+```lua
+Settings:Destroy()
+```
+
+## Example
+
+```lua
+local Button = Groupbox:AddButton({
+    Text = "Teleport",
+    Func = function()
+        print("Teleporting to", Options.TeleportTarget.Value)
+    end,
+})
+
+local Settings = Button:AddSettings()
+
+Settings:AddDropdown("TeleportTarget", {
+    Text = "Target",
+    Values = { "Spawn", "Shop", "Boss" },
+    Default = 1,
+})
+
+Settings:AddToggle("TeleportTween", {
+    Text = "Tween teleport",
+    Default = true,
+})
+```

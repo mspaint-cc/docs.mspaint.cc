@@ -166,6 +166,11 @@ const docsTree: Root = {
       name: "UI Passthrough",
       url: "/obsidian/elements/ui-passthrough",
     },
+    {
+      type: "page",
+      name: "Settings",
+      url: "/obsidian/elements/settings",
+    },
   ],
 };
 

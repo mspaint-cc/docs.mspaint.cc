@@ -12,11 +12,12 @@ local Library = require(game:GetService("ReplicatedStorage"):WaitForChild("Obsid
 
 ### Setting up Icons
 
-If you want lucide icon support, save the [lucide icon registry](https://raw.githubusercontent.com/notpoiu/lucide-roblox-direct/refs/heads/main/source.lua) as a modulescript and require it.
+If you want icon support, save [Molto](https://raw.githubusercontent.com/notpoiu/Molto/refs/heads/main/source.lua) as a modulescript and require it.
 
 ```lua
 local Library = require(game:GetService("ReplicatedStorage"):WaitForChild("Obsidian"))
-local Icons = require(game:GetService("ReplicatedStorage"):WaitForChild("Lucide"))
+local Icons = require(game:GetService("ReplicatedStorage"):WaitForChild("Molto"))
+Icons.SetProvider("lucide")
 
 -- Set Library Icon Module
 Library:SetIconModule(Icons)

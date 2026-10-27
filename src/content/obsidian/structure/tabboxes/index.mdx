@@ -20,6 +20,7 @@ You can create a Tabbox by calling the `AddTabbox` method on a Tab.
 local LeftTabBox = Tab:AddTabbox({
     Side = "Left", -- case-insensitive
     Name = "Left Tabbox",
+    -- MaxHeight = 300,
     -- PopOut = true,
     -- MaxPopOutHeight = 200,
     -- PopOutWidth = 280,
@@ -42,6 +43,12 @@ local RightTabBox = Tab:AddTabbox({
     Name: {
       description: 'Optional name used for SaveManager pop-out persistence',
       type: 'string',
+      default: 'nil',
+      required: false
+    },
+    MaxHeight: {
+      description: 'Optional max height (in layout pixels) for the content of every tab. Content past this height becomes scrollable. Tabs can override it with their own max height.',
+      type: 'number',
       default: 'nil',
       required: false
     },
@@ -74,12 +81,40 @@ Creates a tab inside the tabbox (acts like a nested groupbox for elements).
 
 ```lua
 local Tab = Tabbox:AddTab("Tab Name", "home")
+local ScrollingTab = Tabbox:AddTab("Long Tab", "list", 250)
 ```
 
 | Arg Idx | Argument Description | Type | Default |
 | --- | --- | --- | --- |
 | 1 | Title of the tab in the tabbox | string | nil |
 | 2 | Custom Icon or Icon name from lucide.dev | string | nil |
+| 3 | Max content height for this tab, overrides the tabbox `MaxHeight` | number? | nil |
+
+### SetMaxHeight
+
+Sets the max content height for every tab in the tabbox.
+
+```lua
+Tabbox:SetMaxHeight(300)
+Tabbox:SetMaxHeight(nil) -- clear
+```
+
+| Argument | Type | Description |
+| --- | --- | --- |
+| MaxHeight | number \| nil | Max content height in layout pixels, or `nil` to remove the limit |
+
+### Tab:SetMaxHeight
+
+Sets the max content height for a single tabbox tab. Pass `nil` to fall back to the tabbox `MaxHeight`.
+
+```lua
+Tab:SetMaxHeight(250)
+Tab:SetMaxHeight(nil) -- use the tabbox max height
+```
+
+| Argument | Type | Description |
+| --- | --- | --- |
+| MaxHeight | number \| nil | Max content height in layout pixels, or `nil` to use the tabbox value |
 
 ### Nested Tabboxes
 

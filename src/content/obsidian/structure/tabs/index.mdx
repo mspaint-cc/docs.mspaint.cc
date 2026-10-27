@@ -40,6 +40,7 @@ local Tab = Window:AddTab("Main", "user")
 | 1 | Name of the tab | string | nil |
 | 2 | Custom Icon or Icon name from lucide.dev | string | nil |
 | 3 | Tab description | string | nil |
+| 4 | Layout order of the tab button | number | nil |
 
 ### Configuration Table
 ```lua
@@ -74,6 +75,12 @@ local Tab = Window:AddTab({
     Tooltip: {
       description: 'Tooltip shown when hovering the tab button',
       type: 'string',
+      default: 'nil',
+      required: false
+    },
+    Order: {
+      description: 'Layout order of the tab button, defaults to the creation order',
+      type: 'number',
       default: 'nil',
       required: false
     }
@@ -208,6 +215,67 @@ local Tabs = {
     Main = Window:AddTab("Main", "user"),
     ["UI Settings"] = Window:AddTab("UI Settings", "settings"),
 }
+```
+
+---
+
+# Custom Tabs
+
+Custom tabs give you an empty container instead of the usual groupbox columns, so you can build your own UI inside the tab while still using the normal tab button in the sidebar.
+
+### Usage
+
+You can create a Custom Tab by calling the `AddCustomTab` method on a Window. It returns the container `Frame` and the tab table.
+
+### Arguments
+```lua
+local Container, CustomTab = Window:AddCustomTab("Custom", "layout-dashboard")
+
+-- or
+local Container, CustomTab = Window:AddCustomTab({
+    Name = "Custom",
+    Icon = "layout-dashboard",
+    Description = "My own UI",
+    Tooltip = "Custom tab",
+    Order = 1,
+})
+```
+
+<Callout type="info">
+    Custom Tabs take the same arguments as regular tabs
+</Callout>
+
+### Return Values
+
+| Idx | Description | Type |
+| --- | --- | --- |
+| 1 | Empty container that fills the tab content area | Frame |
+| 2 | Tab table | table |
+
+## Methods
+
+Custom tabs do not have groupbox or tabbox methods. They support the following methods:
+
+| Method | Description |
+| --- | --- |
+| `CustomTab:Show()` | Selects the tab |
+| `CustomTab:Hide()` | Deselects the tab |
+| `CustomTab:SetVisible(Visible)` | Shows or hides the tab button |
+| `CustomTab:SetOrder(Order)` | Changes the order of the tab button |
+| `CustomTab:SetTooltip(Text)` | Sets or clears the tab button tooltip |
+| `CustomTab:Destroy()` | Destroys the tab and its container |
+
+## Example
+
+```lua
+local Container, CustomTab = Window:AddCustomTab("Custom", "layout-dashboard")
+
+local Label = Instance.new("TextLabel")
+Label.BackgroundTransparency = 1
+Label.Size = UDim2.fromScale(1, 1)
+Label.Text = "Hello from a custom tab!"
+Label.TextColor3 = Library.Scheme.FontColor
+Label.Parent = Container
 ```
 
 ---

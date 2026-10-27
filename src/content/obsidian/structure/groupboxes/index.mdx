@@ -25,6 +25,7 @@ local LeftGroupBox = Tab:AddGroupbox({
     -- Visible = true,
     -- Collapsed = false,
     -- DisableCollapsing = false,
+    -- MaxHeight = 300,
     -- PopOut = true,
     -- MaxPopOutHeight = 200,
     -- PopOutWidth = 280,
@@ -78,6 +79,12 @@ local RightGroupBox = Tab:AddGroupbox({
       description: 'Whether collapsing the groupbox should be disabled',
       type: 'boolean',
       default: 'false',
+      required: false
+    },
+    MaxHeight: {
+      description: 'Optional max height (in layout pixels) for the groupbox content. Content past this height becomes scrollable.',
+      type: 'number',
+      default: 'nil',
       required: false
     },
     PopOut: {
@@ -143,6 +150,19 @@ Groupbox:SetDescription(nil) -- hide the description
 | Argument | Type | Description |
 | --- | --- | --- |
 | Description | string \| nil | Text to show under the title, or `nil` to hide it |
+
+### SetMaxHeight
+
+Sets the max height of the groupbox content.
+
+```lua
+Groupbox:SetMaxHeight(300)
+Groupbox:SetMaxHeight(nil) -- clear
+```
+
+| Argument | Type | Description |
+| --- | --- | --- |
+| MaxHeight | number \| nil | Max content height in layout pixels, or `nil` to remove the limit |
 
 ### SetPoppedOut
 

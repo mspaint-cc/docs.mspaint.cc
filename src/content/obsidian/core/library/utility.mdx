@@ -143,7 +143,9 @@ Library:ResetCursorIcon()
 
 ## Icons
 
-Icons originate from the [lucide icon pack](https://lucide.dev). You can change the icon library so long as you call it before creating any UI elements and it follows the expected return data.
+Obsidian uses [Molto](https://github.com/notpoiu/Molto) for its icons.
+
+You can change the icon library so long as you call it before creating any UI elements and it follows the expected return data.
 
 ```lua
 local Library = require(game:GetService("ReplicatedStorage"):WaitForChild("Obsidian"))
@@ -153,23 +155,75 @@ local Icons = require(game:GetService("ReplicatedStorage"):WaitForChild("Lucide"
 Library:SetIconModule(Icons)
 ```
 
-The direct lucide module can be found [here](https://raw.githubusercontent.com/notpoiu/lucide-roblox-direct/refs/heads/main/source.lua). (Our automation updates the icon spritesheet each month)
+<Callout type="info">
+  Icons can either be font icons (`FontFace` and `Text`) or image icons (`Url`, `ImageRectOffset` and `ImageRectSize`). Font icons are rendered as a `TextLabel` or `TextButton`, image icons as an `ImageLabel` or `ImageButton`. Use `CreateIcon` and `ApplyIcon` so you don't have to handle both cases yourself.
+</Callout>
 
-### ApplyLucideIcon
+### GetIcon
 
-Applies a Lucide icon table to an `ImageLabel` or `ImageButton`.
+Returns the icon table for a Lucide icon name from the current icon module, or `nil` if it doesn't exist.
 
 ```lua
 local Icon = Library:GetIcon("settings")
-Library:ApplyLucideIcon(ImageLabel, Icon)
-Library:ApplyLucideIcon(ImageButton, Icon, 180) -- optional rotation
 ```
 
-| Argument | Type | Description |
-| --- | --- | --- |
-| ImageGui | ImageLabel \| ImageButton | Target image instance |
-| Icon | Icon | Icon table from `GetIcon` or `GetCustomIcon` |
-| Rotation | number? | Optional rotation in degrees |
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Lucide icon name | string | nil |
+
+### GetCustomIcon
+
+Same as `GetIcon` but also accepts Roblox asset IDs and asset URLs (`rbxassetid://`, `rbxasset://`, `rbxthumb://`, etc.).
+
+```lua
+local Icon = Library:GetCustomIcon("settings")
+local AssetIcon = Library:GetCustomIcon(95816097006870)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Lucide icon name, Roblox asset ID or URL | string \| number | nil |
+
+### CreateIcon
+
+Creates a new icon instance. Font icons create a `TextLabel` (or `TextButton`), image icons create an `ImageLabel` (or `ImageButton`).
+
+`ImageColor3` and `ImageTransparency` are automatically mapped to `TextColor3` and `TextTransparency` for font icons, so you can use the same properties for both icon types. Theme scheme keys (such as `"AccentColor"`) are supported as values.
+
+```lua
+local Icon = Library:GetCustomIcon("settings")
+
+local IconLabel = Library:CreateIcon(Icon, {
+    ImageColor3 = "AccentColor",
+    ImageTransparency = 0.5,
+    Size = UDim2.fromOffset(16, 16),
+    Parent = MyFrame,
+})
+
+local IconButton = Library:CreateIcon(Icon, {
+    Size = UDim2.fromOffset(16, 16),
+    Parent = MyFrame,
+}, true)
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Icon table from `GetIcon` or `GetCustomIcon` | Icon? | nil |
+| 2 | Properties to apply to the created instance | table? | nil |
+| 3 | Whether to create a button instead of a label | boolean? | false |
+
+### ApplyIcon
+
+Applies an icon to an existing icon instance and returns it. If the icon type doesn't match the instance class (for example a font icon applied to an `ImageLabel`), the instance is replaced with a new one of the correct class which keeps its shared properties (name, position, size, colors, parent, etc.), so **always use the returned instance**.
+
+```lua
+IconLabel = Library:ApplyIcon(IconLabel, Library:GetCustomIcon("house"))
+```
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Target icon instance | TextLabel \| TextButton \| ImageLabel \| ImageButton | nil |
+| 2 | Icon table from `GetIcon` or `GetCustomIcon` | Icon? | nil |
 
 ### Custom Icon Registry
 
@@ -182,6 +236,10 @@ type Icon = {
     IconName: string,
     ImageRectOffset: Vector2,
     ImageRectSize: Vector2,
+
+    -- Font icons only
+    FontFace: Font?,
+    Text: string?,
 }
 
 type IconModule = {
@@ -208,6 +266,35 @@ Please make sure you have icons named:
   - `key` (Key System Tab Icon)
   - `search` (Searchbar)
   - `move` (Window movement Icon top right of the window)
+  - `square-arrow-down-left` (Groupbox and Tabbox pop out)
+  - `x` (Close buttons)
+  - `settings` (Element settings gear from `AddSettings`)
+
+<Accordions type="single">
+
+<Accordion title="Deprecated Documentation">
+
+### ApplyLucideIcon
+
+<Callout type="warn">
+  `Library:ApplyLucideIcon` is deprecated and only supports image icons. Please use `Library:CreateIcon` or `Library:ApplyIcon` instead.
+</Callout>
+
+```lua
+local Icon = Library:GetIcon("settings")
+Library:ApplyLucideIcon(ImageLabel, Icon)
+Library:ApplyLucideIcon(ImageButton, Icon, 180) -- optional rotation
+```
+
+| Argument | Type | Description |
+| --- | --- | --- |
+| ImageGui | ImageLabel \| ImageButton | Target image instance |
+| Icon | Icon | Icon table from `GetIcon` or `GetCustomIcon` |
+| Rotation | number? | Optional rotation in degrees |
+
+</Accordion>
+
+</Accordions>
 
 ---
 
