@@ -22,23 +22,7 @@ const docsTree: Root = {
     { type: "page", name: "Step By Step Guide", url: "/key-system" },
 
     { type: "separator", name: "Purchase" },
-    { type: "page", name: "Getting Started", url: "/purchase/getting_started" },
-    {
-      type: "folder",
-      name: "Payment Methods",
-      children: [
-        { type: "page", name: "Official Shop", url: "/purchase/mspaintcc" },
-
-        { type: "page", name: "BloxProducts", url: "/purchase/bloxproducts" },
-        { type: "page", name: "cheapkeyz", url: "/purchase/cheapkeyz" },
-        { type: "page", name: "Chara Market", url: "/purchase/charamarket" },
-        { type: "page", name: "YESU", url: "/purchase/YESU" },
-        { type: "page", name: "Reii", url: "/purchase/reiishop" },
-        { type: "page", name: "bennnyr", url: "/purchase/bennnyr" },
-        { type: "page", name: "lunor.wtf", url: "/purchase/lunor" },
-        { type: "page", name: "Gefesha", url: "/purchase/gefesha" }
-      ],
-    },
+    { type: "page", name: "Buy a Key", url: "https://www.mspaint.cc/buy", external: true },
 
     { type: "separator", name: "Addons" },
     { type: "page", name: "Getting Started", url: "/addons/getting_started" },
