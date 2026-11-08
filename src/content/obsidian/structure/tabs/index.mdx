@@ -83,6 +83,12 @@ local Tab = Window:AddTab({
       type: 'number',
       default: 'nil',
       required: false
+    },
+    SubTabs: {
+      description: 'Turns the tab into a holder for subtabs. Groupboxes and tabboxes must then be added to subtabs',
+      type: 'boolean',
+      default: 'false',
+      required: false
     }
   }}
 />
@@ -216,6 +222,45 @@ local Tabs = {
     ["UI Settings"] = Window:AddTab("UI Settings", "settings"),
 }
 ```
+
+---
+
+# Sub Tabs
+
+A tab created with `SubTabs = true` shows a row of subtab buttons at the top of its content area. Every subtab works like a normal tab, so you add groupboxes and tabboxes to the subtabs instead of the tab itself. The top bar shows the active subtab as `Tab / SubTab`.
+
+### Usage
+
+```lua
+local Visuals = Window:AddTab({ Name = "Visual settings", Icon = "eye", SubTabs = true })
+
+local Enemy = Visuals:AddSubTab("Enemy", "eye")
+local Entities = Visuals:AddSubTab({ Name = "Entities", Icon = "box", Description = "Entity ESP" })
+
+Enemy:AddLeftGroupbox("ESP")
+Entities:AddTabbox({ Side = 2, Name = "Colors" })
+```
+
+<Callout type="info">
+    `AddSubTab` takes the same arguments as `Window:AddTab`. The first subtab is selected automatically.
+</Callout>
+
+### Arguments
+
+| Arg Idx | Argument Description | Type | Default |
+| --- | --- | --- | --- |
+| 1 | Name of the subtab | string | nil |
+| 2 | Custom Icon or Icon name from lucide.dev | string | nil |
+| 3 | Subtab description, falls back to the tab description | string | nil |
+| 4 | Layout order of the subtab button | number | nil |
+
+## Methods
+
+Subtabs support every regular tab method (`AddGroupbox`, `AddTabbox`, `UpdateWarningBox`, `Show`, `SetVisible`, `SetOrder`, `SetTooltip` and `Destroy`).
+
+<Callout type="warn">
+    Calling `AddGroupbox`, `AddTabbox` or `UpdateWarningBox` on a tab with `SubTabs = true` raises an error.
+</Callout>
 
 ---
 

@@ -441,7 +441,7 @@ Library:SetFont(Font.fromEnum(Enum.Font.GothamMedium))
 
 ### SetNotifySide
 
-Changes which side of the screen notifications appear on.
+Changes which corner of the screen notifications appear in. "Left" and "Right" are the same as "TopLeft" and "TopRight".
 
 ```lua
 Library:SetNotifySide("Left")
@@ -449,7 +449,7 @@ Library:SetNotifySide("Left")
 
 | Arg Idx | Argument Description | Type | Default |
 | --- | --- | --- | --- |
-| 1 | Side to show notifications | "Left" \| "Right" | "Right" |
+| 1 | Side to show notifications | "TopLeft" \| "TopRight" \| "BottomLeft" \| "BottomRight" \| "Left" \| "Right" | "Right" |
 
 ### SetDPIScale
 

@@ -100,6 +100,12 @@ local Dropdown = Groupbox:AddDropdown("MyDropdown", {
       default: 'false',
       required: false
     },
+    FormatValue: {
+      description: 'Function to format both the displayed value and the values inside the context menu list. FormatDisplayValue and FormatListValue take priority over it when set.',
+      type: 'function',
+      default: 'nil',
+      required: false
+    },
     FormatDisplayValue: {
       description: 'Function to format displayed values',
       type: 'function',
@@ -120,6 +126,12 @@ local Dropdown = Groupbox:AddDropdown("MyDropdown", {
     },
     KeepDisabledValuePosition: {
       description: 'When true, DisabledValues stay in their original Values order instead of being moved to the end of the list.',
+      type: 'boolean',
+      default: 'false',
+      required: false
+    },
+    AutoWidth: {
+      description: 'When true, the list widens past the dropdown width so every value text is fully visible.',
       type: 'boolean',
       default: 'false',
       required: false
@@ -190,6 +202,26 @@ Use a dictionary when the UI needs friendly names but your code needs stable IDs
 For multi dropdowns, `Value` is always a map of selected keys to `true` (for example `{ item01 = true }`).
 
 `Default`, `SetValue`, and `OnChanged` use the **key** for dictionaries, not the label. See the [Example](#example) below.
+
+### Dividers
+
+You can split a list into sections with `Library:DropdownDivider()` (a plain line) or `Library:DropdownDivider(Title)` (a line with a title):
+
+```lua
+Groupbox:AddDropdown("Items", {
+    Values = {
+        "Sword", "Axe",
+        Library:DropdownDivider(),
+        "Bow",
+        Library:DropdownDivider("Rare items"),
+        "Dragon Blade", "Void Staff",
+    },
+})
+```
+
+Dividers can't be selected and are never part of `Value`. Disabled values move to the end of their own section, and while searching a divider is only shown when a match comes after it.
+
+Dividers only work in a list, in a dictionary they are ignored.
 
 ## Methods
 
