@@ -54,7 +54,7 @@ This is the table that contains the information about the addon. It is required 
       required: true
     },
     Title: {
-      description: 'The title of the groupbox where the addon elements will be placed.',
+      description: 'The title of the groupbox where the addon elements will be placed. When `SubTab` is enabled, it is also the name of the addon\'s subtab.',
       type: 'string',
       required: true
     },
@@ -67,6 +67,12 @@ This is the table that contains the information about the addon. It is required 
       description: 'A place id, game id (universe id), script loader path (like `"Doors/Doors"`) or a table of them, that represent the game(s) where the addon will be loaded. If you want the addon to be loaded in all games, use `"*"`.',
       type: 'string | number | table',
       required: true
+    },
+    SubTab: {
+      description: 'If `true`, the addon gets its own subtab in the Addons tab and `mspaint.Groupbox` is placed inside it. You can create more boxes with [`mspaint.SubTab`](#subtab). If `false` or not set, `mspaint.Groupbox` is placed in the main "Addons" subtab and `mspaint.SubTab` is `nil`.',
+      type: 'boolean',
+      required: false,
+      default: 'false'
     }
   }}
 />
@@ -156,6 +162,75 @@ mspaint.Groupbox:AddDivider()
 
 mspaint.Groupbox:AddLabel("Real")
 ```
+
+The groupbox is placed in the main "Addons" subtab by default. If `SubTab = true` is set in [AddonInfo](#addoninfo), it is placed in the addon's own subtab instead.
+
+---
+
+### SubTab
+Only available when `SubTab = true` is set in [AddonInfo](#addoninfo), otherwise it is `nil`. It is the addon's own subtab and lets you create as many groupboxes as you want next to the default `mspaint.Groupbox`.
+
+The following methods are available:
+
+<TypeTable
+  type={{
+    AddLeftGroupbox: {
+      description: 'Creates a groupbox on the left side of the subtab.',
+      type: '(name: string, iconName: string?) => Groupbox'
+    },
+    AddRightGroupbox: {
+      description: 'Creates a groupbox on the right side of the subtab.',
+      type: '(name: string, iconName: string?) => Groupbox'
+    },
+    AddGroupbox: {
+      description: 'Creates a groupbox from an info table (same as Obsidian\'s `:AddGroupbox()`).',
+      type: '(info: table) => Groupbox'
+    }
+  }}
+/>
+
+The returned groupboxes work like `mspaint.Groupbox`. Toggles and options created in them are available in the global `Toggles` and `Options` tables and are removed when the addon is reloaded.
+
+**Example**
+```lua
+mspaint.AddonInfo = {
+    Name = "SigmaAddon",
+    Title = "Sigma Addon", -- Name of the addon's subtab
+    Description = "Best addon made by upio",
+    Game = "*",
+    SubTab = true
+}
+
+-- Default groupbox, placed inside the addon's subtab
+mspaint.Groupbox:AddToggle("Enabled", {
+    Text = "Enabled",
+    Default = false
+})
+
+-- Extra groupboxes
+local VisualsBox = mspaint.SubTab:AddRightGroupbox("Visuals")
+
+VisualsBox:AddSlider("Range", {
+    Text = "Range",
+    Default = 10,
+    Min = 0,
+    Max = 100,
+    Rounding = 0
+})
+
+local MiscBox = mspaint.SubTab:AddLeftGroupbox("Misc")
+
+MiscBox:AddButton({
+    Text = "Do Something",
+    Func = function()
+        print("Clicked!")
+    end
+})
+```
+
+<Callout type="info">
+    `SubTab` is a choice made per addon. Without it, your groupbox lives in the main "Addons" subtab and you cannot create extra boxes. With it, the addon gets its own subtab and cannot add anything to the main "Addons" subtab.
+</Callout>
 
 ---
 
