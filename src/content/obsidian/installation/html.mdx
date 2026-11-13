@@ -28,26 +28,9 @@ import { Tab, Tabs } from "fumadocs-ui/components/tabs";
 <html>
       <head>
         <meta charset="utf-8" />
-        
-        <!-- Tailwind CSS -->
-        <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-        
+
         <!-- Obsidian -->
         <script src="https://www.mspaint.cc/widgets/obsidian.js"></script>
-
-        <!-- Obsidian Scrollbar CSS -->
-        <style>
-          .no-scrollbar {
-            -ms-overflow-style: none; /* IE and Edge */
-            scrollbar-width: none;    /* Firefox */
-          }
-
-          .no-scrollbar::-webkit-scrollbar {
-            width: 0px;
-            height: 0px;
-            display: none;            /* Chrome, Safari, Opera */
-          }
-        </style>
       </head>
       <body>
         <Obsidian
@@ -64,30 +47,12 @@ import { Tab, Tabs } from "fumadocs-ui/components/tabs";
 
 ## Installation
 
-Obsidian depends on TailwindCSS so you need to first setup TailwindCSS.
-You can do this by adding this line of code to the `<head>` section of your HTML file:
-```html
-<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-```
-
-Then you can import the Obsidian widget script in the `<head>` section of your HTML file:
+Import the Obsidian widget script in the `<head>` section of your HTML file:
 ```html
 <script src="https://www.mspaint.cc/widgets/obsidian.js"></script>
 ```
 
-You will also need to add the following lines of code into a stylesheet.
-```css
-.no-scrollbar {
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none;    /* Firefox */
-}
-
-.no-scrollbar::-webkit-scrollbar {
-  width: 0px;
-  height: 0px;
-  display: none;            /* Chrome, Safari, Opera */
-}
-```
+The widget is fully self contained. It ships its own styles and font and renders inside a Shadow DOM.
 
 ---
 

@@ -10,10 +10,10 @@ const CODEPEN_PREFILL_DATA = {
   editors: "100",
   layout: "top",
   tags: ["obsidian", "mspaint", "ui"],
-  head: `<!-- Tailwind CSS -->\n<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>\n\n<!-- Obsidian -->\n<script src="https://www.mspaint.cc/widgets/obsidian.js"></script>`,
-  css: `.no-scrollbar {\n  -ms-overflow-style: none;\n  scrollbar-width: none;\n}\n\n.no-scrollbar::-webkit-scrollbar {\n  width: 0px;\n  height: 0px;\n  display: none;\n}`,
-  html: `<div class="min-h-screen bg-neutral-950 text-white flex items-center justify-center p-6">
-  <div class="w-full max-w-4xl">
+  head: `<!-- Obsidian -->\n<script src="https://www.mspaint.cc/widgets/obsidian.js"></script>`,
+  css: `body {\n  margin: 0;\n  background: #0a0a0a;\n}`,
+  html: `<div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px;">
+  <div>
     <Obsidian
       title="mspaint"
       footer="version: example"
