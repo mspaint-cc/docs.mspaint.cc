@@ -3,11 +3,10 @@
 import React from "react";
 import type { ReactNode } from "react";
 
-import type { UIData, TabData, GroupboxData, UIElement, Color3, Vector2, TabboxData } from "./element.types";
+import type { UIData, TabData, GroupboxData, UIElement, Color3, Vector2, TabboxData, DropdownDividerValue } from "./element.types";
 import { UIStateProvider } from "./providers/UIStateProvider";
 import { ObsidianWindow } from "./Window";
 
-// Root wrapper props
 type ObsidianWrapperProps = {
 	title: ReactNode | string;
 	icon?: ReactNode | string;
@@ -18,7 +17,6 @@ type ObsidianWrapperProps = {
 	height?: number | string;
 };
 
-// DSL component prop types
 export type ObsidianTabProps = {
 	name: string;
 	order?: number;
@@ -26,6 +24,13 @@ export type ObsidianTabProps = {
 	description?: string;
 	tooltip?: string;
 	isKeyTab?: boolean;
+	children?: ReactNode;
+};
+
+export type ObsidianSubTabProps = {
+	name: string;
+	order?: number;
+	icon?: string;
 	children?: ReactNode;
 };
 
@@ -41,37 +46,36 @@ export type ObsidianGroupboxProps = {
 	children?: ReactNode;
 };
 
-export type OToggleProps = {
+type BaseElementProps = { visible?: boolean; disabled?: boolean };
+
+export type OToggleProps = BaseElementProps & {
 	text: string;
 	defaultChecked?: boolean;
 	risky?: boolean;
 	variant?: "Switch" | "Checkbox";
-	visible?: boolean;
-	disabled?: boolean;
 };
 
-export type OLabelProps = {
+export type OLabelProps = BaseElementProps & {
 	text: string;
 	doesWrap?: boolean;
-	visible?: boolean;
-	disabled?: boolean;
 };
 
-export type OButtonProps = {
+export type OButtonProps = BaseElementProps & {
 	text: string;
 	icon?: string;
 	risky?: boolean;
-	visible?: boolean;
-	disabled?: boolean;
 	subButtonText?: string;
 	subButtonIcon?: string;
 	subButtonRisky?: boolean;
 };
 
-export type ODropdownProps = {
+export type ODropdownProps = BaseElementProps & {
 	text: string;
 	value?: string | { [key: string]: boolean };
-	options: string[] | { [key: string]: string };
+	options: (string | DropdownDividerValue)[] | { [key: string]: string };
+	displayText?: string;
+	autoWidth?: boolean;
+	keepDisabledValuePosition?: boolean;
 	disabledValues?: string[];
 	valueImages?: { [key: string]: string };
 	multi?: boolean;
@@ -79,11 +83,9 @@ export type ODropdownProps = {
 	allowNull?: boolean;
 	specialType?: string;
 	enablePlayerImages?: boolean;
-	visible?: boolean;
-	disabled?: boolean;
 };
 
-export type OSliderProps = {
+export type OSliderProps = BaseElementProps & {
 	text: string;
 	value?: number;
 	min?: number;
@@ -93,54 +95,34 @@ export type OSliderProps = {
 	rounding?: number;
 	prefix?: string;
 	suffix?: string;
-	visible?: boolean;
-	disabled?: boolean;
 };
 
-export type OInputProps = {
+export type OInputProps = BaseElementProps & {
 	text: string;
 	value?: string;
 	placeholder?: string;
 	maxLength?: number;
 	clearTextOnFocus?: boolean;
-	visible?: boolean;
-	disabled?: boolean;
 };
 
-export type ODividerProps = {
+export type ODividerProps = BaseElementProps & {
 	text?: string;
 	marginTop?: number;
 	marginBottom?: number;
-	visible?: boolean;
-	disabled?: boolean;
 };
 
-export type OVideoProps = {
-	height?: number;
-	visible?: boolean;
-	disabled?: boolean;
-};
+export type OVideoProps = BaseElementProps & { height?: number };
 
-export type OViewportProps = {
-	height?: number;
-	visible?: boolean;
-	disabled?: boolean;
-};
+export type OViewportProps = BaseElementProps & { height?: number };
 
-export type OUIPassthroughProps = {
-	height?: number;
-	visible?: boolean;
-	disabled?: boolean;
-};
+export type OUIPassthroughProps = BaseElementProps & { height?: number };
 
-export type OKeyBoxProps = {
+export type OKeyBoxProps = BaseElementProps & {
 	placeholder?: string;
 	value?: string;
-	visible?: boolean;
-	disabled?: boolean;
 };
 
-export type OImageProps = {
+export type OImageProps = BaseElementProps & {
 	text?: string;
 	image: string;
 	color?: Color3;
@@ -149,8 +131,6 @@ export type OImageProps = {
 	height?: number;
 	scaleType?: string;
 	transparency?: number;
-	visible?: boolean;
-	disabled?: boolean;
 };
 
 export type TabWarningProps = {
@@ -161,9 +141,9 @@ export type TabWarningProps = {
 	lockSize?: boolean;
 };
 
-// DSL marker components (return null; used only for structure parsing)
-const TAGS = {
+const Tags = {
 	Tab: "obsidian-tab",
+	SubTab: "obsidian-subtab",
 	Left: "obsidian-left",
 	Right: "obsidian-right",
 	Groupbox: "obsidian-groupbox",
@@ -182,14 +162,16 @@ const TAGS = {
 	TabWarning: "obsidian-tabwarning"
 } as const;
 
-// Strongly-typed, no-op marker components used for structural parsing
-const makeMarker = <P extends object>(display: string) => {
+type TagName = keyof typeof Tags;
+
+const makeMarker = <P extends object>(displayName: string) => {
 	const Marker: React.FC<P> = () => null;
-	Marker.displayName = display;
+	Marker.displayName = displayName;
 	return Marker;
 };
 
 export const ObsidianTab = makeMarker<ObsidianTabProps>("ObsidianTab");
+export const ObsidianSubTab = makeMarker<ObsidianSubTabProps>("ObsidianSubTab");
 export const ObsidianLeft = makeMarker<ObsidianSideProps>("ObsidianLeft");
 export const ObsidianRight = makeMarker<ObsidianSideProps>("ObsidianRight");
 export const ObsidianGroupbox = makeMarker<ObsidianGroupboxProps>("ObsidianGroupbox");
@@ -208,7 +190,6 @@ export const OUIPassthrough = makeMarker<OUIPassthroughProps>("OUIPassthrough");
 export const OKeyBox = makeMarker<OKeyBoxProps>("OKeyBox");
 export const TabWarning = makeMarker<TabWarningProps>("TabWarning");
 
-// Long-form aliases for convenience in pages
 export { OLabel as ObsidianLabel };
 export { OToggle as ObsidianToggle };
 export { OButton as ObsidianButton };
@@ -222,482 +203,357 @@ export { OViewport as ObsidianViewport };
 export { OUIPassthrough as ObsidianUIPassthrough };
 export { OKeyBox as ObsidianKeyBox };
 export { TabWarning as ObsidianTabWarning };
+export { ObsidianSubTab as OSubTab };
 
-// Parsing helpers
-const MARK = "__obsidianType";
-type ElementLike = { type?: unknown };
-function isTag(node: ReactNode, tag: string): node is React.ReactElement {
-	return !!(node && typeof node === "object" && (node as ElementLike).type === tag);
-}
-function getExportNameFromClientRef(ref: unknown): string | undefined {
-	// Next.js client references often have an $$id like "path/to/file.tsx#ExportName"
-	const maybe = ref as { $$id?: unknown } | undefined;
-	const id = maybe && typeof maybe.$$id === "string" ? maybe.$$id : undefined;
-	if (!id) return undefined;
-	const hash = id.lastIndexOf("#");
-	return hash >= 0 ? id.slice(hash + 1) : undefined;
-}
+export const DropdownDivider = (title?: string): DropdownDividerValue => ({ DropdownDivider: true, Title: title });
+
+const MarkerProperty = "__obsidianType";
 
 type NameLike = {
 	displayName?: string;
 	name?: string;
 	_name?: string;
 	render?: { displayName?: string; name?: string };
+	$$id?: unknown;
 };
-function getTypeName(t: unknown): string | undefined {
-	const n = t as NameLike | undefined;
-	return n?.displayName || n?.name || n?._name || n?.render?.displayName || n?.render?.name || getExportNameFromClientRef(t);
-}
 
-function isElementOfType<T>(node: ReactNode, cmp: React.ComponentType<T>): node is React.ReactElement<T> {
+const getTypeName = (type: unknown) => {
+	const named = type as NameLike | undefined;
+	const clientReferenceId = typeof named?.$$id === "string" ? named.$$id : undefined;
+	const clientExportName = clientReferenceId && clientReferenceId.includes("#") ? clientReferenceId.slice(clientReferenceId.lastIndexOf("#") + 1) : undefined;
+
+	return named?.displayName || named?.name || named?._name || named?.render?.displayName || named?.render?.name || clientExportName;
+};
+
+const isElementOfType = (node: ReactNode, component: React.ComponentType<never>) => {
 	if (!React.isValidElement(node)) return false;
-	const t = node.type as unknown;
-	if (t === cmp) return true;
+	if (node.type === component) return true;
 
-	const tName = getTypeName(t);
-	const cName = getTypeName(cmp);
+	const nodeName = getTypeName(node.type);
+	const componentName = getTypeName(component);
+	if (!nodeName || !componentName) return false;
 
-	if (!tName || !cName) return false;
+	return nodeName.replace(/\./g, "") === componentName.replace(/\./g, "");
+};
 
-	// Allow matching "Obsidian.Tab" to "ObsidianTab" and vice versa.
-	const normalize = (s: string) => s.replace(/\./g, "");
-	return normalize(tName) === normalize(cName);
-}
-
-function isMarker(node: ReactNode, type: string): node is React.ReactElement {
+const matchesElement = (node: ReactNode, component: React.ComponentType<never>, name: TagName): node is React.ReactElement => {
 	if (!node || typeof node !== "object") return false;
-	const el = node as { props?: Record<string, unknown> };
-	return !!(el.props && el.props[MARK] === type);
-}
+	if (isElementOfType(node, component)) return true;
+
+	const element = node as { type?: unknown; props?: Record<string, unknown> };
+	return element.type === Tags[name] || element.props?.[MarkerProperty] === name;
+};
+
+const createBaseElement = (props: BaseElementProps, type: string, text: string, elementIndex: number) => ({
+	index: elementIndex,
+	visible: props.visible ?? true,
+	type,
+	text,
+	disabled: props.disabled ?? false
+});
+
+type ElementParserEntry = {
+	component: React.ComponentType<never>;
+	name: TagName;
+	text: (props: never) => string;
+	build: (props: never) => Record<string, unknown>;
+};
+
+const defineEntry = <P,>(component: React.ComponentType<P>, name: TagName, text: (props: P) => string, build: (props: P) => Record<string, unknown>) =>
+	({ component, name, text, build }) as unknown as ElementParserEntry;
+
+const getDefaultDropdownValue = (props: ODropdownProps) => {
+	if (props.multi) return {};
+	if (Array.isArray(props.options)) return props.options?.[0] ?? "";
+	return Object.keys(props.options || {})[0] ?? "";
+};
+
+const ElementParsers: ElementParserEntry[] = [
+	defineEntry(OToggle, "Toggle", (props) => props.text, (props) => ({
+		value: props.defaultChecked ?? false,
+		properties: { risky: props.risky ?? false, variant: props.variant ?? "Switch" }
+	})),
+	defineEntry(OLabel, "Label", (props) => props.text, (props) => ({
+		properties: { doesWrap: props.doesWrap ?? false }
+	})),
+	defineEntry(OButton, "Button", (props) => props.text, (props) => ({
+		icon: props.icon,
+		properties: { risky: props.risky ?? false, doubleClick: false, icon: props.icon },
+		subButton: props.subButtonText
+			? { text: props.subButtonText, icon: props.subButtonIcon, properties: { risky: props.subButtonRisky, icon: props.subButtonIcon } }
+			: undefined
+	})),
+	defineEntry(ODropdown, "Dropdown", (props) => props.text, (props) => ({
+		value: props.value ?? getDefaultDropdownValue(props),
+		properties: {
+			values: props.options ?? [],
+			displayText: props.displayText,
+			autoWidth: props.autoWidth,
+			keepDisabledValuePosition: props.keepDisabledValuePosition,
+			disabledValues: props.disabledValues ?? [],
+			valueImages: props.valueImages,
+			multi: props.multi ?? false,
+			searchable: props.searchable ?? false,
+			allowNull: props.allowNull,
+			specialType: props.specialType,
+			enablePlayerImages: props.enablePlayerImages
+		}
+	})),
+	defineEntry(OSlider, "Slider", (props) => props.text, (props) => ({
+		value: props.value ?? props.min ?? 0,
+		properties: {
+			min: props.min ?? 0,
+			max: props.max ?? 100,
+			compact: props.compact,
+			hideMax: props.hideMax,
+			rounding: props.rounding,
+			prefix: props.prefix ?? "",
+			suffix: props.suffix ?? ""
+		}
+	})),
+	defineEntry(OInput, "Input", (props) => props.text, (props) => ({
+		value: props.value ?? "",
+		properties: {
+			placeholder: props.placeholder ?? "",
+			finished: false,
+			emptyReset: "",
+			numeric: false,
+			clearTextOnFocus: props.clearTextOnFocus ?? false,
+			allowEmpty: true,
+			maxLength: props.maxLength
+		}
+	})),
+	defineEntry(ODivider, "Divider", () => "", (props) => ({
+		properties: { text: props.text, marginTop: props.marginTop ?? 0, marginBottom: props.marginBottom ?? 0 }
+	})),
+	defineEntry(OImage, "Image", (props) => props.text ?? "", (props) => ({
+		properties: {
+			image: props.image,
+			color: props.color ?? { r: 255, g: 255, b: 255 },
+			rectOffset: props.rectOffset ?? { x: 0, y: 0 },
+			rectSize: props.rectSize ?? { x: 0, y: 0 },
+			height: props.height ?? 30,
+			scaleType: props.scaleType ?? "Fit",
+			transparency: props.transparency ?? 1
+		}
+	})),
+	defineEntry(OVideo, "Video", () => "", (props) => ({
+		properties: { video: "", looped: false, playing: false, volume: 1, height: props.height ?? 200 }
+	})),
+	defineEntry(OViewport, "Viewport", () => "", (props) => ({
+		properties: { height: props.height ?? 200, interactive: false, autoFocus: true }
+	})),
+	defineEntry(OUIPassthrough, "UIPassthrough", () => "", (props) => ({
+		properties: { height: props.height ?? 24 }
+	})),
+	defineEntry(OKeyBox, "KeyBox", (props) => props.placeholder ?? "Key", (props) => ({
+		value: props.value ?? "",
+		properties: { placeholder: props.placeholder ?? "Key" }
+	}))
+];
 
 function parseElements(children: ReactNode, startIndex = 0): { elements: UIElement[]; lastIndex: number } {
 	const elements: UIElement[] = [];
-	let idx = startIndex;
+	let elementIndex = startIndex;
 
 	React.Children.forEach(children, (child) => {
-		if (isElementOfType(child, OToggle) || isMarker(child, "Toggle") || isTag(child, TAGS.Toggle)) {
-			const p = child.props as OToggleProps;
-			elements.push({
-				index: idx++,
-				visible: p.visible ?? true,
-				type: "Toggle",
-				text: p.text,
-				disabled: p.disabled ?? false,
-				value: p.defaultChecked ?? false,
-				properties: {
-					risky: p.risky ?? false,
-					variant: p.variant ?? "Switch"
-				}
-			} as unknown as UIElement);
-			return;
-		}
-		if (isElementOfType(child, OLabel) || isMarker(child, "Label") || isTag(child, TAGS.Label)) {
-			const p = child.props as OLabelProps;
-			elements.push({
-				index: idx++,
-				visible: p.visible ?? true,
-				type: "Label",
-				text: p.text,
-				disabled: p.disabled ?? false,
-				properties: { doesWrap: p.doesWrap ?? false }
-			} as unknown as UIElement);
-			return;
-		}
-		if (isElementOfType(child, OButton) || isMarker(child, "Button") || isTag(child, TAGS.Button)) {
-			const p = child.props as OButtonProps;
-			elements.push({
-				index: idx++,
-				visible: p.visible ?? true,
-				type: "Button",
-				text: p.text,
-				icon: p.icon,
-				disabled: p.disabled ?? false,
-				properties: { risky: p.risky ?? false, doubleClick: false, icon: p.icon },
-				subButton: p.subButtonText
-					? {
-							text: p.subButtonText,
-							icon: p.subButtonIcon,
-							properties: { risky: p.subButtonRisky, icon: p.subButtonIcon },
-						}
-					: undefined
-			} as unknown as UIElement);
-			return;
-		}
-		if (isElementOfType(child, ODropdown) || isMarker(child, "Dropdown") || isTag(child, TAGS.Dropdown)) {
-			const p = child.props as ODropdownProps;
-			elements.push({
-				index: idx++,
-				visible: p.visible ?? true,
-				type: "Dropdown",
-				text: p.text,
-				disabled: p.disabled ?? false,
-				value: p.value ?? (p.multi ? {} : Array.isArray(p.options) ? (p.options?.[0] ?? "") : Object.keys(p.options || {})[0] ?? ""),
-				properties: {
-					values: p.options ?? [],
-					disabledValues: p.disabledValues ?? [],
-					valueImages: p.valueImages,
-					multi: p.multi ?? false,
-					searchable: p.searchable ?? false,
-					allowNull: p.allowNull,
-					specialType: p.specialType,
-					enablePlayerImages: p.enablePlayerImages
-				}
-			} as unknown as UIElement);
-			return;
-		}
-		if (isElementOfType(child, OSlider) || isMarker(child, "Slider") || isTag(child, TAGS.Slider)) {
-			const p = child.props as OSliderProps;
-			const min = p.min ?? 0;
-			const max = p.max ?? 100;
-			elements.push({
-				index: idx++,
-				visible: p.visible ?? true,
-				type: "Slider",
-				text: p.text,
-				disabled: p.disabled ?? false,
-				value: p.value ?? min,
-				properties: {
-					min,
-					max,
-					compact: p.compact,
-					hideMax: p.hideMax,
-					rounding: p.rounding,
-					prefix: p.prefix ?? "",
-					suffix: p.suffix ?? ""
-				}
-			} as unknown as UIElement);
-			return;
-		}
-		if (isElementOfType(child, OInput) || isMarker(child, "Input") || isTag(child, TAGS.Input)) {
-			const p = child.props as OInputProps;
-			elements.push({
-				index: idx++,
-				visible: p.visible ?? true,
-				type: "Input",
-				text: p.text,
-				disabled: p.disabled ?? false,
-				value: p.value ?? "",
-				properties: {
-					placeholder: p.placeholder ?? "",
-					finished: false,
-					emptyReset: "",
-					numeric: false,
-					clearTextOnFocus: p.clearTextOnFocus ?? false,
-					allowEmpty: true,
-					maxLength: p.maxLength
-				}
-			} as unknown as UIElement);
-			return;
-		}
-		if (isElementOfType(child, ODivider) || isMarker(child, "Divider") || isTag(child, TAGS.Divider)) {
-			const p = child.props as ODividerProps;
-			elements.push({
-				index: idx++,
-				visible: p.visible ?? true,
-				type: "Divider",
-				text: "",
-				disabled: p.disabled ?? false,
-				properties: {
-					text: p.text,
-					marginTop: p.marginTop ?? 0,
-					marginBottom: p.marginBottom ?? 0
-				}
-			} as unknown as UIElement);
-			return;
-		}
-		if (isElementOfType(child, OImage) || isMarker(child, "Image") || isTag(child, TAGS.Image)) {
-			const p = child.props as OImageProps;
-			elements.push({
-				index: idx++,
-				visible: p.visible ?? true,
-				type: "Image",
-				text: p.text ?? "",
-				disabled: p.disabled ?? false,
-				properties: {
-					image: p.image,
-					color: p.color ?? { r: 255, g: 255, b: 255 },
-					rectOffset: p.rectOffset ?? { x: 0, y: 0 },
-					rectSize: p.rectSize ?? { x: 0, y: 0 },
-					height: p.height ?? 30,
-					scaleType: p.scaleType ?? "Fit",
-					transparency: p.transparency ?? 1
-				}
-			} as unknown as UIElement);
-			return;
-		}
-		if (isElementOfType(child, OVideo) || isMarker(child, "Video") || isTag(child, TAGS.Video)) {
-			const p = child.props as OVideoProps;
-			elements.push({
-				index: idx++,
-				visible: p.visible ?? true,
-				type: "Video",
-				text: "",
-				disabled: p.disabled ?? false,
-				properties: {
-					video: "",
-					looped: false,
-					playing: false,
-					volume: 1,
-					height: p.height ?? 200
-				}
-			} as unknown as UIElement);
-			return;
-		}
-		if (isElementOfType(child, OViewport) || isMarker(child, "Viewport") || isTag(child, TAGS.Viewport)) {
-			const p = child.props as OViewportProps;
-			elements.push({
-				index: idx++,
-				visible: p.visible ?? true,
-				type: "Viewport",
-				text: "",
-				disabled: p.disabled ?? false,
-				properties: {
-					height: p.height ?? 200,
-					interactive: false,
-					autoFocus: true
-				}
-			} as unknown as UIElement);
-			return;
-		}
-		if (isElementOfType(child, OUIPassthrough) || isMarker(child, "UIPassthrough") || isTag(child, TAGS.UIPassthrough)) {
-			const p = child.props as OUIPassthroughProps;
-			elements.push({
-				index: idx++,
-				visible: p.visible ?? true,
-				type: "UIPassthrough",
-				text: "",
-				disabled: p.disabled ?? false,
-				properties: {
-					height: p.height ?? 24
-				}
-			} as unknown as UIElement);
-			return;
-		}
-		if (isElementOfType(child, OKeyBox) || isMarker(child, "KeyBox") || isTag(child, TAGS.KeyBox)) {
-			const p = child.props as OKeyBoxProps;
-			elements.push({
-				index: idx++,
-				visible: p.visible ?? true,
-				type: "KeyBox",
-				text: p.placeholder ?? "Key",
-				disabled: p.disabled ?? false,
-				value: p.value ?? "",
-				properties: {
-					placeholder: p.placeholder ?? "Key"
-				}
-			} as unknown as UIElement);
-			return;
-		}
+		const parser = ElementParsers.find((entry) => matchesElement(child, entry.component, entry.name));
+		if (!parser || !React.isValidElement(child)) return;
+
+		const props = child.props as never;
+		elements.push({ ...createBaseElement(props, parser.name, parser.text(props), elementIndex++), ...parser.build(props) } as unknown as UIElement);
 	});
 
-	return { elements, lastIndex: idx };
+	return { elements, lastIndex: elementIndex };
 }
 
-function parseGroupboxes(children: ReactNode): {
-	byName: { [key: string]: GroupboxData };
-} {
-	const out: { [key: string]: GroupboxData } = {};
+function parseGroupboxes(children: ReactNode): { [key: string]: GroupboxData } {
+	const groupboxes: { [key: string]: GroupboxData } = {};
 	let globalIndex = 0;
 
 	React.Children.forEach(children, (child) => {
-		if (!isElementOfType(child, ObsidianGroupbox) && !isMarker(child, "Groupbox") && !isTag(child, TAGS.Groupbox)) return;
-		const p = child.props as ObsidianGroupboxProps;
+		if (!matchesElement(child, ObsidianGroupbox, "Groupbox")) return;
 
-		const { elements } = parseElements(p.children, 0);
-		const groupbox: GroupboxData = {
+		const props = child.props as ObsidianGroupboxProps;
+		groupboxes[props.name] = {
 			type: "Groupbox",
-			name: p.name,
-			order: p.order ?? 0,
+			name: props.name,
+			order: props.order ?? 0,
 			side: "Unknown",
-			icon: p.icon,
-			description: p.description,
-			collapsed: p.collapsed,
-			disableCollapsing: p.disableCollapsing,
-			elements: elements.map((el) => ({
-				...el,
-				index: globalIndex++
-			})) as unknown as UIElement[]
+			icon: props.icon,
+			description: props.description,
+			collapsed: props.collapsed,
+			disableCollapsing: props.disableCollapsing,
+			elements: parseElements(props.children, 0).elements.map((element) => ({ ...element, index: globalIndex++ }))
 		};
-		out[p.name] = groupbox;
 	});
 
-	return { byName: out };
+	return groupboxes;
+}
+
+function parseTabContent(children: ReactNode): Pick<TabData, "groupboxes" | "tabboxes" | "warningBox"> {
+	const childList = React.Children.toArray(children);
+	const leftNode = childList.find((child) => matchesElement(child, ObsidianLeft, "Left")) as React.ReactElement<ObsidianSideProps> | undefined;
+	const rightNode = childList.find((child) => matchesElement(child, ObsidianRight, "Right")) as React.ReactElement<ObsidianSideProps> | undefined;
+	const warningNode = childList.find((child) => matchesElement(child, TabWarning, "TabWarning")) as React.ReactElement<TabWarningProps> | undefined;
+	const warningProps = warningNode?.props;
+
+	return {
+		tabboxes: { Left: [], Right: [], Unknown: [] },
+		groupboxes: {
+			Left: leftNode ? parseGroupboxes(leftNode.props.children) : {},
+			Right: rightNode ? parseGroupboxes(rightNode.props.children) : {},
+			Unknown: {}
+		},
+		warningBox: {
+			Visible: warningProps?.visible ?? false,
+			Title: warningProps?.title ?? "",
+			IsNormal: warningProps?.isNormal ?? true,
+			Text: warningProps?.text ?? "",
+			LockSize: warningProps?.lockSize ?? false
+		}
+	};
 }
 
 function parseTabs(children: ReactNode): UIData {
 	const tabs: { [key: string]: TabData } = {};
 
 	React.Children.forEach(children, (child) => {
-		if (!isElementOfType(child, ObsidianTab) && !isMarker(child, "Tab") && !isTag(child, TAGS.Tab)) return;
-		const p = child.props as ObsidianTabProps;
+		if (!matchesElement(child, ObsidianTab, "Tab")) return;
 
-		const leftNode = React.Children.toArray(p.children).find(
-			(c) => isElementOfType(c, ObsidianLeft) || isMarker(c, "Left") || isTag(c, TAGS.Left)
-		) as React.ReactElement | undefined;
-		const rightNode = React.Children.toArray(p.children).find(
-			(c) => isElementOfType(c, ObsidianRight) || isMarker(c, "Right") || isTag(c, TAGS.Right)
-		) as React.ReactElement | undefined;
-		const warningNode = React.Children.toArray(p.children).find(
-			(c) => isElementOfType(c, TabWarning) || isMarker(c, "TabWarning") || isTag(c, TAGS.TabWarning)
-		) as React.ReactElement | undefined;
+		const props = child.props as ObsidianTabProps;
+		const subTabs: { [key: string]: TabData } = {};
+		let subTabIndex = 0;
 
-		const left = leftNode ? parseGroupboxes((leftNode.props as { children?: React.ReactNode }).children) : { byName: {} };
-		const right = rightNode ? parseGroupboxes((rightNode.props as { children?: React.ReactNode }).children) : { byName: {} };
+		React.Children.forEach(props.children, (subChild) => {
+			if (!matchesElement(subChild, ObsidianSubTab, "SubTab")) return;
 
-		const tabData: TabData = {
-			name: p.name,
+			const subProps = subChild.props as ObsidianSubTabProps;
+			subTabs[subProps.name] = {
+				name: subProps.name,
+				type: "SubTab",
+				icon: subProps.icon ?? "",
+				order: subProps.order ?? ++subTabIndex,
+				elements: [],
+				...parseTabContent(subProps.children)
+			};
+		});
+
+		const hasSubTabs = Object.keys(subTabs).length > 0;
+		tabs[props.name] = {
+			name: props.name,
 			type: "Tab",
-			icon: p.icon ?? "",
-			description: p.description,
-			tooltip: p.tooltip,
-			isKeyTab: p.isKeyTab,
-			order: p.order ?? 0,
-			elements: p.isKeyTab ? parseElements(p.children, 0).elements : [],
-			tabboxes: { Left: [], Right: [], Unknown: [] },
-			groupboxes: {
-				Left: left.byName,
-				Right: right.byName,
-				Unknown: {}
-			},
-			warningBox: {
-				Visible: (warningNode?.props as TabWarningProps)?.visible ?? false,
-				Title: (warningNode?.props as TabWarningProps)?.title ?? "",
-				IsNormal: (warningNode?.props as TabWarningProps)?.isNormal ?? true,
-				Text: (warningNode?.props as TabWarningProps)?.text ?? "",
-				LockSize: (warningNode?.props as TabWarningProps)?.lockSize ?? false
-			}
+			icon: props.icon ?? "",
+			description: props.description,
+			tooltip: props.tooltip,
+			isKeyTab: props.isKeyTab,
+			order: props.order ?? 0,
+			elements: props.isKeyTab ? parseElements(props.children, 0).elements : [],
+			hasSubTabs: hasSubTabs || undefined,
+			subTabs: hasSubTabs ? subTabs : undefined,
+			...parseTabContent(props.children)
 		};
-
-		tabs[p.name] = tabData;
 	});
 
 	return { tabs } as UIData;
 }
 
-function buildUIData(children?: ReactNode): UIData | undefined {
-	if (!children) return undefined;
-	return parseTabs(children);
-}
+type RawTab = {
+	name?: string;
+	type?: string;
+	icon?: string;
+	description?: string;
+	tooltip?: string;
+	isKeyTab?: boolean;
+	hasSubTabs?: boolean;
+	activeSubTab?: string;
+	subTabs?: unknown;
+	elements?: unknown;
+	order?: unknown;
+	tabboxes?: { Left?: unknown; Right?: unknown; Unknown?: unknown };
+	groupboxes?: { Left?: unknown; Right?: unknown; Unknown?: unknown };
+	dependencyGroupboxes?: unknown;
+	warningBox?: { Visible?: unknown; Title?: unknown; IsNormal?: unknown; Text?: unknown; LockSize?: unknown };
+};
 
-// Accepts a variety of shapes and normalizes into UIData
+const normalizeGroupSide = (side: unknown): { [key: string]: GroupboxData } => {
+	if (Array.isArray(side)) {
+		const groupboxes: { [key: string]: GroupboxData } = {};
+		for (const groupbox of side as (Partial<GroupboxData> | undefined)[]) {
+			if (groupbox && groupbox.name) groupboxes[String(groupbox.name)] = groupbox as GroupboxData;
+		}
+		return groupboxes;
+	}
+
+	return side && typeof side === "object" ? (side as { [key: string]: GroupboxData }) : {};
+};
+
+const normalizeTabSide = (side: unknown): TabboxData[] => {
+	if (Array.isArray(side)) return side as TabboxData[];
+	return side && typeof side === "object" ? Object.values(side as Record<string, TabboxData>) : [];
+};
+
+const normalizeTab = (name: string, rawTab: RawTab): TabData => {
+	const subTabs: Record<string, TabData> = {};
+	if (rawTab.subTabs && typeof rawTab.subTabs === "object") {
+		for (const [subName, rawSubTab] of Object.entries(rawTab.subTabs as Record<string, unknown>)) {
+			if (rawSubTab && typeof rawSubTab === "object") subTabs[subName] = normalizeTab(subName, rawSubTab as RawTab);
+		}
+	}
+
+	const hasSubTabs = Object.keys(subTabs).length > 0;
+	const tabboxes = rawTab.tabboxes ?? {};
+	const groupboxes = rawTab.groupboxes ?? {};
+
+	return {
+		name: rawTab.name ?? name,
+		type: rawTab.type ?? "Tab",
+		icon: rawTab.icon ?? "",
+		description: rawTab.description,
+		tooltip: rawTab.tooltip,
+		isKeyTab: Boolean(rawTab.isKeyTab),
+		hasSubTabs: hasSubTabs || undefined,
+		activeSubTab: rawTab.activeSubTab,
+		subTabs: hasSubTabs ? subTabs : undefined,
+		elements: Array.isArray(rawTab.elements) ? (rawTab.elements as TabData["elements"]) : [],
+		order: Number(rawTab.order ?? 0),
+		tabboxes: {
+			Left: normalizeTabSide(tabboxes.Left),
+			Right: normalizeTabSide(tabboxes.Right),
+			Unknown: normalizeTabSide(tabboxes.Unknown)
+		},
+		groupboxes: {
+			Left: normalizeGroupSide(groupboxes.Left),
+			Right: normalizeGroupSide(groupboxes.Right),
+			Unknown: normalizeGroupSide(groupboxes.Unknown)
+		},
+		dependencyGroupboxes: rawTab.dependencyGroupboxes && typeof rawTab.dependencyGroupboxes === "object" ? (rawTab.dependencyGroupboxes as TabData["dependencyGroupboxes"]) : {},
+		warningBox: {
+			Visible: Boolean(rawTab.warningBox?.Visible ?? false),
+			Title: String(rawTab.warningBox?.Title ?? ""),
+			IsNormal: Boolean(rawTab.warningBox?.IsNormal ?? true),
+			Text: String(rawTab.warningBox?.Text ?? ""),
+			LockSize: Boolean(rawTab.warningBox?.LockSize ?? false)
+		}
+	};
+};
+
 function normalizeUIData(data: unknown): UIData | undefined {
 	if (!data || typeof data !== "object") return undefined;
 
-	const anyData = data as { tabs?: unknown; metadata?: unknown };
-	const tabsSrc = anyData.tabs && typeof anyData.tabs === "object" ? (anyData.tabs as Record<string, unknown>) : undefined;
-	if (!tabsSrc) return undefined;
+	const rawData = data as { tabs?: unknown; metadata?: unknown };
+	if (!rawData.tabs || typeof rawData.tabs !== "object") return undefined;
 
-	const outTabs: Record<string, TabData> = {};
-	for (const [name, raw] of Object.entries(tabsSrc as Record<string, unknown>)) {
-		if (!raw || typeof raw !== "object") continue;
-
-		type RawTab = {
-			name?: string;
-			type?: string;
-			icon?: string;
-			description?: string;
-			tooltip?: string;
-			isKeyTab?: boolean;
-			elements?: unknown;
-			order?: unknown;
-			tabboxes?: {
-				Left?: unknown;
-				Right?: unknown;
-				Unknown?: unknown;
-			};
-			groupboxes?: {
-				Left?: unknown;
-				Right?: unknown;
-				Unknown?: unknown;
-			};
-			dependencyGroupboxes?: unknown;
-			warningBox?: {
-				Visible?: unknown;
-				Title?: unknown;
-				IsNormal?: unknown;
-				Text?: unknown;
-				LockSize?: unknown;
-			};
-		};
-
-		const normalizeGroupSide = (side: unknown): { [key: string]: GroupboxData } => {
-			if (!side) return {};
-			if (Array.isArray(side)) {
-				const acc: { [key: string]: GroupboxData } = {};
-				for (const gb of side as unknown[]) {
-					const maybeGb = gb as Partial<GroupboxData> | undefined;
-					if (maybeGb && maybeGb.name) acc[String(maybeGb.name)] = maybeGb as GroupboxData;
-				}
-				return acc;
-			}
-			if (typeof side === "object") return side as { [key: string]: GroupboxData };
-			return {};
-		};
-
-		const normalizeTabSide = (side: unknown): TabboxData[] => {
-			if (!side) return [];
-			if (Array.isArray(side)) return side as TabboxData[];
-			if (typeof side === "object") return Object.values(side as Record<string, TabboxData>);
-			return [];
-		};
-
-		const rawTab = raw as RawTab;
-		const tabboxes = rawTab.tabboxes ?? {
-			Left: [],
-			Right: [],
-			Unknown: []
-		};
-		const groupboxes = rawTab.groupboxes ?? {
-			Left: {},
-			Right: {},
-			Unknown: {}
-		};
-
-		outTabs[name] = {
-			name: (rawTab.name ?? name) as string,
-			type: (rawTab.type ?? "Tab") as string,
-			icon: (rawTab.icon ?? "") as string,
-			description: rawTab.description,
-			tooltip: rawTab.tooltip,
-			isKeyTab: Boolean(rawTab.isKeyTab),
-			elements: Array.isArray(rawTab.elements) ? (rawTab.elements as TabData["elements"]) : [],
-			order: Number(rawTab.order ?? 0),
-			tabboxes: {
-				Left: normalizeTabSide(tabboxes.Left),
-				Right: normalizeTabSide(tabboxes.Right),
-				Unknown: normalizeTabSide(tabboxes.Unknown)
-			},
-			groupboxes: {
-				Left: normalizeGroupSide(groupboxes.Left),
-				Right: normalizeGroupSide(groupboxes.Right),
-				Unknown: normalizeGroupSide(groupboxes.Unknown)
-			},
-			dependencyGroupboxes:
-				rawTab.dependencyGroupboxes && typeof rawTab.dependencyGroupboxes === "object"
-					? (rawTab.dependencyGroupboxes as TabData["dependencyGroupboxes"])
-					: {},
-			warningBox: {
-				Visible: Boolean(rawTab.warningBox?.Visible ?? false),
-				Title: String(rawTab.warningBox?.Title ?? ""),
-				IsNormal: Boolean(rawTab.warningBox?.IsNormal ?? true),
-				Text: String(rawTab.warningBox?.Text ?? ""),
-				LockSize: Boolean(rawTab.warningBox?.LockSize ?? false)
-			}
-		} as TabData;
+	const tabs: Record<string, TabData> = {};
+	for (const [name, rawTab] of Object.entries(rawData.tabs as Record<string, unknown>)) {
+		if (rawTab && typeof rawTab === "object") tabs[name] = normalizeTab(name, rawTab as RawTab);
 	}
 
-	return {
-		tabs: outTabs,
-		metadata: anyData.metadata as UIData["metadata"]
-	} as UIData;
+	return { tabs, metadata: rawData.metadata as UIData["metadata"] };
 }
 
 export function Obsidian({ title, icon, footer, uiData, children, width, height }: ObsidianWrapperProps) {
-	const data = React.useMemo(() => {
-		const fromChildren = buildUIData(children);
-		const fromProp = normalizeUIData(uiData);
-		return fromProp ?? fromChildren;
-	}, [uiData, children]);
+	const data = React.useMemo(() => normalizeUIData(uiData) ?? (children ? parseTabs(children) : undefined), [uiData, children]);
 
 	return (
 		<UIStateProvider>

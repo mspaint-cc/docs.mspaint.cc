@@ -1,76 +1,34 @@
 import { cn } from "@/lib/utils";
 import * as React from "react";
 import type { ReactNode } from "react";
-import { useCornerRadius } from "../providers/ObsidianDataProvider";
-import { getIcon } from "../Window";
-
-function resolveCustomIconSrc(icon?: string) {
-	if (!icon) return null;
-
-	const assetId = icon.match(/rbxassetid:\/\/(\d+)/i)?.[1] || (/^\d+$/.test(icon) ? icon : null);
-	if (assetId) return `https://www.roblox.com/asset-thumbnail/image?assetId=${assetId}&width=150&height=150&format=png`;
-	if (icon.startsWith("http://") || icon.startsWith("https://") || icon.startsWith("/")) return icon;
-
-	return null;
-}
+import { useHalfCornerRadius } from "../providers/ObsidianDataProvider";
+import { getIcon, resolveCustomIconSrc } from "../utils/icons";
 
 export const ButtonBase = React.forwardRef<
 	HTMLButtonElement,
-	{
-		text: string | ReactNode;
-		icon?: string;
-		containerClassName?: string;
-		className?: string;
-		children?: ReactNode;
-		replacedText?: boolean;
-		centeredText?: boolean;
-	} & React.ButtonHTMLAttributes<HTMLButtonElement>
->(({ text, icon, containerClassName, className, children, replacedText = false, centeredText = false, style, ...props }, ref) => {
-	const br = useCornerRadius();
-	const IconComponent = getIcon(icon);
-	const customIconSrc = IconComponent ? null : resolveCustomIconSrc(icon);
+	{ containerClassName?: string; children?: ReactNode } & React.ButtonHTMLAttributes<HTMLButtonElement>
+>(({ containerClassName, className, children, style, ...props }, ref) => {
+	const halfCornerRadius = useHalfCornerRadius();
 
 	return (
-		<div className={cn("flex w-full min-w-0 h-[23px] justify-center items-center", containerClassName)}>
+		<div className={cn("flex w-full min-w-0 h-[21px] justify-center items-center", containerClassName)}>
 			<button
 				ref={ref}
 				type="button"
 				className={cn(
-					"box-border flex items-center w-full h-full cursor-pointer border hover:brightness-125 overflow-hidden leading-none",
-					!replacedText && (centeredText ? "justify-center" : "justify-start px-2"),
-					props.disabled && "pointer-events-none opacity-50"
+					"group/button box-border flex items-center w-full h-full cursor-pointer border overflow-hidden leading-none",
+					props.disabled ? "pointer-events-none bg-[var(--background-color)] border-[color-mix(in_srgb,var(--outline-color)_50%,transparent)]" : "bg-[var(--main-color)] border-[var(--outline-color)]",
+					className
 				)}
 				style={{
-					borderTopLeftRadius: br,
-					borderTopRightRadius: br,
-					borderBottomLeftRadius: br,
-					borderBottomRightRadius: br,
-					backgroundColor: props.disabled ? "var(--background-color)" : "var(--main-color)",
-					borderColor: "var(--outline-color)",
+					borderTopLeftRadius: halfCornerRadius,
+					borderTopRightRadius: halfCornerRadius,
+					borderBottomLeftRadius: halfCornerRadius,
+					borderBottomRightRadius: halfCornerRadius,
 					...style
 				}}
 				{...props}
 			>
-				{!replacedText ? (
-					<span
-						className={cn(
-							"flex items-center w-full min-w-0 h-full text-white text-[12px] opacity-50 truncate gap-1.5",
-							centeredText ? "justify-center text-center" : "justify-start text-left",
-							props.disabled && "opacity-20",
-							className
-						)}
-					>
-						{IconComponent ? (
-							<IconComponent className="size-3.5 shrink-0" />
-						) : customIconSrc ? (
-							<img src={customIconSrc} alt="" className="size-3.5 shrink-0 object-contain" />
-						) : null}
-						{text}
-					</span>
-				) : (
-					text
-				)}
-
 				{children}
 			</button>
 		</div>
@@ -78,6 +36,41 @@ export const ButtonBase = React.forwardRef<
 });
 
 ButtonBase.displayName = "ButtonBase";
+
+export function ButtonText({
+	icon,
+	disabled,
+	className,
+	children
+}: {
+	icon?: string;
+	disabled?: boolean;
+	className?: string;
+	children?: ReactNode;
+}) {
+	const IconComponent = getIcon(icon);
+	const customIconSrc = IconComponent ? null : resolveCustomIconSrc(icon);
+
+	return (
+		<span
+			className={cn(
+				"flex items-center w-full min-w-0 h-full text-white text-[14px] opacity-60 group-hover/button:opacity-100 transition-opacity truncate gap-[6px]",
+				disabled && "opacity-20 group-hover/button:opacity-20",
+				className
+			)}
+		>
+			{IconComponent ? (
+				React.createElement(IconComponent, { className: "size-3.5 shrink-0" })
+			) : customIconSrc ? (
+				// eslint-disable-next-line @next/next/no-img-element
+				<img src={customIconSrc} alt="" className="size-3.5 shrink-0 object-contain" />
+			) : null}
+			{children}
+		</span>
+	);
+}
+
+type ButtonProperties = { text: string; icon?: string; risky?: boolean };
 
 export default function Button({
 	text,
@@ -101,39 +94,29 @@ export default function Button({
 	};
 	disabled?: boolean;
 }) {
-	if (subButton != undefined) {
-		return (
-			<div className="flex flex-row items-center w-full gap-[0.35rem]">
-				<ButtonBase
-					text={text}
-					icon={icon}
-					containerClassName="flex-1"
-					centeredText={true}
-					className={risky ? "text-red-500 opacity-80" : undefined}
-					disabled={disabled}
-				/>
-
-				<ButtonBase
-					text={subButton.text}
-					icon={subButton.icon ?? subButton.properties?.icon}
-					containerClassName="flex-1"
-					centeredText={true}
-					className={(subButton.properties?.risky ?? subButton.risky) ? "text-red-500 opacity-80" : undefined}
-					disabled={disabled}
-				/>
-			</div>
-		);
+	const buttons: ButtonProperties[] = [{ text, icon, risky }];
+	if (subButton) {
+		buttons.push({
+			text: subButton.text,
+			icon: subButton.icon ?? subButton.properties?.icon,
+			risky: subButton.properties?.risky ?? subButton.risky
+		});
 	}
 
 	return (
-		<div className="flex flex-row items-center w-full">
-			<ButtonBase
-				text={text}
-				icon={icon}
-				centeredText={true}
-				className={risky ? "text-red-500 opacity-80" : undefined}
-				disabled={disabled}
-			/>
+		<div className={cn("flex flex-row items-center w-full", subButton && "gap-[6px]")}>
+			{buttons.map((button, buttonIndex) => (
+				<ButtonBase
+					key={buttonIndex}
+					containerClassName={subButton ? "flex-1" : undefined}
+					className={cn("justify-center", button.risky && "text-[var(--red-color)]")}
+					disabled={disabled}
+				>
+					<ButtonText icon={button.icon} disabled={disabled} className={cn("justify-center text-center", button.risky && "text-inherit")}>
+						{button.text}
+					</ButtonText>
+				</ButtonBase>
+			))}
 		</div>
 	);
 }

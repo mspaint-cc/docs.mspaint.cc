@@ -1,9 +1,10 @@
 "use client";
 
-import React from "react";
-import { useCornerRadius } from "../providers/ObsidianDataProvider";
-import { useUIValue } from "../providers/UIStateProvider";
+import { useHalfCornerRadius } from "../providers/ObsidianDataProvider";
+import { useElementValue } from "../providers/UIStateProvider";
 import { cn } from "@/lib/utils";
+
+const keyBoxPartClassName = "box-border h-full text-[14px] border bg-[var(--main-color)] border-[var(--outline-color)] text-[var(--font-color)] outline-none";
 
 export default function KeyBox({
 	placeholder = "Key",
@@ -14,47 +15,22 @@ export default function KeyBox({
 	value?: string;
 	stateKey?: string;
 }) {
-	const br = useCornerRadius();
-	const [stored, setStored] = useUIValue<string>(stateKey, value);
-	const [local, setLocal] = React.useState(stored ?? value);
-
-	React.useEffect(() => {
-		if (typeof stored === "string") setLocal(stored);
-	}, [stored]);
+	const halfCornerRadius = useHalfCornerRadius();
+	const [currentValue, setCurrentValue] = useElementValue(stateKey, value);
 
 	return (
-		<div className="w-[75%] max-w-full mx-auto flex flex-row items-stretch gap-0 h-[21px]">
+		<div className="w-[75%] mx-auto flex flex-row h-[21px]">
 			<input
 				type="text"
-				value={local}
+				value={currentValue}
 				placeholder={placeholder}
-				className={cn(
-					"flex-1 min-w-0 h-full px-2 text-[14px] text-left outline-none border",
-					"bg-[var(--main-color)] text-[var(--font-color)] placeholder:opacity-40"
-				)}
-				style={{
-					borderRadius: br,
-					borderColor: "var(--outline-color)"
-				}}
-				onChange={(event) => {
-					const next = event.target.value;
-					setLocal(next);
-					if (stateKey) setStored(next);
-				}}
+				className={cn(keyBoxPartClassName, "flex-1 min-w-0 px-[8px] !text-left placeholder:text-[color-mix(in_srgb,var(--font-color)_50%,black)] focus:border-[var(--accent-color)] transition-colors")}
+				style={{ borderRadius: halfCornerRadius }}
+				onChange={(event) => setCurrentValue(event.target.value)}
 			/>
 
-			<button
-				type="button"
-				className={cn(
-					"ml-[8px] w-[63px] h-full text-[14px] border shrink-0",
-					"bg-[var(--main-color)] text-[var(--font-color)] opacity-60 hover:opacity-100"
-				)}
-				style={{
-					borderRadius: br,
-					borderColor: "var(--outline-color)"
-				}}
-			>
-				Execute
+			<button type="button" className={cn(keyBoxPartClassName, "group/keybox ml-[8px] w-[63px] shrink-0 cursor-pointer")} style={{ borderRadius: halfCornerRadius }}>
+				<span className="opacity-60 group-hover/keybox:opacity-100 transition-opacity">Execute</span>
 			</button>
 		</div>
 	);

@@ -7,7 +7,7 @@ import { OpenInV0Button } from "@/components/open-in-v0-button";
 import DemoObsidian from "@/components/demo/Obsidian";
 import { Tab, Tabs } from "fumadocs-ui/components/tabs";
 
-We use the shadcn/ui CLI to automate the installation process.
+Obsidian is distributed as a [shadcn/ui](https://ui.shadcn.com/) registry item, so the CLI copies the components into your project and installs every dependency for you.
 
 <Tabs items={['Preview', 'Code']}>
   <Tab value="Preview">
@@ -25,86 +25,83 @@ We use the shadcn/ui CLI to automate the installation process.
   </Tab>
 
   <Tab value="Code">
-    ```tsx
-    import { useMemo } from "react";
+    ```tsx title="app/obsidian-demo/page.tsx"
     import { Obsidian } from "@/components/obsidian/obsidian";
-    import UIData from "@/components/demo/ObsidianExtracted.json";
+    import UIData from "./ObsidianExtracted.json";
 
     export default function DemoObsidian() {
-        const memoizedObsidian = useMemo(
-            () => (
-                <Obsidian
-                    title="mspaint"
-                    icon="/mspaint.png"
-                    footer="version: example"
-                    uiData={UIData}
-                />
-            ),
-            []
-        );
-
         return (
-          <div className="w-screen h-screen flex justify-center items-center">
-            <div className="max-w-[720px] max-h-[600px] scale-[0.8] max-sm:scale-[0.5] md:scale-90 lg:scale-100">
-              {memoizedObsidian}
+            <div className="w-screen h-screen flex justify-center items-center">
+                <div className="max-w-[720px] max-h-[600px] scale-[0.8] max-sm:scale-[0.5] md:scale-90 lg:scale-100">
+                    <Obsidian title="mspaint" icon="/mspaint.png" footer="version: example" uiData={UIData} />
+                </div>
             </div>
-          </div>
         );
     }
     ```
-
   </Tab>
 </Tabs>
+
+## Requirements
+
+- Next.js with the App Router
+- Tailwind CSS v4
+- A project initialized with shadcn/ui (`npx shadcn@latest init`)
 
 ## Installation
 
 <Tabs items={["pnpm", "npm", "yarn", "bun"]}>
   <Tab value="pnpm">
     ```bash
-    pnpm dlx shadcn@latest add "https://www.mspaint.cc/r/obsidian"
+    pnpm dlx shadcn@latest add https://www.mspaint.cc/r/obsidian
     ```
   </Tab>
   <Tab value="npm">
     ```bash
-    npx shadcn@latest add "https://www.mspaint.cc/r/obsidian"
+    npx shadcn@latest add https://www.mspaint.cc/r/obsidian
     ```
   </Tab>
   <Tab value="yarn">
     ```bash
-    yarn shadcn@latest add "https://www.mspaint.cc/r/obsidian"
+    yarn dlx shadcn@latest add https://www.mspaint.cc/r/obsidian
     ```
   </Tab>
   <Tab value="bun">
     ```bash
-    bunx --bun shadcn@latest add "https://www.mspaint.cc/r/obsidian"
+    bunx --bun shadcn@latest add https://www.mspaint.cc/r/obsidian
     ```
   </Tab>
 </Tabs>
 
----
+This adds the components to `components/obsidian`, installs `dompurify`, `lucide-react`, `@radix-ui/react-tabs`, `@react-three/fiber` and `three`, and registers the `no-scrollbar` utility in your global CSS file.
 
-Then add the following lines of code in your `global.css` file.
-```css
-.no-scrollbar {
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none;    /* Firefox */
-}
+To update to the latest version, run the same command again and overwrite the existing files.
 
-.no-scrollbar::-webkit-scrollbar {
-  width: 0px;
-  height: 0px;
-  display: none;            /* Chrome, Safari, Opera */
-}
+### Demo page
+
+If you also want the demo page shown above, add the `obsidian-demo` item. It creates `app/obsidian-demo/page.tsx` together with an example `ObsidianExtracted.json`:
+
+```bash
+npx shadcn@latest add https://www.mspaint.cc/r/obsidian-demo
 ```
+
+<Callout type="info">
+  The `icon` prop is rendered with `next/image`. When using a remote URL, add its host to `images.remotePatterns` in your `next.config.ts`.
+</Callout>
 
 ---
 
 ## Usage
 
+The UI can be built either from JSX components or from an extracted JSON file.
+
+### Components
+
 ```tsx
 import {
   Obsidian,
   ObsidianTab,
+  ObsidianSubTab,
   ObsidianLeft,
   ObsidianRight,
   ObsidianGroupbox,
@@ -116,7 +113,8 @@ import {
   ObsidianButton,
   ObsidianLabel,
   ObsidianDivider,
-  ObsidianImage,
+  ObsidianKeyBox,
+  DropdownDivider
 } from "@/components/obsidian/obsidian";
 ```
 
@@ -128,47 +126,69 @@ import {
   //width={720}
   //height={600}
 >
-  <ObsidianTab name="General" order={0} icon="Settings">
+  <ObsidianTab name="General" order={0} icon="Settings" description="General settings">
+    <ObsidianTabWarning visible title="Warning" text="This is a tab warning." isNormal />
+
     <ObsidianLeft>
-      <ObsidianGroupbox name="Basics" order={0}>
+      <ObsidianGroupbox name="Basics" order={0} icon="Box" description="Groupbox <b>descriptions</b> support rich text.">
         <ObsidianToggle text="Enable feature" defaultChecked />
-        <ObsidianSlider
-          text="Opacity"
-          min={0}
-          max={100}
-          value={80}
-          suffix="%"
-        />
+        <ObsidianToggle text="Risky feature" risky variant="Checkbox" />
+        <ObsidianSlider text="Opacity" min={0} max={100} value={80} suffix="%" />
         <ObsidianInput text="Display name" placeholder="Type your name" />
-        <ObsidianDivider />
-        <ObsidianDropdown text="Mode" options={["Simple", "Advanced"]} />
-        <ObsidianButton text="Apply" />
+        <ObsidianDivider text="Mode" />
+        <ObsidianDropdown text="Mode" options={["Simple", DropdownDivider("More"), "Advanced"]} />
+        <ObsidianButton text="Apply" subButtonText="Reset" subButtonRisky />
       </ObsidianGroupbox>
     </ObsidianLeft>
 
     <ObsidianRight>
       <ObsidianGroupbox name="Info" order={0}>
         <ObsidianLabel text="This is a label." />
-        <ObsidianImage text="Logo" image="/next.svg" height={200} />
+        <ObsidianLabel text="This is a long label that wraps onto multiple lines." doesWrap />
       </ObsidianGroupbox>
     </ObsidianRight>
+  </ObsidianTab>
+
+  <ObsidianTab name="Visuals" order={1} icon="Eye">
+    <ObsidianSubTab name="Players" order={0}>
+      <ObsidianLeft>
+        <ObsidianGroupbox name="ESP">
+          <ObsidianToggle text="Enabled" />
+        </ObsidianGroupbox>
+      </ObsidianLeft>
+    </ObsidianSubTab>
+
+    <ObsidianSubTab name="World" order={1}>
+      <ObsidianLeft>
+        <ObsidianGroupbox name="Lighting">
+          <ObsidianToggle text="Fullbright" />
+        </ObsidianGroupbox>
+      </ObsidianLeft>
+    </ObsidianSubTab>
+  </ObsidianTab>
+
+  <ObsidianTab name="Key" order={2} icon="Key" isKeyTab>
+    <ObsidianLabel text="Enter your key below." doesWrap />
+    <ObsidianKeyBox placeholder="Key" />
   </ObsidianTab>
 </Obsidian>
 ```
 
-## Extra Resources
-If you want to automatically dump your obsidian UI to a JSON file, you can use the following script which will save a file named `ObsidianExtracted.json` in your executor's `workspace` folder:
+Icons use [Lucide](https://lucide.dev/icons) component names in PascalCase, such as `Settings` or `SettingsIcon`. Roblox asset ids and image URLs also work.
+
+### Extracted JSON
+
+If you want to automatically dump your Obsidian UI to a JSON file, you can use the following script which will save a file named `ObsidianExtracted.json` in your executor's `workspace` folder:
 ```lua
 loadstring(game:HttpGet("https://raw.githubusercontent.com/mspaint-cc/assets/refs/heads/main/uidata/extractor.lua"))()
 ```
-This file can then be imported and put into the `uiData` prop of the Obsidian component:
-```tsx
-import UIData from "@/data/ObsidianExtracted.json";
 
-<Obsidian
-  title="mspaint"
-  icon="/mspaint.png"
-  footer="version: example"
-  uiData={UIData}
-/>
+Import the file and pass it to the `uiData` prop. When `uiData` is set, children are ignored:
+```tsx
+import { Obsidian } from "@/components/obsidian/obsidian";
+import UIData from "./ObsidianExtracted.json";
+
+<Obsidian title="mspaint" icon="/mspaint.png" footer="version: example" uiData={UIData} />
 ```
+
+The [test view page](/obsidian-test) lets you preview an extracted JSON file before adding it to your project.

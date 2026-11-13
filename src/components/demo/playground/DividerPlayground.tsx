@@ -44,7 +44,7 @@ export default function DividerPlayground() {
       <CopyPseudoComponent codegenfunc={generatePseudoCode} />
 
       <div className="flex items-center justify-center min-h-[150px] relative">
-        <div className="w-[50%] max-sm:w-[90%] max-md:w-[80%] max-lg:w-[60%] flex flex-col gap-2 mx-auto">
+        <div className="w-full max-w-[280px] flex flex-col gap-2 mx-auto">
           <UIStateProvider>
             <ObsidianDataProvider scheme={{}}>
               <div className="flex flex-col gap-[8px]">

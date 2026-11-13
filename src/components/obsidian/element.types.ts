@@ -1,4 +1,3 @@
-// Data Structures //
 export interface Color3 {
 	r: number;
 	g: number;
@@ -106,11 +105,16 @@ export interface ButtonElement extends BaseElement {
 	};
 }
 
+export type DropdownDividerValue = { DropdownDivider: true; Title?: string };
+
 export interface DropdownElement extends BaseElement {
 	type: "Dropdown";
 	value: string | { [key: string]: boolean };
 	properties: {
-		values: string[] | { [key: string]: string };
+		values: (string | DropdownDividerValue)[] | { [key: string]: string };
+		displayText?: string;
+		autoWidth?: boolean;
+		keepDisabledValuePosition?: boolean;
 		disabledValues?: string[] | { [key: string]: unknown };
 		valueImages?: { [key: string]: string };
 		multi?: boolean;
@@ -286,6 +290,9 @@ export interface TabData {
 	order: number;
 	visible?: boolean;
 	isKeyTab?: boolean;
+	hasSubTabs?: boolean;
+	activeSubTab?: string;
+	subTabs?: { [key: string]: TabData };
 	elements?: UIElement[];
 	tabboxes: {
 		Left: TabboxData[];
@@ -315,6 +322,9 @@ export interface UIData {
 	metadata?: {
 		cornerRadius?: number;
 		forceCheckbox?: boolean;
+		window?: {
+			sidebarCompacted?: boolean;
+		};
 		scheme?: {
 			backgroundColor?: string;
 			mainColor?: string;

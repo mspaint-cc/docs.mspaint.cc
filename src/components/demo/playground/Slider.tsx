@@ -94,7 +94,7 @@ export default function SliderPlayground() {
       <CopyPseudoComponent codegenfunc={safeGeneratePseudoCode} />
 
       <div className="flex items-center justify-center min-h-[150px] relative w-full">
-        <div className="w-full max-w-xl">{memoizedSlider}</div>
+        <div className="w-full max-w-[280px]">{memoizedSlider}</div>
       </div>
 
       <div className="flex flex-col gap-4">

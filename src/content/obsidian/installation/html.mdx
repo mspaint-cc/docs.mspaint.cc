@@ -37,7 +37,7 @@ import { Tab, Tabs } from "fumadocs-ui/components/tabs";
           title="mspaint"
           footer="version: example"
           icon="https://www.mspaint.cc/icon.png"
-          ui-data-src="https://raw.githubusercontent.com/mspaint-cc/webmspaint/refs/heads/main/registry/obsidian-demo/ObsidianExtracted.json">
+          ui-data-src="./ObsidianExtracted.json">
         </Obsidian>
       </body>
   </html>
@@ -63,7 +63,7 @@ The widget is fully self contained. It ships its own styles and font and renders
   title="mspaint"
   footer="version: example"
   icon="https://www.mspaint.cc/icon.png"
-  ui-data-src="https://raw.githubusercontent.com/mspaint-cc/webmspaint/refs/heads/main/registry/obsidian-demo/ObsidianExtracted.json">
+  ui-data-src="./ObsidianExtracted.json">
 </Obsidian>
 ```
 
@@ -82,7 +82,7 @@ or
 </Obsidian>
 ```
 
-To check how the UI data is structured, you may refer to the [UI parser](https://github.com/mspaint-cc/webmspaint/blob/main/src/components/obsidian/DynamicTab.tsx) or the [UI Element Typedefs](https://github.com/mspaint-cc/webmspaint/blob/main/src/components/obsidian/element.types.ts).
+To check how the UI data is structured, you may refer to the UI parser (`components/obsidian/ui/DynamicTab.tsx`) or the UI element typedefs (`components/obsidian/element.types.ts`) included in the [Next.js + Tailwind](/obsidian/installation/next) registry install.
 Additionally, the [test view page](/obsidian-test) allows you to test the extracted JSON UI data.
 
 ## Extra Resources

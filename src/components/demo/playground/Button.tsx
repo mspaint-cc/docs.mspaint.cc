@@ -72,7 +72,7 @@ export default function ButtonPlayground() {
         <CopyPseudoComponent codegenfunc={generatePseudoCode} />
 
         <div className="flex items-center justify-center min-h-[150px] relative w-full">
-          {memoizedComponent}
+          <div className="w-full max-w-[280px]">{memoizedComponent}</div>
         </div>
 
         <div className="flex flex-col gap-3">

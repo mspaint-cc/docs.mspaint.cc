@@ -12,6 +12,7 @@ type UIStateContextType = {
 
 	subscribe: (key: string, callback: () => void) => () => void;
 	get: (key: string) => unknown;
+	getState: () => Readonly<UIState>;
 
 	game: Readonly<string>;
 	setGame: (newGame: string) => void;
@@ -29,57 +30,50 @@ export function UIStateProvider({ children }: { children: ReactNode }) {
 
 	const stateRef = React.useRef<UIState>({});
 	const listenersRef = React.useRef<Map<string, Set<() => void>>>(new Map());
+
 	const notify = React.useCallback((key: string) => {
-		const set = listenersRef.current.get(key);
-		if (!set) return;
-		for (const cb of Array.from(set)) {
+		const listeners = listenersRef.current.get(key);
+		if (!listeners) return;
+
+		for (const listener of Array.from(listeners)) {
 			try {
-				cb();
-			} catch (err) {
-				if (process.env.NODE_ENV !== "production") {
-					console.error("[UIState.notify] listener threw:", err);
-				}
+				listener();
+			} catch (error) {
+				if (process.env.NODE_ENV !== "production") console.error("[UIState.notify] listener threw:", error);
 			}
 		}
 	}, []);
 
+	const commitState = React.useCallback((nextState: UIState) => {
+		stateRef.current = nextState;
+		setStateMap(nextState);
+	}, []);
+
 	const setState = React.useCallback(
 		(key: string, value: unknown) => {
-			const prev = (stateRef.current as Record<string, unknown>)[key];
-			if (Object.is(prev, value)) return;
+			if (Object.is(stateRef.current[key], value)) return;
 
-			const next = { ...stateRef.current, [key]: value };
-			stateRef.current = next;
-			setStateMap(next);
+			commitState({ ...stateRef.current, [key]: value });
 			notify(key);
 		},
-		[notify]
+		[commitState, notify]
 	);
 
 	const resetState = React.useCallback(
 		(prefix?: string) => {
-			if (prefix === undefined) {
-				// notify all keys //
-				stateRef.current = {};
-				setStateMap({});
-				for (const key of listenersRef.current.keys()) notify(key);
-				return;
+			const nextState: UIState = {};
+			if (prefix !== undefined) {
+				for (const [key, value] of Object.entries(stateRef.current)) {
+					if (!key.startsWith(prefix)) nextState[key] = value;
+				}
 			}
 
-			const prev = stateRef.current;
-			const next: UIState = {};
-			for (const [k, v] of Object.entries(prev)) {
-				if (!k.startsWith(prefix)) next[k] = v;
-			}
-
-			// notify keys under the prefix //
-			stateRef.current = next;
-			setStateMap(next);
+			commitState(nextState);
 			for (const key of listenersRef.current.keys()) {
-				if (key.startsWith(prefix)) notify(key);
+				if (prefix === undefined || key.startsWith(prefix)) notify(key);
 			}
 		},
-		[notify]
+		[commitState, notify]
 	);
 
 	const subscribe = React.useCallback((key: string, callback: () => void) => {
@@ -91,92 +85,72 @@ export function UIStateProvider({ children }: { children: ReactNode }) {
 
 		listeners.add(callback);
 		return () => {
-			listeners?.delete(callback);
-			if (listeners && listeners.size === 0) listenersRef.current.delete(key);
+			listeners.delete(callback);
+			if (listeners.size === 0) listenersRef.current.delete(key);
 		};
 	}, []);
 
 	const get = React.useCallback((key: string) => stateRef.current[key], []);
+	const getState = React.useCallback(() => stateRef.current, []);
 
-	return (
-		<UIStateContext.Provider
-			value={{
-				state,
-				setState,
-				resetState,
-				subscribe,
-				get,
-				game,
-				setGame,
-				footerGame,
-				setFooterGame
-			}}
-		>
-			{children}
-		</UIStateContext.Provider>
+	const contextValue = React.useMemo(
+		() => ({ state, setState, resetState, subscribe, get, getState, game, setGame, footerGame, setFooterGame }),
+		[state, setState, resetState, subscribe, get, getState, game, footerGame]
 	);
+
+	return <UIStateContext.Provider value={contextValue}>{children}</UIStateContext.Provider>;
 }
 
 export function useUIState() {
-	const ctx = React.useContext(UIStateContext);
-	if (!ctx) throw new Error("useUIState must be used within UIStateProvider");
-	return ctx;
+	const context = React.useContext(UIStateContext);
+	if (!context) throw new Error("useUIState must be used within UIStateProvider");
+	return context;
 }
 
 export function useResetUIState() {
-	const { resetState } = useUIState();
-	return resetState;
+	return useUIState().resetState;
 }
 
 export function useUIValue<T = unknown>(
 	key: string | undefined,
 	initialValue?: T
-): [T | undefined, (value: T | ((prev: T | undefined) => T)) => void] {
-	const ctx = React.useContext(UIStateContext);
-	if (!ctx) throw new Error("useUIValue must be used within UIStateProvider");
+): [T | undefined, (value: T | ((previous: T | undefined) => T)) => void] {
+	const { setState, subscribe, get } = useUIState();
 
-	const { setState, subscribe, get } = ctx;
-
-	const getSnapshot = React.useCallback(() => {
-		if (!key) return initialValue as T | undefined;
-		return (get(key) as T | undefined) ?? (initialValue as T | undefined);
-	}, [get, key, initialValue]);
-
-	const getServerSnapshot = React.useCallback(() => initialValue as T | undefined, [initialValue]);
-
-	const subscribeKey = React.useCallback(
-		(onStoreChange: () => void) => {
-			if (!key) return () => {};
-			return subscribe(key, onStoreChange);
-		},
-		[subscribe, key]
+	const getSnapshot = React.useCallback(
+		() => (key ? ((get(key) as T | undefined) ?? initialValue) : initialValue),
+		[get, key, initialValue]
 	);
+	const getServerSnapshot = React.useCallback(() => initialValue, [initialValue]);
+	const subscribeKey = React.useCallback((onStoreChange: () => void) => (key ? subscribe(key, onStoreChange) : () => {}), [subscribe, key]);
 
-	const value = React.useSyncExternalStore(
-		subscribeKey,
-		getSnapshot as unknown as () => T | undefined,
-		getServerSnapshot as unknown as () => T | undefined
-	);
+	const value = React.useSyncExternalStore(subscribeKey, getSnapshot, getServerSnapshot);
 
-	const set = React.useCallback(
-		(v: T | ((prev: T | undefined) => T)) => {
+	const setValue = React.useCallback(
+		(nextValue: T | ((previous: T | undefined) => T)) => {
 			if (!key) return;
-			const next =
-				typeof v === "function"
-					? (v as (prev: T | undefined) => T)((get(key) as T | undefined) ?? (initialValue as T | undefined))
-					: v;
-			setState(key, next as T);
+
+			const resolvedValue =
+				typeof nextValue === "function"
+					? (nextValue as (previous: T | undefined) => T)((get(key) as T | undefined) ?? initialValue)
+					: nextValue;
+			setState(key, resolvedValue);
 		},
 		[setState, key, get, initialValue]
 	);
 
-	return [value, set];
+	return [value, setValue];
 }
 
-export function useUIColor(key: string | undefined, initialColor?: { r: number; g: number; b: number }) {
-	return useUIValue<{ r: number; g: number; b: number }>(key, initialColor);
-}
+export function useElementValue<T>(stateKey: string | undefined, defaultValue: T): [T, (value: T) => void] {
+	const [storedValue, setStoredValue] = useUIValue<T>(stateKey, defaultValue);
+	const [localValue, setLocalValue] = React.useState<T>(defaultValue);
+	const [previousDefault, setPreviousDefault] = React.useState<T>(defaultValue);
 
-export function useUIString(key: string | undefined, initialValue?: string) {
-	return useUIValue<string>(key, initialValue);
+	if (!stateKey && !Object.is(previousDefault, defaultValue)) {
+		setPreviousDefault(defaultValue);
+		setLocalValue(defaultValue);
+	}
+
+	return stateKey ? [storedValue as T, setStoredValue] : [localValue, setLocalValue];
 }

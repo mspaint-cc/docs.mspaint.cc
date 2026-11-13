@@ -110,13 +110,13 @@ export default function ObsidianViewport({
 	interactive?: boolean;
 	autoFocus?: boolean;
 }) {
-	const br = useCornerRadius();
+	const cornerRadius = useCornerRadius();
 	const focusSignal = autoFocus ? height : -height;
 
 	return (
 		<div
-			className="w-full overflow-hidden border border-[rgb(40,40,40)] bg-[rgb(25,25,25)]"
-			style={{ height: `${height}px`, borderRadius: br }}
+			className="w-full overflow-hidden border border-[var(--outline-color)] bg-[var(--main-color)]"
+			style={{ height: `${height}px`, borderRadius: cornerRadius }}
 		>
 			<Canvas
 				camera={{ position: [3.5, 3.5, 3.5], fov: 70 }}

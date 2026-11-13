@@ -93,17 +93,17 @@ export const hsvToRgb = (h: number, s: number, v: number): Color3 => {
 	};
 };
 
-export const normalizeColor = (val: unknown): Color3 => {
-	if (!val) return { r: 255, g: 255, b: 255 };
+export const normalizeColor = (value: unknown): Color3 => {
+	if (!value) return { r: 255, g: 255, b: 255 };
 
-	if (typeof val === "string") {
-		let clean = val.trim();
+	if (typeof value === "string") {
+		let clean = value.trim();
 		if (clean.startsWith("rgb")) {
 			const match = /rgb\s*\(([^)]+)\)/i.exec(clean);
 			if (match) clean = match[1];
 		}
 
-		const parts = clean.split(",").map((p) => p.trim());
+		const parts = clean.split(",").map((part) => part.trim());
 		if (parts.length === 3) {
 			const r = parseFloat(parts[0]);
 			const g = parseFloat(parts[1]);
@@ -111,31 +111,31 @@ export const normalizeColor = (val: unknown): Color3 => {
 
 			if (!isNaN(r) && !isNaN(g) && !isNaN(b)) {
 				const isDecimal = r <= 1 && g <= 1 && b <= 1;
-				const mult = isDecimal ? 255 : 1;
+				const multiplier = isDecimal ? 255 : 1;
 				return {
-					r: Math.max(0, Math.min(255, Math.round(r * mult))),
-					g: Math.max(0, Math.min(255, Math.round(g * mult))),
-					b: Math.max(0, Math.min(255, Math.round(b * mult)))
+					r: Math.max(0, Math.min(255, Math.round(r * multiplier))),
+					g: Math.max(0, Math.min(255, Math.round(g * multiplier))),
+					b: Math.max(0, Math.min(255, Math.round(b * multiplier)))
 				};
 			}
 		}
 
 		const cleanHex = clean.startsWith("#") ? clean.slice(1) : clean;
-		const value = parseInt(cleanHex, 16);
-		if (isNaN(value)) return { r: 255, g: 255, b: 255 };
+		const hexValue = parseInt(cleanHex, 16);
+		if (isNaN(hexValue)) return { r: 255, g: 255, b: 255 };
 
 		return {
-			r: (value >> 16) & 0xff,
-			g: (value >> 8) & 0xff,
-			b: value & 0xff
+			r: (hexValue >> 16) & 0xff,
+			g: (hexValue >> 8) & 0xff,
+			b: hexValue & 0xff
 		};
 	}
 
-	const obj = val as Record<string, unknown>;
+	const colorObject = value as Record<string, unknown>;
 	return {
-		r: typeof obj?.r === "number" ? (obj.r as number) : 255,
-		g: typeof obj?.g === "number" ? (obj.g as number) : 255,
-		b: typeof obj?.b === "number" ? (obj.b as number) : 255
+		r: typeof colorObject?.r === "number" ? (colorObject.r as number) : 255,
+		g: typeof colorObject?.g === "number" ? (colorObject.g as number) : 255,
+		b: typeof colorObject?.b === "number" ? (colorObject.b as number) : 255
 	};
 };
 

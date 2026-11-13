@@ -1,5 +1,16 @@
 import Label from "./Label";
-import { useCornerRadius } from "../providers/ObsidianDataProvider";
+import { useCornerRadius, useThemeScheme } from "../providers/ObsidianDataProvider";
+import { normalizeColor } from "../utils/color";
+
+const NormalScheme = { background: "var(--background-color)", border: "var(--outline-color)", title: "var(--font-color)", titleStroke: "var(--outline-color)" };
+const WarningScheme = { background: "#7f0000", border: "#ff3232", title: "#ff3232", titleStroke: "#a90000" };
+
+const getTextStroke = (color: string) => `0 1px 0 ${color}, 1px 0 0 ${color}, 0 -1px 0 ${color}, -1px 0 0 ${color}`;
+
+const getTextStrokeColor = (fontColor?: string) => {
+	const { r, g, b } = normalizeColor(fontColor);
+	return (r * 0.299 + g * 0.587 + b * 0.114) / 255 > 0.5 ? "var(--dark-color)" : "var(--white-color)";
+};
 
 export default function ObsidianWarningBox({
 	text,
@@ -14,41 +25,30 @@ export default function ObsidianWarningBox({
 	lockSize: boolean;
 	visible: boolean;
 }) {
-	const br = useCornerRadius();
+	const cornerRadius = useCornerRadius();
+	const scheme = useThemeScheme();
 
 	if (!visible) return null;
 	if (title && title.includes("Latest Changelog")) return null;
 
-	const role = isNormal ? "note" : "alert";
-	const ariaLive = isNormal ? "polite" : "assertive";
-	const scheme = isNormal ? {
-		Background: "var(--background-color)",
-		Border: "var(--outline-color)",
-		Title: "var(--font-color)",
-		Text: "var(--font-color)"
-	} : {
-		Background: "#7f0000",
-		Border: "#ff3232",
-		Title: "#ff3232",
-		Text: "#ffffff"
-	};
+	const colors = isNormal ? NormalScheme : WarningScheme;
 
 	return (
 		<div
-			role={role}
-			aria-live={ariaLive}
-			className="w-[calc(100%-20px)] flex flex-col m-2.5 mb-0 px-2 py-1 border"
-			style={{
-				backgroundColor: scheme.Background,
-				borderColor: scheme.Border,
-				borderRadius: br
-			}}
+			role={isNormal ? "note" : "alert"}
+			aria-live={isNormal ? "polite" : "assertive"}
+			className="w-[calc(100%-20px)] flex flex-col m-2.5 mb-0 pt-[5px] pb-[7px] px-[6px] border"
+			style={{ backgroundColor: colors.background, borderColor: colors.border, borderRadius: cornerRadius }}
 		>
-			<Label className="text-[12px] font-normal select-text" style={{ color: scheme.Title }}>
-				{title || (isNormal ? "INFO" : "WARNING")}
-			</Label>
-			<div className={lockSize ? "overflow-y-auto" : "overflow-visible"} style={lockSize ? { maxHeight: 120 } : undefined}>
-				<Label className="text-xs font-normal">{text}</Label>
+			<div className="flex items-center h-[14px] mb-[2px]">
+				<Label className="font-normal select-text" style={{ color: colors.title, textShadow: getTextStroke(colors.titleStroke) }}>
+					{title || (isNormal ? "INFO" : "WARNING")}
+				</Label>
+			</div>
+			<div className={lockSize ? "overflow-y-auto max-h-[120px]" : "overflow-visible"}>
+				<Label className="font-normal" style={{ textShadow: getTextStroke(getTextStrokeColor(scheme?.fontColor)) }}>
+					{text}
+				</Label>
 			</div>
 		</div>
 	);

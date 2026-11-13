@@ -1,6 +1,7 @@
-import { IBM_Plex_Mono } from "next/font/google";
-export const IBMMono = IBM_Plex_Mono({
-	weight: ["400"],
+import { Inconsolata } from "next/font/google";
+export const ObsidianFont = Inconsolata({
 	subsets: ["latin"],
 	variable: "--font"
 });
+
+export const getRobloxLetterSpacing = (fontSize: number) => `${Math.round(fontSize / 2) - fontSize / 2}px`;

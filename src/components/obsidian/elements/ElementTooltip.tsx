@@ -2,11 +2,13 @@
 
 import { useCallback, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { useCornerRadius, useThemeStyles } from "../providers/ObsidianDataProvider";
-import { IBMMono } from "../fonts";
+import { cn } from "@/lib/utils";
+import { useHalfCornerRadius, useThemeStyles } from "../providers/ObsidianDataProvider";
+import { ObsidianFont } from "../fonts";
+import { usePortalContainer } from "../utils/hooks";
 
-const OFFSET_X = 14;
-const OFFSET_Y = 12;
+const OffsetX = 14;
+const OffsetY = 12;
 
 export default function ElementTooltip({
 	tooltip,
@@ -19,64 +21,47 @@ export default function ElementTooltip({
 	disabled?: boolean;
 	children: ReactNode;
 }) {
-	const tip = disabled && disabledTooltip ? disabledTooltip : tooltip;
-	const br = useCornerRadius();
+	const tooltipText = disabled && disabledTooltip ? disabledTooltip : tooltip;
+	const halfCornerRadius = useHalfCornerRadius();
 	const themeStyles = useThemeStyles();
-	const halfBr = `${Math.max(0, parseFloat(br) / 2)}px`;
+	const portalContainer = usePortalContainer();
 	const [visible, setVisible] = useState(false);
-	const [pos, setPos] = useState({ x: 0, y: 0, maxWidth: 240 });
+	const [position, setPosition] = useState({ x: 0, y: 0, maxWidth: 240 });
 
 	const hide = useCallback(() => setVisible(false), []);
-
 	const follow = useCallback(
 		(clientX: number, clientY: number) => {
-			if (!tip) return;
-			setPos({
-				x: clientX + OFFSET_X,
-				y: clientY + OFFSET_Y,
-				maxWidth: Math.max(80, window.innerWidth - clientX - OFFSET_X - 8)
+			if (!tooltipText) return;
+
+			setPosition({
+				x: clientX + OffsetX,
+				y: clientY + OffsetY,
+				maxWidth: Math.max(80, window.innerWidth - clientX - OffsetX - 8)
 			});
 			setVisible(true);
 		},
-		[tip]
+		[tooltipText]
 	);
 
-	if (!tip) return <>{children}</>;
+	if (!tooltipText) return <>{children}</>;
 
 	return (
-		<div
-			className="w-full"
-			onMouseEnter={(event) => follow(event.clientX, event.clientY)}
-			onMouseMove={(event) => follow(event.clientX, event.clientY)}
-			onMouseLeave={hide}
-		>
+		<div className="w-full" onMouseEnter={(event) => follow(event.clientX, event.clientY)} onMouseMove={(event) => follow(event.clientX, event.clientY)} onMouseLeave={hide}>
 			{children}
 			{visible &&
+				portalContainer &&
 				createPortal(
 					<div
-						className={IBMMono.className}
-						style={{
-							...themeStyles,
-							position: "fixed",
-							left: pos.x,
-							top: pos.y,
-							zIndex: 99999,
-							pointerEvents: "none",
-							maxWidth: pos.maxWidth,
-							padding: "2px 4px",
-							fontSize: 12,
-							lineHeight: 1.25,
-							whiteSpace: "pre-wrap",
-							wordBreak: "break-word",
-							color: "var(--font-color)",
-							backgroundColor: "var(--background-color)",
-							border: "1px solid var(--outline-color)",
-							borderRadius: halfBr
-						}}
+						className={cn(
+							"fixed z-[99999] pointer-events-none px-[4px] py-[2px] text-[14px] leading-none whitespace-pre-wrap break-words",
+							"text-[var(--font-color)] bg-[var(--background-color)] border border-[var(--outline-color)]",
+							ObsidianFont.className
+						)}
+						style={{ ...themeStyles, left: position.x, top: position.y, maxWidth: position.maxWidth, borderRadius: halfCornerRadius }}
 					>
-						{tip}
+						{tooltipText}
 					</div>,
-					document.body
+					portalContainer
 				)}
 		</div>
 	);

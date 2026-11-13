@@ -2,10 +2,15 @@
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
-import { ButtonBase } from "./Button";
 import Label from "./Label";
 import { useUIValue } from "../providers/UIStateProvider";
-import { useCornerRadius } from "../providers/ObsidianDataProvider";
+import { useHalfCornerRadius } from "../providers/ObsidianDataProvider";
+
+const OutlinedTextStyle: React.CSSProperties = {
+	WebkitTextStroke: "0.1px #000",
+	WebkitTextFillColor: "var(--font-color)",
+	textShadow: "0 1px 0 #000, 1px 0 0 #000, 0 -1px 0 #000, -1px 0 0 #000"
+};
 
 export default function Slider({
 	text,
@@ -38,163 +43,96 @@ export default function Slider({
 	onValueChange?: (value: number) => void;
 	stateKey?: string;
 }) {
+	const halfCornerRadius = useHalfCornerRadius();
 	const [stateValue, setStateValue] = useUIValue<number | undefined>(stateKey, undefined);
 	const [internalValue, setInternalValue] = React.useState(stateValue ?? value ?? defaultValue ?? min);
+	const trackRef = React.useRef<HTMLDivElement | null>(null);
 
 	const isControlled = value !== undefined && onValueChange !== undefined;
-	const currentValue = isControlled ? (value as number) : internalValue;
+	const currentValue = isControlled ? value : (stateValue ?? internalValue);
 
-	React.useEffect(() => {
-		if (!isControlled && stateValue !== undefined) {
-			setInternalValue(stateValue);
-		}
-	}, [stateValue, isControlled]);
-
-	const roundValue = (num: number) => {
+	const roundValue = (number: number) => {
 		const multiplier = Math.pow(10, rounding);
-		return Math.round(num * multiplier) / multiplier;
+		return Math.round(number * multiplier) / multiplier;
 	};
 
-	const trackRef = React.useRef<HTMLDivElement | null>(null);
-	const draggingRef = React.useRef(false);
+	const quantizeToStep = (number: number) => {
+		if (step <= 0 || !Number.isFinite(step) || max === min) return number;
 
-	const quantizeToStep = (n: number) => {
-		const range = max - min;
-		if (step <= 0 || !Number.isFinite(step) || range === 0) return n;
-
-		const roundingStep = Math.pow(10, -rounding);
-		const effectiveStep = Math.min(step, roundingStep);
-		const steps = Math.round((n - min) / effectiveStep);
-		const snapped = min + steps * effectiveStep;
-
+		const effectiveStep = Math.min(step, Math.pow(10, -rounding));
+		const snapped = min + Math.round((number - min) / effectiveStep) * effectiveStep;
 		return Math.min(max, Math.max(min, snapped));
 	};
 
 	const setFromClientX = (clientX: number) => {
-		const el = trackRef.current;
-		if (!el) return;
+		const track = trackRef.current;
+		if (!track) return;
 
-		const rect = el.getBoundingClientRect();
-		const pct = rect.width > 0 ? (clientX - rect.left) / rect.width : 0;
-		const clampedPct = Math.min(1, Math.max(0, pct));
-		const raw = min + clampedPct * (max - min);
-		const stepped = quantizeToStep(raw);
-		const roundedValue = roundValue(stepped);
+		const rect = track.getBoundingClientRect();
+		const fraction = Math.min(1, Math.max(0, rect.width > 0 ? (clientX - rect.left) / rect.width : 0));
+		const roundedValue = roundValue(quantizeToStep(min + fraction * (max - min)));
 
 		if (!isControlled) setInternalValue(roundedValue);
 		if (stateKey) setStateValue(roundedValue);
-		if (onValueChange) onValueChange(roundedValue);
+		onValueChange?.(roundedValue);
 	};
 
-	const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
-		e.preventDefault();
-		draggingRef.current = true;
+	const onPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+		event.preventDefault();
 		try {
-			(e.currentTarget as HTMLDivElement).setPointerCapture(e.pointerId);
+			event.currentTarget.setPointerCapture(event.pointerId);
 		} catch {}
-		setFromClientX(e.clientX);
+		setFromClientX(event.clientX);
 
-		const move = (ev: PointerEvent) => {
-			if (!draggingRef.current) return;
-			setFromClientX(ev.clientX);
+		const onMove = (moveEvent: PointerEvent) => setFromClientX(moveEvent.clientX);
+		const onUp = () => {
+			window.removeEventListener("pointermove", onMove);
+			window.removeEventListener("pointerup", onUp);
+			window.removeEventListener("pointercancel", onUp);
 		};
 
-		const up = () => {
-			draggingRef.current = false;
-			window.removeEventListener("pointermove", move);
-			window.removeEventListener("pointerup", up);
-			window.removeEventListener("pointercancel", up);
-		};
-
-		window.addEventListener("pointermove", move);
-		window.addEventListener("pointerup", up);
-		window.addEventListener("pointercancel", up);
+		window.addEventListener("pointermove", onMove);
+		window.addEventListener("pointerup", onUp);
+		window.addEventListener("pointercancel", onUp);
 	};
+
+	const formatValue = (number: number) => parseFloat(Number(number).toFixed(rounding)).toString();
 
 	const displayValue = roundValue(currentValue);
-	const displayMax = roundValue(max);
-	const formatValue = (num: number) => {
-		const fixed = Number(num).toFixed(rounding);
-		return parseFloat(fixed).toString();
-	};
+	const percent = Math.min(100, Math.max(0, max > min ? ((currentValue - min) / (max - min)) * 100 : 0));
+	const formattedValue = `${prefix || ""}${formatValue(displayValue)}${hideMax === true || compact ? "" : `/${formatValue(roundValue(max))}`}${suffix || ""}`;
 
-	const fraction = max > min ? (currentValue - min) / (max - min) : 0;
-	const percent = Math.min(100, Math.max(0, fraction * 100));
-	const br = useCornerRadius();
+	const sliderBar = (
+		<div
+			className={cn("relative box-border w-full h-[15px] bg-[var(--main-color)] border-[var(--outline-color)] border", compact && className)}
+			style={{ borderRadius: halfCornerRadius }}
+		>
+			<div
+				ref={trackRef}
+				role="slider"
+				aria-valuemin={min}
+				aria-valuemax={max}
+				aria-valuenow={displayValue}
+				className="absolute inset-0 cursor-pointer overflow-hidden select-none touch-none"
+				style={{ borderRadius: halfCornerRadius }}
+				onPointerDown={onPointerDown}
+			>
+				<div className="absolute left-0 top-0 h-full bg-[var(--accent-color)]" style={{ width: `${percent}%` }} />
+			</div>
+			<div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+				<span className="text-center text-white text-[14px] truncate select-none" style={OutlinedTextStyle}>
+					{compact ? `${text}: ${formattedValue}` : formattedValue}
+				</span>
+			</div>
+		</div>
+	);
 
-	if (compact) {
-		const sliderText = `${text}: ${prefix || ""}${formatValue(displayValue as number)}${suffix || ""}`;
-
-		return (
-			<ButtonBase text="" replacedText={true} containerClassName={cn(className, "h-[17px]")}>
-				<div className="relative w-full h-full flex items-center justify-center">
-					<div
-						ref={trackRef}
-						role="slider"
-						aria-valuemin={min}
-						aria-valuemax={max}
-						aria-valuenow={displayValue}
-						className="absolute inset-0 z-10 cursor-pointer overflow-hidden select-none touch-none pointer-events-auto"
-						style={{ borderRadius: br }}
-						onPointerDown={onPointerDown}
-						onPointerMove={(e) => {
-							if (!draggingRef.current) return;
-							setFromClientX(e.clientX);
-						}}
-					>
-						<div className="absolute left-0 top-0 h-full bg-[var(--accent-color)]" style={{ width: `${percent}%` }} />
-					</div>
-					<span
-						className={cn(`text-center text-white text-xs truncate z-30 pointer-events-none`, "select-none")}
-						style={{
-							WebkitTextStroke: "0.1px #000",
-							WebkitTextFillColor: "var(--font-color)",
-							textShadow: "0 1px 0 #000, 1px 0 0 #000, 0 -1px 0 #000, -1px 0 0 #000"
-						}}
-					>
-						{sliderText}
-					</span>
-				</div>
-			</ButtonBase>
-		);
-	}
+	if (compact) return sliderBar;
 
 	return (
 		<div className={cn("flex flex-col gap-[4px]", className)}>
-			<Label className="text-white opacity-100">{text}</Label>
-			<div className="relative box-border w-full h-[17px] bg-[var(--main-color)] border-[var(--outline-color)] border" style={{ borderRadius: br }}>
-				<div
-					ref={trackRef}
-					role="slider"
-					aria-valuemin={min}
-					aria-valuemax={max}
-					aria-valuenow={displayValue}
-					className="absolute inset-0 cursor-pointer overflow-hidden select-none touch-none"
-					style={{ borderRadius: br }}
-					onPointerDown={onPointerDown}
-					onPointerMove={(e) => {
-						if (!draggingRef.current) return;
-						setFromClientX(e.clientX);
-					}}
-				>
-					<div className="absolute inset-0" />
-					<div className="absolute left-0 top-0 h-full bg-[var(--accent-color)]" style={{ width: `${percent}%` }} />
-				</div>
-				<div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-					<span
-						className="text-center text-white text-xs select-none"
-						style={{
-							WebkitTextStroke: "0.1px #000",
-							WebkitTextFillColor: "var(--font-color)",
-							textShadow: "0 1px 0 #000, 1px 0 0 #000, 0 -1px 0 #000, -1px 0 0 #000"
-						}}
-					>
-						{hideMax === true
-							? `${prefix || ""}${formatValue(displayValue as number)}${suffix || ""}`
-							: `${prefix || ""}${formatValue(displayValue as number)}/${formatValue(displayMax as number)}${suffix || ""}`}
-					</span>
-				</div>
-			</div>
+			<Label className="text-white opacity-100 leading-[14px]">{text}</Label>
+			{sliderBar}
 		</div>
 	);
 }

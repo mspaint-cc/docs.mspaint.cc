@@ -5,10 +5,8 @@ import type { Addons, UIElement } from "../element.types";
 import Divider from "../elements/Divider";
 import Toggle from "../elements/Toggle";
 import Button from "../elements/Button";
-import ObsidianImage from "../elements/Image";
-import ObsidianVideo from "../elements/Video";
+import Placeholder from "../elements/Placeholder";
 import ObsidianViewport from "../elements/Viewport";
-import ObsidianUIPassthrough from "../elements/UIPassthrough";
 import Label from "../elements/Label";
 import Dropdown from "../elements/Dropdown";
 import Input from "../elements/Input";
@@ -16,6 +14,7 @@ import Slider from "../elements/Slider";
 import KeyBox from "../elements/KeyBox";
 import ElementTooltip from "../elements/ElementTooltip";
 import { renderAddons } from "./renderAddons";
+import { getRobloxLetterSpacing } from "../fonts";
 
 export const ElementParser: FC<{
 	element: UIElement;
@@ -43,7 +42,15 @@ export const ElementParser: FC<{
 				);
 
 			case "Label":
-				return <Label doesWrap={element.properties.doesWrap}>{element.text}</Label>;
+				return (
+					<Label
+						doesWrap={element.properties.doesWrap}
+						className={element.properties.doesWrap ? "py-[2px]" : "leading-[18px] min-h-[18px]"}
+						style={element.properties.size ? { fontSize: `${element.properties.size}px`, letterSpacing: getRobloxLetterSpacing(element.properties.size) } : undefined}
+					>
+						{element.text}
+					</Label>
+				);
 
 			case "Button":
 				return (
@@ -81,6 +88,9 @@ export const ElementParser: FC<{
 						allowNull={element.properties.allowNull}
 						specialType={element.properties.specialType}
 						enablePlayerImages={element.properties.enablePlayerImages}
+						displayText={element.properties.displayText}
+						autoWidth={element.properties.autoWidth}
+						keepDisabledValuePosition={element.properties.keepDisabledValuePosition}
 						stateKey={`${scope}:el:Dropdown:${element.index}`}
 					/>
 				);
@@ -123,20 +133,10 @@ export const ElementParser: FC<{
 				);
 
 			case "Image":
-				return (
-					<ObsidianImage
-						image={element.properties.image}
-						transparency={element.properties.transparency}
-						scaleType={element.properties.scaleType}
-						color={element.properties.color}
-						rectOffset={element.properties.rectOffset}
-						height={element.properties.height}
-						rectSize={element.properties.rectSize}
-					/>
-				);
+				return <Placeholder height={element.properties.height} />;
 
 			case "Video":
-				return <ObsidianVideo height={element.properties.height} />;
+				return <Placeholder height={element.properties.height ?? 200} />;
 
 			case "Viewport":
 				return (
@@ -148,7 +148,7 @@ export const ElementParser: FC<{
 				);
 
 			case "UIPassthrough":
-				return <ObsidianUIPassthrough height={element.properties.height} />;
+				return <Placeholder height={element.properties.height ?? 24} />;
 
 			case "KeyBox":
 				return (

@@ -1,9 +1,9 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { useEffect, useState, useMemo } from "react";
-import { useUIState } from "../../providers/UIStateProvider";
-import { useCornerRadius } from "../../providers/ObsidianDataProvider";
+import { useEffect, useState } from "react";
+import { useElementValue } from "../../providers/UIStateProvider";
+import { useHalfCornerRadius } from "../../providers/ObsidianDataProvider";
 
 export default function KeyPicker({
 	defaultValue,
@@ -18,64 +18,44 @@ export default function KeyPicker({
 	mode?: string;
 	modifiers?: string[];
 }) {
-	const { state, setState } = useUIState();
-	const br = useCornerRadius();
-
-	const storedValue = useMemo(() => (stateKey ? (state[stateKey] as string | undefined) : undefined), [stateKey, state]);
-	const [value, setValue] = useState<string>(storedValue ?? defaultValue);
-	const [isListening, setIsListening] = useState<boolean>(false);
+	const halfCornerRadius = useHalfCornerRadius();
+	const [value, setValue] = useElementValue(stateKey, defaultValue);
+	const [isListening, setIsListening] = useState(false);
 
 	useEffect(() => {
 		if (!isListening) return;
 
-		const handleKeyDown = (e: KeyboardEvent) => {
-			e.preventDefault();
-			e.stopPropagation();
+		const handleKeyDown = (event: KeyboardEvent) => {
+			event.preventDefault();
+			event.stopPropagation();
 
-			const key = e.key;
-			const cleaned = key.length === 1 ? key.toUpperCase() : key;
-
-			setValue(cleaned);
-			if (stateKey) setState(stateKey, cleaned);
+			setValue(event.key.length === 1 ? event.key.toUpperCase() : event.key);
 			setIsListening(false);
 		};
 
 		window.addEventListener("keydown", handleKeyDown, { capture: true });
-		return () => {
-			window.removeEventListener("keydown", handleKeyDown, true);
-		};
-	}, [isListening, stateKey, setState]);
+		return () => window.removeEventListener("keydown", handleKeyDown, true);
+	}, [isListening, setValue]);
 
-	useEffect(() => {
-		if (stateKey && storedValue !== undefined && storedValue !== value) {
-			setValue(storedValue);
-		}
-	}, [stateKey, storedValue, value]);
-
-	const display = modifiers && modifiers.length > 0 ? `${modifiers.join(" + ")} + ${value}` : value;
+	const displayValue = modifiers && modifiers.length > 0 ? `${modifiers.join(" + ")} + ${value}` : value;
 
 	return (
 		<div
 			className={cn(
-				"inline-flex justify-center items-center border cursor-pointer select-none",
-				"text-[12px] leading-none whitespace-nowrap",
-				"opacity-40 hover:opacity-100 hover:brightness-125",
-				isListening ? "w-[29px] h-[18px]" : "h-[18px] min-w-[18px] px-[4.5px]",
+				"group/keypicker inline-flex justify-center items-center h-[21px] outline outline-1 cursor-pointer select-none",
+				"text-[14px] leading-none whitespace-nowrap",
+				"bg-[var(--main-color)] outline-[var(--outline-color)] text-[var(--font-color)]",
+				isListening ? "w-[29px]" : "px-[4.5px]",
 				className
 			)}
-			style={{
-				borderRadius: `calc(${br} / 2)`,
-				backgroundColor: "var(--main-color)",
-				borderColor: "var(--outline-color)",
-				color: "var(--font-color)"
-			}}
-			onClick={(e) => {
-				e.preventDefault();
+			style={{ borderRadius: halfCornerRadius }}
+			onClick={(event) => {
+				event.preventDefault();
 				setIsListening(true);
 			}}
 			title={isListening ? "Press a key..." : mode ? `Mode: ${mode}` : undefined}
 		>
-			{isListening ? "..." : display}
+			<span className="opacity-60 transition-opacity group-hover/keypicker:opacity-100">{isListening ? "..." : displayValue}</span>
 		</div>
 	);
 }

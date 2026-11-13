@@ -18,16 +18,16 @@ const collectFromGroupbox = (groupbox: GroupboxData | undefined, into: Map<strin
 
 	collectFromElements(groupbox.elements, into);
 
-	for (const depBox of Object.values(groupbox.dependencyBoxes || {})) {
-		collectFromGroupbox(depBox, into);
+	for (const dependencyBox of Object.values(groupbox.dependencyBoxes || {})) {
+		collectFromGroupbox(dependencyBox, into);
 	}
 
 	for (const tabbox of groupbox.tabboxes || []) {
 		collectFromTabbox(tabbox, into);
 	}
 
-	for (const depGroupbox of groupbox.dependencyGroupboxes || []) {
-		collectFromGroupbox(depGroupbox, into);
+	for (const dependencyGroupbox of groupbox.dependencyGroupboxes || []) {
+		collectFromGroupbox(dependencyGroupbox, into);
 	}
 };
 
@@ -36,8 +36,8 @@ const collectFromTabbox = (tabbox: TabboxData | undefined, into: Map<string, Opt
 
 	for (const tab of Object.values(tabbox.tabs || {})) {
 		collectFromElements(tab.elements, into);
-		for (const depBox of Object.values(tab.dependencyBoxes || {})) {
-			collectFromGroupbox(depBox, into);
+		for (const dependencyBox of Object.values(tab.dependencyBoxes || {})) {
+			collectFromGroupbox(dependencyBox, into);
 		}
 
 		for (const nestedTabbox of tab.tabboxes || []) {
@@ -62,8 +62,8 @@ export const collectOptionDefaults = (tabData: TabData | null | undefined): Map<
 		}
 	}
 
-	for (const depGroupbox of Object.values(tabData.dependencyGroupboxes || {})) {
-		collectFromGroupbox(depGroupbox, into);
+	for (const dependencyGroupbox of Object.values(tabData.dependencyGroupboxes || {})) {
+		collectFromGroupbox(dependencyGroupbox, into);
 	}
 
 	return into;

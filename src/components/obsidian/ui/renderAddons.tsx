@@ -11,14 +11,14 @@ export const renderAddons = (element: UIElement, addons?: Addons[], stateKeyPref
 	const scope = stateKeyPrefix || "global";
 	return (
 		<AddonContainer>
-			{addons.map((addon, idx) => {
-				const addonKey = `${scope}:addon:${addon.type}:${element.index}:${idx}`;
+			{addons.map((addon, addonIndex) => {
+				const addonKey = `${scope}:addon:${addon.type}:${element.index}:${addonIndex}`;
 
 				switch (addon.type) {
 					case "KeyPicker":
 						return (
 							<KeyPicker
-								key={idx}
+								key={addonIndex}
 								defaultValue={addon.displayValue || addon.value}
 								mode={addon.mode}
 								modifiers={addon.modifiers}
@@ -30,7 +30,7 @@ export const renderAddons = (element: UIElement, addons?: Addons[], stateKeyPref
 					case "ColorPicker":
 						return (
 							<ColorPicker
-								key={idx}
+								key={addonIndex}
 								title={addon.title ?? null}
 								defaultValue={addon.value}
 								className="pointer-events-auto"

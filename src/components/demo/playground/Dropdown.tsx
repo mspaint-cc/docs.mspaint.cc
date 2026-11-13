@@ -212,7 +212,7 @@ export default function DropdownPlayground() {
       <CopyPseudoComponent codegenfunc={safeGeneratePseudoCode} />
 
       <div className="flex items-center justify-center min-h-[150px] relative w-full">
-        <div className="w-full max-w-xl">{memoizedDropdown}</div>
+        <div className="w-full max-w-[280px]">{memoizedDropdown}</div>
       </div>
 
       <div className="flex flex-col gap-4">

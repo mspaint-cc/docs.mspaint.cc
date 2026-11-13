@@ -23,7 +23,7 @@ function formatColor3(r: number, g: number, b: number) {
   )})`;
 }
 
-function InternalColorPickerPlayground() {
+export default function ColorPickerPlayground() {
   const [toggleText, setToggleText] = useState("This is a toggle");
   const [title, setTitle] = useState("Some color");
   const [defaultColor, setDefaultColor] = useState("1,1,1");
@@ -47,19 +47,21 @@ function InternalColorPickerPlayground() {
 
   const memoizedPreview = useMemo(
     () => (
-      <div className="relative w-full max-w-[280px]">
-        <Toggle 
-          key={`${parsedColor.r}-${parsedColor.g}-${parsedColor.b}-${title}-${toggleText}`}
-          text={toggleText} 
-          checked={false} 
-          risky={false} 
-          addonData={[
-            { index: 0, type: "Toggle", text: toggleText, visible: true, disabled: false, value: false, properties: { risky: false, variant: "Switch" } } as any,
-            [{ type: "ColorPicker", value: parsedColor, title: title } as any],
-            `playground-${parsedColor.r}-${parsedColor.g}-${parsedColor.b}-${title}`
-          ]}
-        />
-      </div>
+      <UIStateProvider>
+        <ObsidianDataProvider scheme={{}}>
+          <Toggle
+            key={`${parsedColor.r}-${parsedColor.g}-${parsedColor.b}-${title}-${toggleText}`}
+            text={toggleText}
+            checked={false}
+            risky={false}
+            addonData={[
+              { index: 0, type: "Toggle", text: toggleText, visible: true, disabled: false, value: false, properties: { risky: false, variant: "Switch" } } as any,
+              [{ type: "ColorPicker", value: parsedColor, title: title } as any],
+              `playground-${parsedColor.r}-${parsedColor.g}-${parsedColor.b}-${title}`
+            ]}
+          />
+        </ObsidianDataProvider>
+      </UIStateProvider>
     ),
     [parsedColor, title, toggleText]
   );
@@ -116,7 +118,7 @@ function InternalColorPickerPlayground() {
       <CopyPseudoComponent codegenfunc={safeGeneratePseudoCode} />
 
       <div className="flex items-center justify-center min-h-[160px] relative w-full">
-        {memoizedPreview}
+        <div className="w-full max-w-[280px]">{memoizedPreview}</div>
       </div>
 
       <div className="flex flex-col gap-4">
@@ -193,15 +195,5 @@ function InternalColorPickerPlayground() {
         </div>
       </div>
     </div>
-  );
-}
-
-export default function ColorPickerPlayground() {
-  return (
-    <UIStateProvider>
-      <ObsidianDataProvider scheme={{}}>
-        <InternalColorPickerPlayground />
-      </ObsidianDataProvider>
-    </UIStateProvider>
   );
 }

@@ -8,17 +8,17 @@ import { ElementParser } from "./ElementParser";
 import Tabbox from "../elements/TabBox";
 
 export const DependencyBoxRenderer: FC<{
-	depBox: GroupboxData;
+	dependencyBox: GroupboxData;
 	scope: string;
 	optionDefaults: Map<string, OptionDefault>;
-}> = ({ depBox, scope, optionDefaults }) => {
+}> = ({ dependencyBox, scope, optionDefaults }) => {
 	const { state } = useUIState();
-	if (!dependenciesMet(depBox.dependencies, state, optionDefaults)) return null;
+	if (!dependenciesMet(dependencyBox.dependencies, state, optionDefaults)) return null;
 
 	return (
 		<OrderedBoxContent
-			elements={depBox.elements}
-			dependencyBoxes={depBox.dependencyBoxes}
+			elements={dependencyBox.elements}
+			dependencyBoxes={dependencyBox.dependencyBoxes}
 			scope={scope}
 			optionDefaults={optionDefaults}
 		/>
@@ -44,15 +44,15 @@ export const OrderedBoxContent: FC<{
 			});
 		});
 
-		Object.entries(dependencyBoxes || {}).forEach(([depName, depBox], index) => {
+		Object.entries(dependencyBoxes || {}).forEach(([dependencyName, dependencyBox], index) => {
 			list.push({
-				order: depBox.layoutOrder ?? 10000 + index,
+				order: dependencyBox.layoutOrder ?? 10000 + index,
 				tie: 10000 + index,
-				key: `dep-${depName}`,
+				key: `dep-${dependencyName}`,
 				node: (
 					<DependencyBoxRenderer
-						depBox={depBox}
-						scope={`${scope}:dep:${depName}`}
+						dependencyBox={dependencyBox}
+						scope={`${scope}:dep:${dependencyName}`}
 						optionDefaults={optionDefaults}
 					/>
 				)
@@ -75,7 +75,7 @@ export const OrderedBoxContent: FC<{
 			});
 		});
 
-		list.sort((a, b) => a.order - b.order || a.tie - b.tie);
+		list.sort((first, second) => first.order - second.order || first.tie - second.tie);
 		return list;
 	}, [elements, tabboxes, dependencyBoxes, scope, optionDefaults]);
 

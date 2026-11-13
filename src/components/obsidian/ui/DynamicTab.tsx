@@ -2,14 +2,20 @@ import { memo, useMemo, FC } from "react";
 
 import { TabData, TabboxData, GroupboxData } from "../element.types";
 import { Groupbox } from "../elements/GroupBox";
-import { TabContainer, TabLeft, TabRight } from "../elements/Tab";
+import { TabColumn, TabContainer } from "../elements/Tab";
 import Tabbox from "../elements/TabBox";
 import ObsidianWarningBox from "../elements/WarningBox";
 import { ElementParser } from "./ElementParser";
 import { OrderedBoxContent } from "./DependencyBox";
 import { collectOptionDefaults, dependenciesMet, type OptionDefault } from "../utils/dependencies";
-import { useUIState } from "../providers/UIStateProvider";
-import { useCornerRadius } from "../providers/ObsidianDataProvider";
+import { useUIState, useUIValue } from "../providers/UIStateProvider";
+import { useCornerRadius, useHalfCornerRadius } from "../providers/ObsidianDataProvider";
+import { getIcon } from "../utils/icons";
+import { cn } from "@/lib/utils";
+
+type Side = "Left" | "Right";
+
+const byLayoutOrder = (first: GroupboxData, second: GroupboxData) => (first.layoutOrder ?? 0) - (second.layoutOrder ?? 0);
 
 const GroupboxRenderer: FC<{
 	groupbox: GroupboxData;
@@ -36,38 +42,36 @@ const GroupboxRenderer: FC<{
 				/>
 			</Groupbox>
 
-			{[...(groupbox.dependencyGroupboxes || [])]
-				.sort((depA, depB) => (depA.layoutOrder ?? 0) - (depB.layoutOrder ?? 0))
-				.map((depGroupbox) => (
-					<DependencyGroupboxRenderer
-						key={`depgroup-${depGroupbox.name}`}
-						depGroupbox={depGroupbox}
-						scope={`${scope}:depgroup:${depGroupbox.name}`}
-						optionDefaults={optionDefaults}
-					/>
-				))}
+			{[...(groupbox.dependencyGroupboxes || [])].sort(byLayoutOrder).map((dependencyGroupbox) => (
+				<DependencyGroupboxRenderer
+					key={`depgroup-${dependencyGroupbox.name}`}
+					dependencyGroupbox={dependencyGroupbox}
+					scope={`${scope}:depgroup:${dependencyGroupbox.name}`}
+					optionDefaults={optionDefaults}
+				/>
+			))}
 		</>
 	);
 };
 
 const DependencyGroupboxRenderer: FC<{
-	depGroupbox: GroupboxData;
+	dependencyGroupbox: GroupboxData;
 	scope: string;
 	optionDefaults: Map<string, OptionDefault>;
-}> = ({ depGroupbox, scope, optionDefaults }) => {
+}> = ({ dependencyGroupbox, scope, optionDefaults }) => {
 	const { state } = useUIState();
-	const br = useCornerRadius();
-	if (!dependenciesMet(depGroupbox.dependencies, state, optionDefaults)) return null;
+	const cornerRadius = useCornerRadius();
+	if (!dependenciesMet(dependencyGroupbox.dependencies, state, optionDefaults)) return null;
 
 	return (
 		<div
-			className="-mt-[6px] ml-2 mb-3 flex flex-col p-[7px] gap-[8px] bg-[var(--background-color)] border border-[var(--outline-color)] font-normal"
-			style={{ borderRadius: br }}
+			className="-mt-[4px] mb-[10px] flex flex-col p-[7px] gap-[8px] bg-[var(--background-color)] border border-[var(--outline-color)] font-normal"
+			style={{ borderRadius: cornerRadius }}
 		>
 			<OrderedBoxContent
-				elements={depGroupbox.elements}
-				tabboxes={depGroupbox.tabboxes}
-				dependencyBoxes={depGroupbox.dependencyBoxes}
+				elements={dependencyGroupbox.elements}
+				tabboxes={dependencyGroupbox.tabboxes}
+				dependencyBoxes={dependencyGroupbox.dependencyBoxes}
 				scope={scope}
 				optionDefaults={optionDefaults}
 			/>
@@ -75,29 +79,69 @@ const DependencyGroupboxRenderer: FC<{
 	);
 };
 
+const SubTabsRenderer: FC<{ tabData: TabData }> = ({ tabData }) => {
+	const halfCornerRadius = useHalfCornerRadius();
+	const sortedSubTabs = useMemo(
+		() => Object.entries(tabData.subTabs || {}).sort(([, first], [, second]) => (first.order ?? 0) - (second.order ?? 0)),
+		[tabData.subTabs]
+	);
+	const fallbackSubTab = tabData.activeSubTab && tabData.subTabs?.[tabData.activeSubTab] ? tabData.activeSubTab : sortedSubTabs[0]?.[0];
+	const [activeSubTab, setActiveSubTab] = useUIValue<string>(`subtab:${tabData.name}`, fallbackSubTab);
+	const activeSubTabData = (activeSubTab && tabData.subTabs?.[activeSubTab]) || null;
+
+	return (
+		<div className="flex flex-col w-full h-full min-h-0">
+			<div className="flex flex-row gap-[8px] h-[30px] mt-[5px] mx-[8px] px-[1px] py-[3px] overflow-x-auto overflow-y-hidden no-scrollbar shrink-0">
+				{sortedSubTabs.map(([subTabName, subTab]) => {
+					const isActive = subTabName === activeSubTab;
+					const SubTabIcon = getIcon(subTab.icon);
+					const stateOpacity = isActive ? "opacity-100" : "opacity-50 group-hover/subtab:opacity-75";
+
+					return (
+						<button
+							type="button"
+							key={subTabName}
+							onClick={() => setActiveSubTab(subTabName)}
+							className="group/subtab flex flex-row items-center justify-center gap-[6px] px-[8px] h-full shrink-0 bg-[var(--main-color)]"
+							style={{
+								outline: `1px solid ${isActive ? "var(--accent-color)" : "var(--outline-color)"}`,
+								borderRadius: halfCornerRadius
+							}}
+						>
+							{SubTabIcon && <SubTabIcon className={cn("size-[16px] shrink-0 transition-opacity text-[var(--accent-color)]", stateOpacity)} />}
+							<span className={cn("text-[14px] leading-[16px] whitespace-nowrap transition-opacity text-[var(--font-color)]", stateOpacity)}>{subTabName}</span>
+						</button>
+					);
+				})}
+			</div>
+
+			<div className="h-px w-full shrink-0 mt-[5px] bg-[var(--outline-color)]" />
+
+			<div className="flex flex-col flex-1 min-h-0 overflow-hidden">
+				<TabParser tabData={activeSubTabData} />
+			</div>
+		</div>
+	);
+};
+
+const sortSideBoxes = (tabData: TabData | null, side: Side) => {
+	const groupboxes = Object.values(tabData?.groupboxes?.[side] ?? {});
+	const tabboxes = Object.values(tabData?.tabboxes?.[side] ?? {});
+	return [...groupboxes, ...tabboxes].filter(Boolean).sort((first, second) => (first.order ?? 0) - (second.order ?? 0));
+};
+
 const TabParserComponent: FC<{ tabData: TabData | null }> = ({ tabData }) => {
-	const { groupboxes, tabboxes, warningBox, isKeyTab, elements, dependencyGroupboxes } = tabData || {};
 	const optionDefaults = useMemo(() => collectOptionDefaults(tabData), [tabData]);
-
-	const LeftBoxes = useMemo(() => {
-		const GroupboxesList = groupboxes?.Left ? Object.values(groupboxes.Left) : [];
-		const TabboxesList = tabboxes?.Left ? Object.values(tabboxes.Left) : [];
-		return [...GroupboxesList, ...TabboxesList].sort((boxA, boxB) => (boxA.order ?? 0) - (boxB.order ?? 0));
-	}, [groupboxes?.Left, tabboxes?.Left]);
-
-	const RightBoxes = useMemo(() => {
-		const GroupboxesList = groupboxes?.Right ? Object.values(groupboxes.Right) : [];
-		const TabboxesList = tabboxes?.Right ? Object.values(tabboxes.Right) : [];
-		return [...GroupboxesList, ...TabboxesList].sort((boxA, boxB) => (boxA.order ?? 0) - (boxB.order ?? 0));
-	}, [groupboxes?.Right, tabboxes?.Right]);
+	const sideBoxes = useMemo(() => ({ Left: sortSideBoxes(tabData, "Left"), Right: sortSideBoxes(tabData, "Right") }), [tabData]);
 
 	if (!tabData) return null;
+	if (tabData.hasSubTabs && tabData.subTabs) return <SubTabsRenderer tabData={tabData} />;
 
-	if (isKeyTab) {
+	if (tabData.isKeyTab) {
 		return (
-			<div className="flex flex-col items-center justify-center gap-[8px] w-full h-full px-4 py-6 overflow-y-auto">
-				{(elements || []).map((element) => (
-					<div key={`keytab-${element.index}`} className="w-full max-w-[420px]">
+			<div className="flex flex-col items-center justify-center gap-[8px] w-full h-full px-[1px] overflow-y-auto">
+				{(tabData.elements || []).map((element) => (
+					<div key={`keytab-${element.index}`} className="w-full [&_.text-left]:text-center">
 						<ElementParser element={element} stateKeyPrefix={`keytab:${tabData.name}`} />
 					</div>
 				))}
@@ -105,79 +149,43 @@ const TabParserComponent: FC<{ tabData: TabData | null }> = ({ tabData }) => {
 		);
 	}
 
-	return (
-		<>
-			{warningBox && (
-				<ObsidianWarningBox
-					text={warningBox.Text}
-					title={warningBox.Title}
-					visible={warningBox.Visible}
-					isNormal={warningBox.IsNormal}
-					lockSize={warningBox.LockSize}
-				/>
-			)}
+	const renderSide = (side: Side) => {
+		const sideName = side.toLowerCase();
 
-			<TabContainer>
-				<TabLeft>
-					{LeftBoxes.map((Box) => {
-						if (Box.type === "Tabbox") {
-							const TabboxInstance = Box as TabboxData;
-							return (
-								<Tabbox
-									key={TabboxInstance.name}
-									tabs={TabboxInstance.tabs}
-									scope={`tab:${tabData.name}:left:tabbox:${TabboxInstance.name}`}
-									optionDefaults={optionDefaults}
-								/>
-							);
-						}
+		return (
+			<TabColumn side={side}>
+				{sideBoxes[side].map((box) =>
+					box.type === "Tabbox" ? (
+						<Tabbox key={box.name} tabs={(box as TabboxData).tabs} scope={`tab:${tabData.name}:${sideName}:tabbox:${box.name}`} optionDefaults={optionDefaults} />
+					) : (
+						<GroupboxRenderer key={box.name} groupbox={box as GroupboxData} scope={`gb:${tabData.name}:${sideName}:groupbox:${box.name}`} optionDefaults={optionDefaults} />
+					)
+				)}
 
-						const GroupboxInstance = Box as GroupboxData;
-						return (
-							<GroupboxRenderer
-								key={GroupboxInstance.name}
-								groupbox={GroupboxInstance}
-								scope={`gb:${tabData.name}:left:groupbox:${GroupboxInstance.name}`}
-								optionDefaults={optionDefaults}
-							/>
-						);
-					})}
-
-					{Object.entries(dependencyGroupboxes || {}).map(([depName, depGroupbox]) => (
+				{side === "Left" &&
+					Object.entries(tabData.dependencyGroupboxes || {}).map(([dependencyName, dependencyGroupbox]) => (
 						<DependencyGroupboxRenderer
-							key={`dep-gb-left-${depName}`}
-							depGroupbox={depGroupbox}
-							scope={`gb:${tabData.name}:depgroup:${depName}`}
+							key={`dep-gb-left-${dependencyName}`}
+							dependencyGroupbox={dependencyGroupbox}
+							scope={`gb:${tabData.name}:depgroup:${dependencyName}`}
 							optionDefaults={optionDefaults}
 						/>
 					))}
-				</TabLeft>
+			</TabColumn>
+		);
+	};
 
-				<TabRight>
-					{RightBoxes.map((Box) => {
-						if (Box.type === "Tabbox") {
-							const TabboxInstance = Box as TabboxData;
-							return (
-								<Tabbox
-									key={TabboxInstance.name}
-									tabs={TabboxInstance.tabs}
-									scope={`tab:${tabData.name}:right:tabbox:${TabboxInstance.name}`}
-									optionDefaults={optionDefaults}
-								/>
-							);
-						}
+	const { warningBox } = tabData;
 
-						const GroupboxInstance = Box as GroupboxData;
-						return (
-							<GroupboxRenderer
-								key={GroupboxInstance.name}
-								groupbox={GroupboxInstance}
-								scope={`gb:${tabData.name}:right:groupbox:${GroupboxInstance.name}`}
-								optionDefaults={optionDefaults}
-							/>
-						);
-					})}
-				</TabRight>
+	return (
+		<>
+			{warningBox && (
+				<ObsidianWarningBox text={warningBox.Text} title={warningBox.Title} visible={warningBox.Visible} isNormal={warningBox.IsNormal} lockSize={warningBox.LockSize} />
+			)}
+
+			<TabContainer>
+				{renderSide("Left")}
+				{renderSide("Right")}
 			</TabContainer>
 		</>
 	);

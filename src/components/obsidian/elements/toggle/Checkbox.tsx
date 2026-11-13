@@ -1,10 +1,9 @@
 "use client";
 
 import { CheckIcon } from "lucide-react";
-import { useEffect, useState } from "react";
-import { useUIValue } from "../../providers/UIStateProvider";
+import { useElementValue } from "../../providers/UIStateProvider";
 import Label from "../Label";
-import { useCornerRadius } from "../../providers/ObsidianDataProvider";
+import { useHalfCornerRadius } from "../../providers/ObsidianDataProvider";
 
 export default function ToggleCheckbox({
 	text,
@@ -17,42 +16,29 @@ export default function ToggleCheckbox({
 	risky: boolean;
 	stateKey?: string;
 }) {
-	const [externalChecked, setExternalChecked] = useUIValue<boolean | undefined>(stateKey, undefined);
-	const [isChecked, setChecked] = useState<boolean>((externalChecked as boolean | undefined) ?? checked);
-	const br = useCornerRadius();
-
-	useEffect(() => {
-		if (!stateKey) return;
-		const v = externalChecked;
-		if (typeof v === "boolean") setChecked(v);
-	}, [externalChecked, stateKey]);
+	const [isChecked, setChecked] = useElementValue(stateKey, checked);
+	const halfCornerRadius = useHalfCornerRadius();
 
 	return (
 		<div
-			className="relative flex items-center gap-x-2 cursor-pointer group"
-			onClick={(e) => {
-				e.preventDefault();
-				const next = !isChecked;
-				setChecked(next);
-				if (stateKey) setExternalChecked(next);
+			className="relative flex items-center h-[18px] gap-x-[7px] cursor-pointer"
+			onClick={(event) => {
+				event.preventDefault();
+				setChecked(!isChecked);
 			}}
 		>
 			<button
 				type="button"
-				className="size-[20px] border flex items-center justify-center shrink-0 hover:brightness-125"
-				style={{
-					borderRadius: br,
-					backgroundColor: "var(--main-color)",
-					borderColor: "var(--outline-color)"
-				}}
+				className="size-[20px] -my-[1px] border flex items-center justify-center shrink-0 bg-[var(--main-color)] border-[var(--outline-color)]"
+				style={{ borderRadius: halfCornerRadius }}
 			>
-				<CheckIcon className={`size-[16px] transition-opacity`} style={{ opacity: isChecked === true ? 1 : 0, stroke: "var(--font-color)" }} />
+				<CheckIcon className="size-[14px] transition-opacity stroke-[var(--font-color)]" style={{ opacity: isChecked ? 1 : 0 }} />
 			</button>
 
 			<Label
-				className={`text-left block text-xs select-none transition-opacity flex-1`}
+				className="text-left block text-[14px] leading-[18px] select-none transition-opacity flex-1"
 				style={{
-					opacity: isChecked === true ? 0.8 : 0.6,
+					opacity: isChecked ? 1 : 0.6,
 					color: risky ? "var(--color-red-500)" : "var(--font-color)"
 				}}
 			>

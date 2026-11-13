@@ -5,6 +5,8 @@ import { ThemeScheme, getThemeStyles, DefaultTheme, BuiltInThemes } from "../uti
 import { formatColor } from "../utils/color";
 import { Color3 } from "../element.types";
 import { useUIState } from "./UIStateProvider";
+import { ObsidianFont } from "../fonts";
+import { cn } from "@/lib/utils";
 
 interface ObsidianDataContextType {
 	cornerRadius: number;
@@ -19,6 +21,13 @@ const ObsidianDataContext = createContext<ObsidianDataContextType>({
 	themeStyles: {}
 });
 
+const ThemeColorKeys = ["backgroundColor", "mainColor", "accentColor", "outlineColor", "fontColor"] as const;
+const ThemeColorPickerNames = [":BackgroundColor:", ":MainColor:", ":AccentColor:", ":OutlineColor:", ":FontColor:"];
+
+const isThemeOverrideKey = (key: string) =>
+	key.startsWith("theme_override:") ||
+	(key.includes(":addon:ColorPicker:") && ThemeColorPickerNames.some((name) => key.includes(name)));
+
 export function ObsidianDataProvider({
 	cornerRadius = 4,
 	forceCheckbox = false,
@@ -30,78 +39,71 @@ export function ObsidianDataProvider({
 	scheme?: ThemeScheme;
 	children: ReactNode;
 }) {
-	const { state, setState } = useUIState();
+	const { state, setState, getState } = useUIState();
 
 	const themeListKey = Object.keys(state).find((key) => key.endsWith("ThemeManager_ThemeList"));
 	const selectedThemeName = themeListKey ? (state[themeListKey] as string) : undefined;
-	const prevThemeNameRef = React.useRef(selectedThemeName);
+	const previousThemeNameRef = React.useRef(selectedThemeName);
 
 	React.useEffect(() => {
-		if (prevThemeNameRef.current === selectedThemeName) return;
-		prevThemeNameRef.current = selectedThemeName;
+		if (previousThemeNameRef.current === selectedThemeName) return;
+		previousThemeNameRef.current = selectedThemeName;
 
-		for (const key of Object.keys(state)) {
-			if (key.startsWith("theme_override:")) {
-				setState(key, undefined);
-			} else if (key.includes(":addon:ColorPicker:") && (
-				key.includes(":BackgroundColor:") ||
-				key.includes(":MainColor:") ||
-				key.includes(":AccentColor:") ||
-				key.includes(":OutlineColor:") ||
-				key.includes(":FontColor:")
-			)) {
-				setState(key, undefined);
-			}
+		for (const key of Object.keys(getState())) {
+			if (isThemeOverrideKey(key)) setState(key, undefined);
 		}
-	}, [selectedThemeName, setState, state]);
+	}, [selectedThemeName, setState, getState]);
+
+	const overrideValues = ThemeColorKeys.map((key) => state[`theme_override:${key}`]);
+	const overrideDependency = overrideValues.map((value) => (value == null ? "" : JSON.stringify(value))).join("|");
 
 	const activeScheme = React.useMemo(() => {
 		const selectedBuiltIn = selectedThemeName ? BuiltInThemes[selectedThemeName] : undefined;
-		const baseScheme = scheme 
-			? { ...DefaultTheme, ...scheme, ...selectedBuiltIn } 
-			: (selectedBuiltIn ? { ...DefaultTheme, ...selectedBuiltIn } : DefaultTheme);
-
 		const overrides: ThemeScheme = {};
-		for (const key of ["backgroundColor", "mainColor", "accentColor", "outlineColor", "fontColor"] as const) {
-			const val = state[`theme_override:${key}`];
-			if (val !== undefined && val !== null) overrides[key] = formatColor(val as string | Color3);
-		}
+		ThemeColorKeys.forEach((key, keyIndex) => {
+			const value = overrideValues[keyIndex];
+			if (value != null) overrides[key] = formatColor(value as string | Color3);
+		});
 
-		return {
-			...baseScheme,
-			...overrides
-		};
-	}, [scheme, state, selectedThemeName]);
+		return { ...DefaultTheme, ...scheme, ...selectedBuiltIn, ...overrides };
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [scheme, selectedThemeName, overrideDependency]);
 
 	const themeStyles = React.useMemo(() => getThemeStyles(activeScheme), [activeScheme]);
+	const contextValue = React.useMemo(
+		() => ({ cornerRadius, forceCheckbox, scheme: activeScheme, themeStyles }),
+		[cornerRadius, forceCheckbox, activeScheme, themeStyles]
+	);
 
 	return (
-		<ObsidianDataContext.Provider value={{ cornerRadius, forceCheckbox, scheme: activeScheme, themeStyles }}>
+		<ObsidianDataContext.Provider value={contextValue}>
 			<style>{`
 				.obsidian-theme-container .text-white { color: var(--font-color) !important; }
 				.obsidian-theme-container .stroke-white { stroke: var(--font-color) !important; }
 			`}</style>
-			<div style={{ ...themeStyles }}>{children}</div>
+			<div className={cn("obsidian-theme-container font-normal leading-none text-white stroke-white", ObsidianFont.className)} style={themeStyles}>
+				{children}
+			</div>
 		</ObsidianDataContext.Provider>
 	);
 }
 
 export function useCornerRadius() {
-	const context = useContext(ObsidianDataContext);
-	return `${context.cornerRadius}px`;
+	return `${useContext(ObsidianDataContext).cornerRadius}px`;
+}
+
+export function useHalfCornerRadius() {
+	return `${useContext(ObsidianDataContext).cornerRadius / 2}px`;
 }
 
 export function useForceCheckbox() {
-	const context = useContext(ObsidianDataContext);
-	return context.forceCheckbox;
+	return useContext(ObsidianDataContext).forceCheckbox;
 }
 
 export function useThemeStyles() {
-	const context = useContext(ObsidianDataContext);
-	return context.themeStyles;
+	return useContext(ObsidianDataContext).themeStyles;
 }
 
 export function useThemeScheme() {
-	const context = useContext(ObsidianDataContext);
-	return context.scheme;
+	return useContext(ObsidianDataContext).scheme;
 }

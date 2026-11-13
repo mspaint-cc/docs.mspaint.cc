@@ -157,31 +157,29 @@ export const BuiltInThemes: Record<string, ThemeScheme> = {
 };
 
 export const getThemeStyles = (scheme?: ThemeScheme): React.CSSProperties => {
-	const s = scheme || DefaultTheme;
+	const theme = scheme || DefaultTheme;
 
-	const bgColorRaw = formatColor(s.backgroundColor) || DefaultTheme.backgroundColor;
-	const isLightTheme = s.fontColor ? (s.fontColor === "000000" || s.fontColor === "#000000" || s.fontColor === "rgb(0, 0, 0)") : false;
+	const backgroundColor = formatColor(theme.backgroundColor) || DefaultTheme.backgroundColor;
+	const isLightTheme = theme.fontColor ? (theme.fontColor === "000000" || theme.fontColor === "#000000" || theme.fontColor === "rgb(0, 0, 0)") : false;
 
-	const layoutMainBackground = getBetterColor(bgColorRaw, -1, isLightTheme);
-	const layoutSidebarBackground = bgColorRaw;
-	const layoutContainerBackground = getBetterColor(bgColorRaw, 1, isLightTheme);
-	const layoutFooterBackground = getBetterColor(bgColorRaw, 4, isLightTheme);
+	const layoutMainBackground = getBetterColor(backgroundColor, -1, isLightTheme);
+	const layoutContainerBackground = getBetterColor(backgroundColor, 1, isLightTheme);
+	const layoutFooterBackground = getBetterColor(backgroundColor, 4, isLightTheme);
 
 	return {
-		"--background-color": bgColorRaw,
-		"--main-color": formatColor(s.mainColor) || DefaultTheme.mainColor,
-		"--accent-color": formatColor(s.accentColor) || DefaultTheme.accentColor,
-		"--outline-color": formatColor(s.outlineColor) || DefaultTheme.outlineColor,
-		"--font-color": formatColor(s.fontColor) || DefaultTheme.fontColor,
+		"--background-color": backgroundColor,
+		"--main-color": formatColor(theme.mainColor) || DefaultTheme.mainColor,
+		"--accent-color": formatColor(theme.accentColor) || DefaultTheme.accentColor,
+		"--outline-color": formatColor(theme.outlineColor) || DefaultTheme.outlineColor,
+		"--font-color": formatColor(theme.fontColor) || DefaultTheme.fontColor,
 
-		"--red-color": formatColor(s.redColor) || DefaultTheme.redColor,
-		"--destructive-color": formatColor(s.destructiveColor) || DefaultTheme.destructiveColor,
-		"--dark-color": formatColor(s.darkColor) || DefaultTheme.darkColor,
-		"--white-color": formatColor(s.whiteColor) || DefaultTheme.whiteColor,
+		"--red-color": formatColor(theme.redColor) || DefaultTheme.redColor,
+		"--destructive-color": formatColor(theme.destructiveColor) || DefaultTheme.destructiveColor,
+		"--dark-color": formatColor(theme.darkColor) || DefaultTheme.darkColor,
+		"--white-color": formatColor(theme.whiteColor) || DefaultTheme.whiteColor,
 
-		// Layout Specific Colors //
 		"--layout-main-background": layoutMainBackground,
-		"--layout-sidebar-background": layoutSidebarBackground,
+		"--layout-sidebar-background": backgroundColor,
 		"--layout-container-background": layoutContainerBackground,
 		"--layout-footer-background": layoutFooterBackground
 	} as React.CSSProperties;

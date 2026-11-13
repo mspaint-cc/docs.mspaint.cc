@@ -153,7 +153,7 @@ export default function KeybindPlayground() {
       <CopyPseudoComponent codegenfunc={safeGeneratePseudoCode} />
 
       <div className="flex items-center justify-center min-h-[160px] relative w-full">
-        <div className="w-full max-w-xl">{memoizedPreview}</div>
+        <div className="w-full max-w-[280px]">{memoizedPreview}</div>
       </div>
 
       <div className="flex flex-col gap-4">
