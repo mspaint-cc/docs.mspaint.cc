@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { useHalfCornerRadius, useThemeStyles } from "../providers/ObsidianDataProvider";
 import { ObsidianFont } from "../fonts";
 import { usePortalContainer } from "../utils/hooks";
+import Label from "./Label";
 
 const OffsetX = 14;
 const OffsetY = 12;
@@ -59,7 +60,7 @@ export default function ElementTooltip({
 						)}
 						style={{ ...themeStyles, left: position.x, top: position.y, maxWidth: position.maxWidth, borderRadius: halfCornerRadius }}
 					>
-						{tooltipText}
+						<Label className="text-inherit whitespace-pre-wrap break-words">{tooltipText}</Label>
 					</div>,
 					portalContainer
 				)}

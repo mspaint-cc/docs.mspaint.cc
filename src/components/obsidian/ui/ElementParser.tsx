@@ -53,25 +53,17 @@ export const ElementParser: FC<{
 				);
 
 			case "Button":
+				customHandlerForAddons = true;
 				return (
 					<Button
 						text={element.text}
 						icon={element.icon ?? element.properties?.icon}
-						subButton={
-							element.subButton
-								? {
-										text: element.subButton.text,
-										icon: element.subButton.icon ?? element.subButton.properties?.icon,
-										properties: {
-											risky: element.subButton.properties?.risky,
-											doubleClick: element.subButton.properties?.doubleClick,
-											icon: element.subButton.properties?.icon,
-										},
-									}
-								: undefined
-						}
+						subButton={element.subButton}
 						risky={element.properties?.risky}
 						disabled={element.disabled}
+						addons={addons}
+						index={element.index}
+						stateKeyPrefix={stateKeyPrefix}
 					/>
 				);
 
@@ -85,6 +77,8 @@ export const ElementParser: FC<{
 						searchable={element.properties.searchable === true}
 						disabledValues={element.properties.disabledValues}
 						valueImages={element.properties.valueImages}
+						listLabels={element.properties.listLabels}
+						displayLabels={element.properties.displayLabels}
 						allowNull={element.properties.allowNull}
 						specialType={element.properties.specialType}
 						enablePlayerImages={element.properties.enablePlayerImages}

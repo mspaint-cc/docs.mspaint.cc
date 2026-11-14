@@ -11,6 +11,7 @@ import { createPortal } from "react-dom";
 import { useHalfCornerRadius, useThemeStyles } from "../providers/ObsidianDataProvider";
 import { useAnchoredRect, useClickOutside, usePortalContainer } from "../utils/hooks";
 import type { DropdownDividerValue } from "../element.types";
+import { renderIcon } from "../utils/icons";
 
 const NoAnimationClassName = "data-[state=open]:animate-none data-[state=closed]:animate-none data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0";
 const ItemHeight = 21;
@@ -78,16 +79,18 @@ function DropdownDivider({ label }: { label: string }) {
 	);
 }
 
+const DropdownIconClassName = "size-[16px] rounded-sm object-cover shrink-0";
+
 function DropdownOption({
 	label,
-	imageSrc,
+	icon,
 	isSelected,
 	isDisabled,
 	autoWidth,
 	onSelect
 }: {
 	label: string;
-	imageSrc?: string;
+	icon: React.ReactNode;
 	isSelected: boolean;
 	isDisabled: boolean;
 	autoWidth?: boolean;
@@ -96,8 +99,8 @@ function DropdownOption({
 	return (
 		<div
 			className={cn(
-				"py-0 gap-[4px] flex items-center cursor-pointer text-white",
-				imageSrc ? "pl-[4px] pr-[7px]" : "px-[7px]",
+				"py-0 gap-[5px] flex items-center cursor-pointer text-white",
+				icon ? "pl-[4px] pr-[7px]" : "px-[7px]",
 				isSelected && "bg-[var(--main-color)]",
 				isDisabled ? "opacity-20 cursor-not-allowed" : isSelected ? "opacity-100" : "opacity-50",
 				ObsidianFont.className
@@ -115,10 +118,7 @@ function DropdownOption({
 			}}
 			style={{ height: `${ItemHeight}px` }}
 		>
-			{imageSrc && (
-				// eslint-disable-next-line @next/next/no-img-element
-				<img src={imageSrc} alt="" className="size-[16px] rounded-sm object-cover shrink-0" />
-			)}
+			{icon}
 			<Label className={cn("px-0 text-[14px] text-inherit", autoWidth ? "whitespace-nowrap" : "truncate")} doesWrap={false}>
 				{label}
 			</Label>
@@ -134,6 +134,8 @@ export default function Dropdown({
 	searchable,
 	disabledValues,
 	valueImages,
+	listLabels,
+	displayLabels,
 	allowNull,
 	specialType,
 	enablePlayerImages,
@@ -149,6 +151,8 @@ export default function Dropdown({
 	searchable?: boolean;
 	disabledValues?: DisabledValues;
 	valueImages?: { [key: string]: string };
+	listLabels?: { [key: string]: string };
+	displayLabels?: { [key: string]: string };
 	allowNull?: boolean;
 	specialType?: string;
 	enablePlayerImages?: boolean;
@@ -175,8 +179,12 @@ export default function Dropdown({
 	const selectedMap = React.useMemo(() => (multi ? toSelectionMap(storedValue) : {}), [multi, storedValue]);
 	const selectedKey = multi ? "" : toSelectionKey(storedValue);
 
-	const optionItems = React.useMemo(() => normalizeOptions(options), [options]);
-	const labelByKey = React.useMemo(() => Object.fromEntries(optionItems.filter((item) => !item.isDivider).map((item) => [item.key, item.label])), [optionItems]);
+	const rawOptionItems = React.useMemo(() => normalizeOptions(options), [options]);
+	const optionItems = React.useMemo(
+		() => (listLabels ? rawOptionItems.map((item) => (item.isDivider ? item : { ...item, label: listLabels[item.key] ?? item.label })) : rawOptionItems),
+		[rawOptionItems, listLabels]
+	);
+	const labelByKey = React.useMemo(() => Object.fromEntries(rawOptionItems.filter((item) => !item.isDivider).map((item) => [item.key, item.label])), [rawOptionItems]);
 
 	const setOpen = React.useCallback((nextOpen: boolean) => {
 		setIsOpen(nextOpen);
@@ -203,7 +211,7 @@ export default function Dropdown({
 			groups[groups.length - 1].items.push(item);
 		}
 
-		const isItemDisabled = (item: OptionItem) => isDisabledValue(disabledValues, item.key, item.label);
+		const isItemDisabled = (item: OptionItem) => isDisabledValue(disabledValues, item.key, labelByKey[item.key] ?? item.label);
 		const result: OptionItem[] = [];
 		for (const group of groups) {
 			if (query && group.items.length === 0) continue;
@@ -214,7 +222,7 @@ export default function Dropdown({
 		}
 
 		return result;
-	}, [optionItems, searchable, searchQuery, keepDisabledValuePosition, disabledValues]);
+	}, [optionItems, labelByKey, searchable, searchQuery, keepDisabledValuePosition, disabledValues]);
 
 	const visibleCount = Math.ceil(MaxPanelHeight / ItemHeight) + Overscan;
 	const startIndex = Math.max(0, Math.floor(scrollTop / ItemHeight) - Math.floor(Overscan / 2));
@@ -229,7 +237,7 @@ export default function Dropdown({
 		if (initialDisplayText && isUnchanged) return initialDisplayText;
 
 		const selectedKeys = multi ? Object.keys(selectedMap).filter((key) => selectedMap[key]) : selectedKey.trim().length ? [selectedKey] : [];
-		return selectedKeys.length ? selectedKeys.map((key) => labelByKey[key] ?? key).join(", ") : "---";
+		return selectedKeys.length ? selectedKeys.map((key) => displayLabels?.[key] ?? labelByKey[key] ?? key).join(", ") : "---";
 	})();
 
 	const onSelectOption = (optionKey: string, optionLabel: string) => {
@@ -245,6 +253,14 @@ export default function Dropdown({
 	};
 
 	const showPlayerImages = specialType === "Player" && enablePlayerImages === true;
+	const getOptionIcon = (key: string, label: string) => {
+		const iconRef = valueImages?.[key] || valueImages?.[label];
+		if (iconRef) return renderIcon(iconRef, DropdownIconClassName);
+
+		return showPlayerImages ? renderIcon(playerThumbnail(label), DropdownIconClassName) : null;
+	};
+	const firstSelectedKey = multi ? optionItems.find((item) => !item.isDivider && selectedMap[item.key])?.key : selectedKey || undefined;
+	const displayIcon = firstSelectedKey ? getOptionIcon(firstSelectedKey, labelByKey[firstSelectedKey] ?? firstSelectedKey) : null;
 
 	return (
 		<div className="flex flex-col gap-1">
@@ -263,7 +279,8 @@ export default function Dropdown({
 					aria-controls={listboxId}
 					style={isOpen ? { borderBottomLeftRadius: 0, borderBottomRightRadius: 0 } : undefined}
 				>
-					<ButtonText className="absolute w-[calc(100%-35px)] justify-start text-left text-white opacity-100 text-[14px]">
+					<ButtonText className={cn("absolute w-[calc(100%-35px)] justify-start text-left text-white opacity-100 text-[14px]", displayIcon && "left-[4px] gap-[2px]")}>
+						{displayIcon}
 						<Label className="text-inherit truncate" doesWrap={false}>
 							{displayText}
 						</Label>
@@ -323,11 +340,11 @@ export default function Dropdown({
 									<DropdownOption
 										key={startIndex + optionIndex}
 										label={optionItem.label}
-										imageSrc={valueImages?.[optionItem.key] || valueImages?.[optionItem.label] || (showPlayerImages ? playerThumbnail(optionItem.label) : undefined)}
+										icon={getOptionIcon(optionItem.key, labelByKey[optionItem.key])}
 										isSelected={multi ? selectedMap[optionItem.key] === true : selectedKey === optionItem.key}
-										isDisabled={isDisabledValue(disabledValues, optionItem.key, optionItem.label)}
+										isDisabled={isDisabledValue(disabledValues, optionItem.key, labelByKey[optionItem.key])}
 										autoWidth={autoWidth}
-										onSelect={() => onSelectOption(optionItem.key, optionItem.label)}
+										onSelect={() => onSelectOption(optionItem.key, labelByKey[optionItem.key])}
 									/>
 								)
 							)}

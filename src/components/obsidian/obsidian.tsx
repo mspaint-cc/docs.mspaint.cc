@@ -78,6 +78,8 @@ export type ODropdownProps = BaseElementProps & {
 	keepDisabledValuePosition?: boolean;
 	disabledValues?: string[];
 	valueImages?: { [key: string]: string };
+	listLabels?: { [key: string]: string };
+	displayLabels?: { [key: string]: string };
 	multi?: boolean;
 	searchable?: boolean;
 	allowNull?: boolean;
@@ -292,6 +294,8 @@ const ElementParsers: ElementParserEntry[] = [
 			keepDisabledValuePosition: props.keepDisabledValuePosition,
 			disabledValues: props.disabledValues ?? [],
 			valueImages: props.valueImages,
+			listLabels: props.listLabels,
+			displayLabels: props.displayLabels,
 			multi: props.multi ?? false,
 			searchable: props.searchable ?? false,
 			allowNull: props.allowNull,

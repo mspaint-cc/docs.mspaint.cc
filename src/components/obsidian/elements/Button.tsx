@@ -2,7 +2,10 @@ import { cn } from "@/lib/utils";
 import * as React from "react";
 import type { ReactNode } from "react";
 import { useHalfCornerRadius } from "../providers/ObsidianDataProvider";
-import { getIcon, resolveCustomIconSrc } from "../utils/icons";
+import { renderIcon } from "../utils/icons";
+import { renderAddonItems } from "../ui/renderAddons";
+import type { Addons } from "../element.types";
+import Label from "./Label";
 
 export const ButtonBase = React.forwardRef<
 	HTMLButtonElement,
@@ -48,9 +51,6 @@ export function ButtonText({
 	className?: string;
 	children?: ReactNode;
 }) {
-	const IconComponent = getIcon(icon);
-	const customIconSrc = IconComponent ? null : resolveCustomIconSrc(icon);
-
 	return (
 		<span
 			className={cn(
@@ -59,25 +59,23 @@ export function ButtonText({
 				className
 			)}
 		>
-			{IconComponent ? (
-				React.createElement(IconComponent, { className: "size-3.5 shrink-0" })
-			) : customIconSrc ? (
-				// eslint-disable-next-line @next/next/no-img-element
-				<img src={customIconSrc} alt="" className="size-3.5 shrink-0 object-contain" />
-			) : null}
+			{renderIcon(icon, "size-3.5 shrink-0 object-contain")}
 			{children}
 		</span>
 	);
 }
 
-type ButtonProperties = { text: string; icon?: string; risky?: boolean };
+type ButtonProperties = { text: string; icon?: string; risky?: boolean; addons?: Addons[]; index?: string | number };
 
 export default function Button({
 	text,
 	icon,
 	risky,
 	subButton,
-	disabled
+	disabled,
+	addons,
+	index,
+	stateKeyPrefix
 }: {
 	text: string;
 	icon?: string;
@@ -85,37 +83,48 @@ export default function Button({
 	subButton?: {
 		text: string;
 		icon?: string;
+		index?: string | number;
 		properties?: {
 			risky?: boolean;
 			doubleClick?: boolean;
 			icon?: string;
+			addons?: Addons[];
 		};
 		risky?: boolean;
 	};
 	disabled?: boolean;
+	addons?: Addons[];
+	index?: string | number;
+	stateKeyPrefix?: string;
 }) {
-	const buttons: ButtonProperties[] = [{ text, icon, risky }];
+	const buttons: ButtonProperties[] = [{ text, icon, risky, addons, index: index ?? "button" }];
 	if (subButton) {
 		buttons.push({
 			text: subButton.text,
 			icon: subButton.icon ?? subButton.properties?.icon,
-			risky: subButton.properties?.risky ?? subButton.risky
+			risky: subButton.properties?.risky ?? subButton.risky,
+			addons: subButton.properties?.addons,
+			index: subButton.index ?? `${index ?? "button"}_Sub`
 		});
 	}
 
 	return (
-		<div className={cn("flex flex-row items-center w-full", subButton && "gap-[6px]")}>
+		<div className="flex flex-row items-center w-full gap-[6px]">
 			{buttons.map((button, buttonIndex) => (
-				<ButtonBase
-					key={buttonIndex}
-					containerClassName={subButton ? "flex-1" : undefined}
-					className={cn("justify-center", button.risky && "text-[var(--red-color)]")}
-					disabled={disabled}
-				>
-					<ButtonText icon={button.icon} disabled={disabled} className={cn("justify-center text-center", button.risky && "text-inherit")}>
-						{button.text}
-					</ButtonText>
-				</ButtonBase>
+				<div key={buttonIndex} className="flex flex-1 min-w-0 flex-row items-center gap-[6px] h-[21px]">
+					<ButtonBase
+						containerClassName="flex-1"
+						className={cn("justify-center", button.risky && "text-[var(--red-color)]")}
+						disabled={disabled}
+					>
+						<ButtonText icon={button.icon} disabled={disabled} className={cn("justify-center text-center", button.risky && "text-inherit")}>
+							<Label className="w-auto text-inherit truncate" doesWrap={false}>
+								{button.text}
+							</Label>
+						</ButtonText>
+					</ButtonBase>
+					{renderAddonItems(button.index ?? buttonIndex, button.addons, stateKeyPrefix, "outline-offset-[-1px]")}
+				</div>
 			))}
 		</div>
 	);

@@ -101,6 +101,7 @@ export interface ButtonElement extends BaseElement {
 			risky?: boolean;
 			doubleClick?: boolean;
 			icon?: string;
+			addons?: Addons[] | undefined;
 		};
 	};
 }
@@ -117,6 +118,8 @@ export interface DropdownElement extends BaseElement {
 		keepDisabledValuePosition?: boolean;
 		disabledValues?: string[] | { [key: string]: unknown };
 		valueImages?: { [key: string]: string };
+		listLabels?: { [key: string]: string };
+		displayLabels?: { [key: string]: string };
 		multi?: boolean;
 		searchable?: boolean;
 		allowNull?: boolean;
