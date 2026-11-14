@@ -168,28 +168,44 @@ The groupbox is placed in the main "Addons" subtab by default. If `SubTab = true
 ---
 
 ### SubTab
-Only available when `SubTab = true` is set in [AddonInfo](#addoninfo), otherwise it is `nil`. It is the addon's own subtab and lets you create as many groupboxes as you want next to the default `mspaint.Groupbox`.
+Only available when `SubTab = true` is set in [AddonInfo](#addoninfo), otherwise it is `nil`. It is the addon's own subtab and lets you create as many groupboxes and tabboxes as you want next to the default `mspaint.Groupbox`.
 
-The following methods are available:
+It exposes every Obsidian [subtab](/obsidian/structure/tabs#sub-tabs) method, for example:
 
 <TypeTable
   type={{
+    AddGroupbox: {
+      description: 'Creates a groupbox from an info table, see [Groupboxes](/obsidian/structure/groupboxes).',
+      type: '(info: table) => Groupbox'
+    },
+    AddTabbox: {
+      description: 'Creates a tabbox from an info table, see [Tabboxes](/obsidian/structure/tabboxes).',
+      type: '(info: table) => Tabbox'
+    },
     AddLeftGroupbox: {
-      description: 'Creates a groupbox on the left side of the subtab.',
+      description: 'Deprecated, creates a groupbox on the left side of the subtab.',
       type: '(name: string, iconName: string?) => Groupbox'
     },
     AddRightGroupbox: {
-      description: 'Creates a groupbox on the right side of the subtab.',
+      description: 'Deprecated, creates a groupbox on the right side of the subtab.',
       type: '(name: string, iconName: string?) => Groupbox'
     },
-    AddGroupbox: {
-      description: 'Creates a groupbox from an info table (same as Obsidian\'s `:AddGroupbox()`).',
-      type: '(info: table) => Groupbox'
+    AddLeftTabbox: {
+      description: 'Deprecated, creates a tabbox on the left side of the subtab.',
+      type: '(name: string) => Tabbox'
+    },
+    AddRightTabbox: {
+      description: 'Deprecated, creates a tabbox on the right side of the subtab.',
+      type: '(name: string) => Tabbox'
+    },
+    UpdateWarningBox: {
+      description: 'Shows a warning box at the top of the subtab.',
+      type: '(info: table) => ()'
     }
   }}
 />
 
-The returned groupboxes work like `mspaint.Groupbox`. Toggles and options created in them are available in the global `Toggles` and `Options` tables and are removed when the addon is reloaded.
+Everything created from it (groupboxes, tabboxes, tabbox tabs, dependency boxes and elements) works like `mspaint.Groupbox`. Toggles and options created in them are available in the global `Toggles` and `Options` tables and are removed when the addon is reloaded.
 
 **Example**
 ```lua
@@ -225,6 +241,15 @@ MiscBox:AddButton({
     Func = function()
         print("Clicked!")
     end
+})
+
+-- Tabboxes
+local SettingsTabbox = mspaint.SubTab:AddTabbox({ Side = "Right", Name = "Settings" })
+local GeneralTab = SettingsTabbox:AddTab("General", "settings")
+
+GeneralTab:AddToggle("AutoSave", {
+    Text = "Auto Save",
+    Default = true
 })
 ```
 
